@@ -17,7 +17,7 @@ def update_sensor_interval(request, sensorId):
     """
     if request.method == 'POST':
         try:
-            sensor = SensorConfig.objects.get(sensorId=sensorId)
+            sensor = SensorConfig.objects.get(id=sensorId)
         except ObjectDoesNotExist:
             return JsonResponse({'error': f'Sensor with sensorId {sensorId} not found.'}, status=404)
 

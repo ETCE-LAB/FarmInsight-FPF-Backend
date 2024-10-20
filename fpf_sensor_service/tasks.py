@@ -11,13 +11,13 @@ def generate_measurement(sensor):
     :param sensor: Sensor to measure
     """
     try:
-        db_sensor = SensorConfig.objects.get(sensorId=sensor.sensorId)
+        db_sensor = SensorConfig.objects.get(id=sensor.id)
         SensorMeasurement.objects.create(
-            sensorId=db_sensor.sensorId,
+            sensor_id=db_sensor.id,
             value=random.uniform(20.0, 100.0)
         )
     except SensorConfig.DoesNotExist:
-        print(f"SensorConfig with sensorId {sensor.sensorId} does not exist.")
+        print(f"SensorConfig with sensorId {sensor.id} does not exist.")
     except ValueError as e:
         print(f"Invalid UUID format: {e}")
 
@@ -28,14 +28,14 @@ def send_measurements(sensorId):
     If succeeded, delete entries from local database.
     :param sensorId: GUID of sensor
     """
-    measurements = SensorMeasurement.objects.filter(sensorId=sensorId)
+    measurements = SensorMeasurement.objects.filter(sensor_id=sensorId)
     if measurements.exists():
         data = [
             {'measuredAt': m.measuredAt.isoformat(), 'value': m.value}
             for m in measurements
         ]
 
-        url = f"{settings.MEASUREMENTS_BASE_URL}/measurements/{sensorId}"
+        url = f"{settings.MEASUREMENTS_BASE_URL}/api/measurements/{sensorId}"
         response = requests.post(url, json={'measurements': data})
 
         if response.status_code == 200:
