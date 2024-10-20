@@ -36,7 +36,7 @@ def send_measurements(sensorId):
         ]
 
         url = f"{settings.MEASUREMENTS_BASE_URL}/api/measurements/{sensorId}"
-        response = requests.post(url, json={'measurements': data})
+        response = requests.post(url, json=data)
 
         if response.status_code == 201:
             measurements.delete()
