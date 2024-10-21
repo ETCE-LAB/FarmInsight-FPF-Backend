@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 
+
 class SensorConfig(models.Model):
     """
     SensorConfig model with the id as a GUID and the intervall as an Integer
