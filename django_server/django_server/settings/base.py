@@ -1,12 +1,13 @@
 import os
 import environ
+from pathlib import Path
 
 # Initialize environment variables
 env = environ.Env()
 
 # Paths
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 # Common settings
 SECRET_KEY = env('SECRET_KEY', default='your-default-secret-key')
 DEBUG = False
