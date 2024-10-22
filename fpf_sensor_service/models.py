@@ -7,7 +7,7 @@ class SensorConfig(models.Model):
     SensorConfig model with the id as a GUID and the intervall as an Integer
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    intervallSeconds = models.IntegerField()
+    intervalSeconds = models.IntegerField()
 
 
 class SensorMeasurement(models.Model):
