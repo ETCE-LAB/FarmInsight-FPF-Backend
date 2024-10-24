@@ -34,7 +34,7 @@ def start_scheduler():
         scheduler.add_job(
             schedule_sensor_task,
             'interval',
-            seconds=sensor.intervallSeconds,
+            seconds=sensor.intervalSeconds,
             args=[sensor]
         )
         logging.info(f"Scheduled task for sensor: {sensor.id}")
