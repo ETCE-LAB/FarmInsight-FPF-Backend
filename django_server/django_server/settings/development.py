@@ -1,4 +1,5 @@
 from .base import *
+import colorlog
 
 # Enable debug mode for development
 DEBUG = True
@@ -14,16 +15,36 @@ MEASUREMENTS_BASE_URL = env('MEASUREMENTS_BASE_URL')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'colored': {
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s%(levelname)s: %(message)s',
+            'log_colors': {
+                'DEBUG': 'blue',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'bold_red',
+            },
+        },
+    },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'colored',
+            'level': 'DEBUG',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'fpf_sensor_service': {
+            'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
         },
     },
 }

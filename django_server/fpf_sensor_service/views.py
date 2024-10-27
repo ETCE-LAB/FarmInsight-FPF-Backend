@@ -2,9 +2,11 @@ from django.http import JsonResponse
 from .models import SensorConfig
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
-import json
-import logging
+from rest_framework.parsers import JSONParser
 from fpf_sensor_service.scheduler import scheduler
+from fpf_sensor_service.logging_utils import get_logger
+from fpf_sensor_service.serializers import SensorConfigSerializer
+logger = get_logger()
 
 
 @csrf_exempt
@@ -21,28 +23,25 @@ def update_sensor_interval(request, sensorId):
         except ObjectDoesNotExist:
             return JsonResponse({'error': f'Sensor with sensorId {sensorId} not found.'}, status=404)
 
-        try:
-            body_unicode = request.body.decode('utf-8')
-            body_data = json.loads(body_unicode)
-            interval_seconds = body_data.get('intervalSeconds')
-        except (ValueError, KeyError):
-            return JsonResponse({'error': 'Invalid JSON or missing "intervalSeconds"'}, status=400)
+        data = JSONParser().parse(request)
+        serializer = SensorConfigSerializer(sensor, data=data, partial=True)
 
-        if interval_seconds:
-            sensor.intervallSeconds = int(interval_seconds)
-            sensor.save()
+        # Validate and update if valid
+        if serializer.is_valid():
+            serializer.save()
 
-            # Update the existing job's interval in APScheduler
+            # Update the job in APScheduler
             job_id = f"sensor_{sensorId}"
-
-            # Modify the existing job if it exists, otherwise log an error
             job = scheduler.get_job(job_id)
             if job:
-                scheduler.reschedule_job(job_id, trigger='interval', seconds=sensor.intervallSeconds)
-                logging.info(f"Updated interval for sensor {sensorId} to {sensor.intervallSeconds} seconds")
-                return JsonResponse({'status': 'success', 'sensorId': sensorId, 'newInterval': sensor.intervallSeconds})
+                scheduler.reschedule_job(job_id, trigger='interval', seconds=sensor.intervalSeconds)
+                logger.info(f"Updated interval for sensor {sensorId} to {sensor.intervalSeconds} seconds")
+                return JsonResponse({'status': 'success', 'sensorId': sensorId, 'newInterval': sensor.intervalSeconds})
             else:
-                logging.error(f"No job found for sensor {sensorId}")
+                logger.error(f"No job found for sensor {sensorId}")
                 return JsonResponse({'error': f'No scheduled job found for sensor {sensorId}'}, status=404)
+        else:
+            # Return serializer errors if validation fails
+            return JsonResponse(serializer.errors, status=400)
 
-        return JsonResponse({'error': 'intervalSeconds not provided'}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
