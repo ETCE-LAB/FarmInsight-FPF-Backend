@@ -53,7 +53,18 @@ python manage.py runserver
 ```
 
 ## Running the Application
+You can start the app with the following command.
+In development mode, there are predefined settings (e.g. a default port) in order for the app to work seamlessly with other FarmInsight projects.
+Start the app with:
+```
+python manage.py runserver
+```
+Otherwise, you can also specify the port yourself:
+```
+python manage.py runserver 8002
+```
 On server startup, the scheduler starts automatically.
+
 ## API Endpoints
 Here are some of the key API endpoints for the sensor service:
 
