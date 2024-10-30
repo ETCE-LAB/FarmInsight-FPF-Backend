@@ -2,7 +2,7 @@ import random
 from .models import SensorConfig, SensorMeasurement
 import requests
 from django.conf import settings
-from fpf_sensor_service.logging_utils import get_logger
+from fpf_sensor_service.utils.logging_utils import get_logger
 
 logger = get_logger()
 

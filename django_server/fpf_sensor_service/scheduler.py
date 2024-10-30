@@ -1,11 +1,9 @@
-import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from fpf_sensor_service.models import SensorConfig
 from fpf_sensor_service.tasks import generate_measurement, send_measurements
-from fpf_sensor_service.logging_utils import get_logger
+from fpf_sensor_service.utils.logging_utils import get_logger
 
 logger = get_logger()
-# Set scheduler
 scheduler = BackgroundScheduler()
 
 

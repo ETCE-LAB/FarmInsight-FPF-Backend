@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SensorConfig
+from fpf_sensor_service.models.sensor_config import SensorConfig
 
 
 class SensorConfigSerializer(serializers.ModelSerializer):
