@@ -2,6 +2,9 @@ import random
 from .models import SensorConfig, SensorMeasurement
 import requests
 from django.conf import settings
+from fpf_sensor_service.utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 def generate_measurement(sensor):
@@ -11,15 +14,16 @@ def generate_measurement(sensor):
     :param sensor: Sensor to measure
     """
     try:
+        logger.info(f"Run measurement for {sensor.id}.")
         db_sensor = SensorConfig.objects.get(id=sensor.id)
         SensorMeasurement.objects.create(
             sensor_id=db_sensor.id,
             value=random.uniform(20.0, 100.0)
         )
     except SensorConfig.DoesNotExist:
-        print(f"SensorConfig with sensorId {sensor.id} does not exist.")
+        logger.error(f"SensorConfig with sensorId {sensor.id} does not exist.")
     except ValueError as e:
-        print(f"Invalid UUID format: {e}")
+        logger.error(f"Invalid UUID format: {e}")
 
 
 def send_measurements(sensorId):
@@ -41,4 +45,4 @@ def send_measurements(sensorId):
         if response.status_code == 201:
             measurements.delete()
         else:
-            print('Error sending measurements, will retry.')
+            logger.info('Error sending measurements, will retry.')

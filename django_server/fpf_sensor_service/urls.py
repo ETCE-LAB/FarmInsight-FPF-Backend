@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import post_sensor_interval
 
 urlpatterns = [
-    path('sensorInterval/<str:sensorId>', views.update_sensor_interval, name='update_sensor_interval'),
+    path('sensorInterval/<str:sensorId>', post_sensor_interval, name='update_sensor_interval'),
 ]
