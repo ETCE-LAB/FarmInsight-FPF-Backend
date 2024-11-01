@@ -1,0 +1,1 @@
+from .sensor_config_views import post_sensor_interval
