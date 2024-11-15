@@ -1,1 +1,1 @@
-from .enum_utils import ListableEnum
+from .sensor_connection_types import SensorConnectionTypes

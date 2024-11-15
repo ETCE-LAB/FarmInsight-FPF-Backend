@@ -1,12 +1,5 @@
 import uuid
 from django.db import models
-from fpf_sensor_service.utils import ListableEnum
-
-
-class SensorConnectionTypes(ListableEnum):
-    PinConnection = 'PinConnection'
-    PicoConnection = 'PicoConnection'
-    FarmbotApiConnection = 'FarmbotApiConnection'
 
 
 class SensorConfig(models.Model):
