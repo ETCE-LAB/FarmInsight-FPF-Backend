@@ -15,7 +15,7 @@ class TypedSensorFactory:
 
     def get_available_sensor_types(self):
         return {
-            connection_type: sensor_class.get_required_fields() for connection_type, sensor_class in self.registry
+            connection_type.value: sensor_class.get_required_fields() for connection_type, sensor_class in self.registry.items()
         }
 
     def get_typed_sensor(self, sensor_model: SensorConfig) -> TypedSensor:

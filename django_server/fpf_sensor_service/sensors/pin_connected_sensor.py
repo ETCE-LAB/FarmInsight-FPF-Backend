@@ -11,7 +11,7 @@ class PinConnectedSensor(TypedSensor):
     def get_required_fields():
         return {
             'Pin': {
-                'Type': 'number',
+                'type': 'number',
             }
         }
 

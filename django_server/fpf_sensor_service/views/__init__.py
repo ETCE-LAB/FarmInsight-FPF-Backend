@@ -1,1 +1,1 @@
-from .sensor_config_views import post_sensor_interval
+from .sensor_config_views import post_sensor_interval, get_available_sensor_types

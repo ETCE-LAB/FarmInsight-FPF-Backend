@@ -4,6 +4,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from fpf_sensor_service.services.sensor_config_services import update_sensor_interval
+from fpf_sensor_service.sensors import TypedSensorFactory
+
+
+typed_sensor_factory = TypedSensorFactory()
 
 
 @api_view(['POST'])
@@ -17,3 +21,8 @@ def post_sensor_interval(request, sensorId):
     data = JSONParser().parse(request)
     response = update_sensor_interval(data, sensorId)
     return JsonResponse(response['data'], status=response['status'])
+
+
+@api_view(['GET'])
+def get_available_sensor_types(request):
+    return Response(typed_sensor_factory.get_available_sensor_types())
