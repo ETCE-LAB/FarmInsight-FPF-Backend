@@ -1,4 +1,4 @@
-# FarmInsight-Sensor-Integration
+# FarmInsight-FPF-Backend
 
 A Django-based sensor service that allows configuring sensors, collecting sensor data, and sending it to a remote system based on configurable intervals.
 
