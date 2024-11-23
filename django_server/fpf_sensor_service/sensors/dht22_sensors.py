@@ -21,7 +21,9 @@ class PinDHT22HumiditySensor(TypedSensor):
             name='DHT22',
             connection=ConnectionType.PIN,
             parameter='humidity',
-            tags={},
+            tags={
+                'info': 'minimum interval 3 seconds.'
+            },
             fields=[
                 FieldDescription(
                     name='pin',
@@ -56,7 +58,9 @@ class PinDHT22TemperatureSensor(TypedSensor):
             name='DHT22',
             connection=ConnectionType.PIN,
             parameter='humidity',
-            tags={},
+            tags={
+                'info': 'minimum interval 3 seconds.'
+            },
             fields=[
                 FieldDescription(
                     name='pin',
