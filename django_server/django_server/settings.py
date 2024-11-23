@@ -2,19 +2,16 @@ import os
 import environ
 from pathlib import Path
 
-# Initialize environment variables
-env = environ.Env()
 
-# Paths
-#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Common settings
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.dev'))
+
 SECRET_KEY = env('SECRET_KEY', default='your-default-secret-key')
-DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Installed apps common to all environments
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,13 +19,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Additional apps
     'rest_framework',
     'fpf_sensor_service',
 ]
 
-# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -59,7 +53,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_server.wsgi.application'
 
-# Use the local SQLite database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -67,12 +60,54 @@ DATABASES = {
     }
 }
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+
+SERVER_PORT = env('SERVER_PORT', default=8001)
+
+DEBUG = env('DEBUG', default='True') == 'True'
+
+MEASUREMENTS_BASE_URL = env('MEASUREMENTS_BASE_URL')
+GENERATE_MEASUREMENTS = env('GENERATE_MEASUREMENTS', default='False') == 'True'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'colored': {
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s%(levelname)s: %(message)s',
+            'log_colors': {
+                'DEBUG': 'blue',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'bold_red',
+            },
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'colored',
+            'level': 'DEBUG',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'fpf_sensor_service': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

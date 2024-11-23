@@ -1,15 +1,15 @@
 import os
 import sys
 
+from django_server import settings
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_server.settings.development')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_server.settings')
 
-    # Set default port in dev mode
-    if os.getenv("DJANGO_SETTINGS_MODULE") == "django_server.settings.development":
-        from django.core.management.commands.runserver import Command as runserver
-        runserver.default_port = "8001"
+    from django.core.management.commands.runserver import Command as runserver
+    runserver.default_port = settings.SERVER_PORT
 
     try:
         from django.core.management import execute_from_command_line

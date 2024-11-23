@@ -1,0 +1,77 @@
+import json
+
+from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
+    FieldType, IntRangeRuleInclusive
+
+#from adafruit_blinka.microcontroller.bcm283x.pin import Pin
+#from adafruit_dht import DHT22
+
+
+class PinDHT22HumiditySensor(TypedSensor):
+    pin = None
+
+    def init_additional_information(self):
+        additional_information = json.loads(self.sensor_config.additionalInformation)
+        self.pin = additional_information['pin']
+
+    @staticmethod
+    def get_description() -> SensorDescription:
+        return SensorDescription(
+            id='7711013a-d9f6-4990-9d9b-7222ff98ca9f',
+            name='DHT22',
+            connection=ConnectionType.PIN,
+            parameter='humidity',
+            tags={},
+            fields=[
+                FieldDescription(
+                    name='pin',
+                    type=FieldType.INTEGER,
+                    rules=[
+                        IntRangeRuleInclusive(
+                            min=1,
+                            max=40
+                        ),
+                    ]
+                ),
+            ]
+        )
+
+    def get_measurement(self):
+        pass
+        #dhtDevice = DHT22(Pin(self.pin))
+        #return dhtDevice.humidity
+
+
+class PinDHT22TemperatureSensor(TypedSensor):
+    pin = None
+
+    def init_additional_information(self):
+        additional_information = json.loads(self.sensor_config.additionalInformation)
+        self.pin = additional_information['pin']
+
+    @staticmethod
+    def get_description() -> SensorDescription:
+        return SensorDescription(
+            id='5464114a-443f-4c56-a864-abc415b3d3a2',
+            name='DHT22',
+            connection=ConnectionType.PIN,
+            parameter='humidity',
+            tags={},
+            fields=[
+                FieldDescription(
+                    name='pin',
+                    type=FieldType.INTEGER,
+                    rules=[
+                        IntRangeRuleInclusive(
+                            min=1,
+                            max=40
+                        ),
+                    ]
+                ),
+            ]
+        )
+
+    def get_measurement(self):
+        pass
+        #dhtDevice = DHT22(Pin(self.pin))
+        #return dhtDevice.temperature
