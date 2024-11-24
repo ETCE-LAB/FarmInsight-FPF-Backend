@@ -5,12 +5,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from django_server import settings
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement
-from fpf_sensor_service.sensors import TypedSensor, typed_sensor_factory
+from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
 from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
 scheduler = BackgroundScheduler()
+typed_sensor_factory = TypedSensorFactory()
 
 
 def send_measurements(sensor_id):

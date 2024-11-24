@@ -2,8 +2,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from fpf_sensor_service.serializers import SensorDescriptionSerializer
 from fpf_sensor_service.services import create_sensor_config, update_sensor_config, get_sensor_config
-from fpf_sensor_service.sensors import typed_sensor_factory
+from fpf_sensor_service.sensors import TypedSensorFactory
+
+
+typed_sensor_factory = TypedSensorFactory()
 
 
 @api_view(['POST'])
@@ -26,5 +31,7 @@ def get_sensor(request, sensor_id):
 
 @api_view(['GET'])
 def get_available_sensor_types(request):
-    return Response(typed_sensor_factory.get_available_sensor_types())
+    sensor_types = typed_sensor_factory.get_available_sensor_types()
+    serializer = SensorDescriptionSerializer(sensor_types, many=True)
+    return Response(serializer.data)
 

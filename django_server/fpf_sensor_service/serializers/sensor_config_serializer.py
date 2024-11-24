@@ -5,9 +5,12 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from fpf_sensor_service.models.sensor_config import SensorConfig
-from fpf_sensor_service.sensors import typed_sensor_factory
+from fpf_sensor_service.sensors import TypedSensorFactory
 from fpf_sensor_service.sensors.typed_sensor import FieldType, IntRangeRuleInclusive
 from fpf_sensor_service.utils import is_uuid
+
+
+typed_sensor_factory = TypedSensorFactory()
 
 
 class JSONStringField(serializers.Field):
