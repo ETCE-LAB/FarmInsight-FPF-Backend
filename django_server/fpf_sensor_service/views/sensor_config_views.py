@@ -7,24 +7,28 @@ from fpf_sensor_service.sensors import typed_sensor_factory
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def post_sensor(request):
     serializer = create_sensor_config(request.data)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['PUT'])
-def update_sensor(request, sensor_id):
+@permission_classes([IsAuthenticated])
+def put_sensor(request, sensor_id):
     serializer = update_sensor_config(request.data, sensor_id)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_sensor(request, sensor_id):
     serializer = get_sensor_config(sensor_id)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_available_sensor_types(request):
     return Response(typed_sensor_factory.get_available_sensor_types())
 

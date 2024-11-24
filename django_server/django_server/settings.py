@@ -1,4 +1,5 @@
 import os
+
 import environ
 from pathlib import Path
 
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'fpf_sensor_service',
+    'oauth2_provider',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +76,22 @@ DEBUG = env('DEBUG', default='True') == 'True'
 
 MEASUREMENTS_BASE_URL = env('MEASUREMENTS_BASE_URL')
 GENERATE_MEASUREMENTS = env('GENERATE_MEASUREMENTS', default='False') == 'True'
+
+DASHBOARD_BACKEND_USER_ID = env('DASHBOARD_BACKEND_USER_ID')
+
+OAUTH2_PROVIDER = {
+    'SCOPES': {"openid": ''},
+    'RESOURCE_SERVER_INTROSPECTION_URL': env('RESOURCE_SERVER_INTROSPECTION_URL', default='https://development-isse-identityserver.azurewebsites.net/connect/introspect'),
+    'RESOURCE_SERVER_INTROSPECTION_CREDENTIALS': ('interactive', ''),
+    'OAUTH2_VALIDATOR_CLASS': 'fpf_sensor_service.custom_oauth_validator.CustomOAuth2Validator',
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ),
+}
+
 
 LOGGING = {
     'version': 1,

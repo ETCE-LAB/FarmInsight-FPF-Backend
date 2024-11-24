@@ -2,15 +2,35 @@ import random
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
+from requests.auth import HTTPBasicAuth
 
 from django_server import settings
-from fpf_sensor_service.models import SensorConfig, SensorMeasurement
+from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
 from fpf_sensor_service.sensors import TypedSensor, typed_sensor_factory
 from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
 scheduler = BackgroundScheduler()
+
+
+def get_or_request_api_key() -> str or None:
+    api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
+    if not api_key:
+        fpf_id = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
+        if not fpf_id:
+            logger.error('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
+            return None
+
+        url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_id}/api-key"
+        response = requests.get(url)
+        if response.status_code != 200:
+            logger.error('!!! Request for new API Key failed !!!')
+        else:
+            api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
+            if api_key:
+                return api_key.value
+    return None
 
 
 def send_measurements(sensor_id):
@@ -27,12 +47,16 @@ def send_measurements(sensor_id):
         ]
 
         url = f"{settings.MEASUREMENTS_BASE_URL}/api/measurements/{sensor_id}"
-        response = requests.post(url, json=data)
 
-        if response.status_code == 201:
-            measurements.delete()
-        else:
-            logger.info('Error sending measurements, will retry.')
+        api_key = get_or_request_api_key()
+        if api_key is not None:
+            auth = HTTPBasicAuth('Token', api_key)
+            response = requests.post(url, json=data, auth=auth)
+
+            if response.status_code == 201:
+                measurements.delete()
+            else:
+                logger.info('Error sending measurements, will retry.')
 
 
 def schedule_task(sensor: TypedSensor):
