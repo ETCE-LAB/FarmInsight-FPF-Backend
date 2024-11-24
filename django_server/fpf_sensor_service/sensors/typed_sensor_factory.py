@@ -6,14 +6,17 @@ from fpf_sensor_service.serializers.sensor_description_serializer import SensorD
 
 
 class TypedSensorFactory:
-    def __init__(self, **kwargs):
-        self.registry = {}
-        for sensor_class in TypedSensor.__subclasses__():
-            description = sensor_class.get_description()
-            if description.id in self.registry:
-                raise Exception("Multiple typed sensors with the same id detected!!")
+    registry = None
 
-            self.registry[description.id] = sensor_class
+    def __init__(self, **kwargs):
+        if self.registry is None:
+            self.registry = {}
+            for sensor_class in TypedSensor.__subclasses__():
+                description = sensor_class.get_description()
+                if description.id in self.registry:
+                    raise Exception("Multiple typed sensors with the same id detected!!")
+
+                self.registry[description.id] = sensor_class
 
     def get_available_sensor_types(self) -> list[SensorDescription]:
         return [
