@@ -21,7 +21,7 @@ class TypedSensorFactory:
         ]
 
     def get_typed_sensor(self, sensor_model: SensorConfig) -> TypedSensor:
-        return self.registry[sensor_model.sensorClassId](sensor_model)
+        return self.registry[str(sensor_model.sensorClassId)](sensor_model)
 
     def get_typed_sensor_class(self, sensor_class_id: str) -> Type[TypedSensor]:
         return self.registry[sensor_class_id]
