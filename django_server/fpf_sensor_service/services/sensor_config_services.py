@@ -33,9 +33,8 @@ def update_sensor_config(data, sensor_id) -> SensorConfigSerializer:
     :return: Response data and status
     """
     sensor = SensorConfig.objects.get(id=sensor_id)
-
     serializer = SensorConfigSerializer(sensor, data=data, partial=True)
-    if serializer.is_valid():
+    if serializer.is_valid(raise_exception=True):
         sensor_config = serializer.save()
         reschedule_task(sensor_config)
 

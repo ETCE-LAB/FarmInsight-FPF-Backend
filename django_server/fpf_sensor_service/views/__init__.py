@@ -1,1 +1,1 @@
-from .sensor_config_views import update_sensor, get_available_sensor_types, post_sensor, get_sensor
+from .sensor_config_views import get_available_sensor_types, post_sensor, SensorView

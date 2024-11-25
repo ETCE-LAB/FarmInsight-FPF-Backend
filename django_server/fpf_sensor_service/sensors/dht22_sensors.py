@@ -17,7 +17,7 @@ class PinDHT22HumiditySensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            id='7711013a-d9f6-4990-9d9b-7222ff98ca9f',
+            sensor_class_id='7711013a-d9f6-4990-9d9b-7222ff98ca9f',
             name='DHT22',
             connection=ConnectionType.PIN,
             parameter='humidity',
@@ -54,7 +54,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            id='5464114a-443f-4c56-a864-abc415b3d3a2',
+            sensor_class_id='5464114a-443f-4c56-a864-abc415b3d3a2',
             name='DHT22',
             connection=ConnectionType.PIN,
             parameter='humidity',

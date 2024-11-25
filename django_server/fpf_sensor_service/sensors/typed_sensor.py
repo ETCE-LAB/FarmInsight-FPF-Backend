@@ -38,7 +38,7 @@ class SensorDescription(NamedTuple):
 
     !!! NEVER CHANGE OR DELETE THESE, the DB will store them to identify the class !!!
     """
-    id: str
+    sensor_class_id: str
     name: str
     connection: ConnectionType
     parameter: str

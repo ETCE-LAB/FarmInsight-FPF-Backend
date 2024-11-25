@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from fpf_sensor_service.serializers import SensorDescriptionSerializer
 from fpf_sensor_service.services import create_sensor_config, update_sensor_config, get_sensor_config
@@ -17,16 +18,14 @@ def post_sensor(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view(['PUT'])
-def update_sensor(request, sensor_id):
-    serializer = update_sensor_config(request.data, sensor_id)
-    return Response(serializer.data)
+class SensorView(APIView):
+    def get(self, request, sensor_id):
+        serializer = get_sensor_config(sensor_id)
+        return Response(serializer.data)
 
-
-@api_view(['GET'])
-def get_sensor(request, sensor_id):
-    serializer = get_sensor_config(sensor_id)
-    return Response(serializer.data)
+    def put(self, request, sensor_id):
+        serializer = update_sensor_config(request.data, sensor_id)
+        return Response(serializer.data)
 
 
 @api_view(['GET'])

@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import NamedTuple
 
 from rest_framework import serializers
 
@@ -49,7 +48,7 @@ class FieldDescriptionSerializer(serializers.Serializer):
 
 
 class SensorDescriptionSerializer(serializers.Serializer):
-    id = serializers.CharField()
+    sensorClassId = serializers.CharField(source="sensor_class_id")
     name = serializers.CharField()
     connection = EnumField(enum_class=ConnectionType)
     parameter = serializers.CharField()

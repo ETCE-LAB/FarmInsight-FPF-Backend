@@ -13,10 +13,10 @@ class TypedSensorFactory:
             self.registry = {}
             for sensor_class in TypedSensor.__subclasses__():
                 description = sensor_class.get_description()
-                if description.id in self.registry:
+                if description.sensor_class_id in self.registry:
                     raise Exception("Multiple typed sensors with the same id detected!!")
 
-                self.registry[description.id] = sensor_class
+                self.registry[description.sensor_class_id] = sensor_class
 
     def get_available_sensor_types(self) -> list[SensorDescription]:
         return [
