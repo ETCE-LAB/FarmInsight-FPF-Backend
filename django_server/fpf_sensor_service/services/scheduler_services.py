@@ -6,12 +6,13 @@ from requests.auth import HTTPBasicAuth
 
 from django_server import settings
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
-from fpf_sensor_service.sensors import TypedSensor, typed_sensor_factory
+from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
 from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
 scheduler = BackgroundScheduler()
+typed_sensor_factory = TypedSensorFactory()
 
 
 def get_or_request_api_key() -> str or None:
@@ -84,15 +85,16 @@ def schedule_task(sensor: TypedSensor):
 
 def reschedule_task(sensor_config: SensorConfig):
     job_id = f"sensor_{sensor_config.id}"
-    job = scheduler.get_job(job_id)
 
-    sensor_class = typed_sensor_factory.get_typed_sensor_class(sensor_config)
+
+    sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
     sensor = sensor_class(sensor_config)
 
+    job = scheduler.get_job(job_id)
     if job:
-        scheduler.reschedule_job(job_id, trigger='interval', seconds=sensor_config.intervalSeconds, args=[sensor])
-    else:
-        schedule_task(sensor)
+        scheduler.remove_job(job_id)
+
+    schedule_task(sensor)
 
 
 def add_scheduler_task(sensor_config: SensorConfig):
