@@ -1,10 +1,11 @@
-import uuid
 from django.db import models
 
 
 class SensorConfig(models.Model):
     """
-    SensorConfig model with the id as a GUID and the intervall as an Integer
+    The ID is provided by the backend!
     """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    intervalSeconds = models.IntegerField()
+    id = models.UUIDField(primary_key=True, editable=False)
+    intervalSeconds = models.IntegerField(blank=False)
+    sensorClassId = models.UUIDField()
+    additionalInformation = models.TextField(blank=True)

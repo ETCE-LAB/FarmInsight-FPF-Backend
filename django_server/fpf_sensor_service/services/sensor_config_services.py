@@ -1,4 +1,5 @@
-from fpf_sensor_service.scheduler import scheduler
+from fpf_sensor_service.services import add_scheduler_task
+from fpf_sensor_service.services.scheduler_services import scheduler, reschedule_task
 from fpf_sensor_service.utils.logging_utils import get_logger
 from fpf_sensor_service.models.sensor_config import SensorConfig
 from fpf_sensor_service.serializers.sensor_config_serializer import SensorConfigSerializer
@@ -6,28 +7,35 @@ from fpf_sensor_service.serializers.sensor_config_serializer import SensorConfig
 logger = get_logger()
 
 
-def update_sensor_interval(data, sensorId):
+def get_sensor_config(sensor_id: str) -> SensorConfigSerializer:
+    sensor_config = SensorConfig.objects.get(id=sensor_id)
+    return SensorConfigSerializer(sensor_config)
+
+
+def create_sensor_config(data) -> SensorConfigSerializer:
+    serializer = SensorConfigSerializer(data=data)
+    if serializer.is_valid(raise_exception=True):
+        sensor_config = SensorConfig(**serializer.validated_data)
+        # need to make sure that we use the same ID as the dashboard backend and Serializer doesn't do that
+        sensor_config.id = data['id']
+        sensor_config.save()
+
+        add_scheduler_task(sensor_config)
+
+        return SensorConfigSerializer(sensor_config)
+
+
+def update_sensor_config(data, sensor_id) -> SensorConfigSerializer:
     """
     Update the sensor interval on SQLite db and update the scheduling job interval.
     :param data: Parsed data from the request
-    :param sensorId: GUID of sensor which must already exist in the database
+    :param sensor_id: GUID of sensor which must already exist in the database
     :return: Response data and status
     """
-    try:
-        sensor = SensorConfig.objects.get(id=sensorId)
-    except SensorConfig.DoesNotExist:
-        return {'data': {'error': f'Sensor with sensorId {sensorId} not found.'}, 'status': 404}
-
+    sensor = SensorConfig.objects.get(id=sensor_id)
     serializer = SensorConfigSerializer(sensor, data=data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        job_id = f"sensor_{sensorId}"
-        job = scheduler.get_job(job_id)
-        if job:
-            scheduler.reschedule_job(job_id, trigger='interval', seconds=sensor.intervalSeconds)
-            return {'data': {'status': 'success', 'sensorId': sensorId, 'newInterval': sensor.intervalSeconds},
-                    'status': 200}
-        else:
-            return {'data': {'error': f'No scheduled job found for sensor {sensorId}'}, 'status': 404}
-    else:
-        return {'data': serializer.errors, 'status': 400}
+    if serializer.is_valid(raise_exception=True):
+        sensor_config = serializer.save()
+        reschedule_task(sensor_config)
+
+    return serializer
