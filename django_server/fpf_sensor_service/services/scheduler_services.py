@@ -31,7 +31,7 @@ def get_or_request_api_key() -> str or None:
             api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
             if api_key:
                 return api_key.value
-    return None
+    return api_key.value
 
 
 def send_measurements(sensor_id):
@@ -51,8 +51,10 @@ def send_measurements(sensor_id):
 
         api_key = get_or_request_api_key()
         if api_key is not None:
-            auth = HTTPBasicAuth('Token', api_key)
-            response = requests.post(url, json=data, auth=auth)
+            #auth = HTTPBasicAuth('Token', api_key)
+            response = requests.post(url, json=data, headers={
+                'Authorization': f'ApiKey {api_key}'
+            })
 
             if response.status_code == 201:
                 measurements.delete()
