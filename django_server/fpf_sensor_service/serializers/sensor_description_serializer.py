@@ -49,9 +49,10 @@ class FieldDescriptionSerializer(serializers.Serializer):
 
 class SensorDescriptionSerializer(serializers.Serializer):
     sensorClassId = serializers.CharField(source="sensor_class_id")
-    name = serializers.CharField()
+    model = serializers.CharField()
     connection = EnumField(enum_class=ConnectionType)
     parameter = serializers.CharField()
+    unit = serializers.CharField()
     tags = serializers.DictField(child=serializers.CharField())
     fields = FieldDescriptionSerializer(many=True)
 

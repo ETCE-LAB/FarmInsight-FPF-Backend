@@ -39,9 +39,10 @@ class SensorDescription(NamedTuple):
     !!! NEVER CHANGE OR DELETE THESE, the DB will store them to identify the class !!!
     """
     sensor_class_id: str
-    name: str
+    model: str
     connection: ConnectionType
     parameter: str
+    unit: str
     tags: dict[str, str]
     fields: List[FieldDescription]
 
