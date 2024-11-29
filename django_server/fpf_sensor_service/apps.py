@@ -30,7 +30,7 @@ class SensorAppConfig(AppConfig):
                     retry_count += 1
                 else:
                     self.log.info("Starting APScheduler...")
-                    from fpf_sensor_service.scheduler import start_scheduler
+                    from fpf_sensor_service.services import start_scheduler
                     start_scheduler()
                     self.log.info("APScheduler started successfully.")
                     break

@@ -1,4 +1,4 @@
-# FarmInsight-Sensor-Integration
+# FarmInsight-FPF-Backend
 
 A Django-based sensor service that allows configuring sensors, collecting sensor data, and sending it to a remote system based on configurable intervals.
 
@@ -45,6 +45,10 @@ Setup .env files at:
 Example of .env file:
 ```
 MEASUREMENTS_BASE_URL=http://localhost:3001
+GENERATE_MEASUREMENTS=True
+
+RESOURCE_SERVER_INTROSPECTION_URL=https://development-isse-identityserver.azurewebsites.net/connect/introspect
+DASHBOARD_BACKEND_USER_ID=<ID HERE>
 ```
 
 Run the server via the IDE or via:
