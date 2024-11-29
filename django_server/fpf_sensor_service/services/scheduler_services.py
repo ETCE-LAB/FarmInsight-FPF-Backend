@@ -87,16 +87,11 @@ def schedule_task(sensor: TypedSensor):
 
 def reschedule_task(sensor_config: SensorConfig):
     job_id = f"sensor_{sensor_config.id}"
-
-
-    sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
-    sensor = sensor_class(sensor_config)
-
     job = scheduler.get_job(job_id)
     if job:
         scheduler.remove_job(job_id)
 
-    schedule_task(sensor)
+    add_scheduler_task(sensor_config)
 
 
 def add_scheduler_task(sensor_config: SensorConfig):
