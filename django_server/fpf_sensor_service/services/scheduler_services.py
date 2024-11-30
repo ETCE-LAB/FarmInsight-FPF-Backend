@@ -15,22 +15,27 @@ scheduler = BackgroundScheduler()
 typed_sensor_factory = TypedSensorFactory()
 
 
+def request_api_key() -> str or None:
+    fpf_config = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
+    if not fpf_config:
+        logger.error('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
+        return None
+
+    url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_config.value}/api-key"
+    response = requests.get(url)
+    if response.status_code != 200:
+        logger.error('!!! Request for new API Key failed !!!')
+        return None
+    else:
+        api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
+        if api_key:
+            return api_key.value
+
+
 def get_or_request_api_key() -> str or None:
     api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
     if not api_key:
-        fpf_id = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
-        if not fpf_id:
-            logger.error('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
-            return None
-
-        url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_id}/api-key"
-        response = requests.get(url)
-        if response.status_code != 200:
-            logger.error('!!! Request for new API Key failed !!!')
-        else:
-            api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
-            if api_key:
-                return api_key.value
+        return request_api_key()
     return api_key.value
 
 
@@ -58,6 +63,8 @@ def send_measurements(sensor_id):
 
             if response.status_code == 201:
                 measurements.delete()
+            elif response.status_code == 403:
+                request_api_key()
             else:
                 logger.info('Error sending measurements, will retry.')
 
