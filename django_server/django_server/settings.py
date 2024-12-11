@@ -122,7 +122,7 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'plain',
             'level': 'DEBUG',
-            'filename': '/home/fpf/FarmInsight-FPF-Backend/django_server/myapp.log',
+            'filename': 'myapp.log',
         },
     },
     'loggers': {
