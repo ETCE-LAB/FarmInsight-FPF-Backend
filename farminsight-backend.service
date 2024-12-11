@@ -1,0 +1,12 @@
+[Unit]
+Description=Django Dashboard
+Requires=docker-influxdb.service
+After=docker-influxdb.service
+RequiresMountsFor=/home/fpf/FarmInsight-Dashboard-Backend/django_server /home/fpf/env/bin/python
+
+[Service]
+WorkingDirectory=/home/fpf/FarmInsight-Dashboard-Backend/django_server
+ExecStart=/home/fpf/env/bin/python /home/fpf/FarmInsight-Dashboard-Backend/django_server/manage.py runserver
+
+[Install]
+WantedBy=multi-user.target

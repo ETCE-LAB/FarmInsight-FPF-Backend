@@ -3,8 +3,8 @@ import json
 from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
     FieldType, IntRangeRuleInclusive
 
-#from adafruit_blinka.microcontroller.bcm283x.pin import Pin
-#from adafruit_dht import DHT22
+from adafruit_blinka.microcontroller.bcm283x.pin import Pin
+from adafruit_dht import DHT22
 
 
 class PinDHT22HumiditySensor(TypedSensor):
@@ -40,9 +40,10 @@ class PinDHT22HumiditySensor(TypedSensor):
         )
 
     def get_measurement(self):
-        pass
-        #dhtDevice = DHT22(Pin(self.pin))
-        #return dhtDevice.humidity
+        dhtDevice = DHT22(Pin(self.pin))
+        value = dhtDevice.humidity
+        dhtDevice.exit()
+        return value
 
 
 class PinDHT22TemperatureSensor(TypedSensor):
@@ -78,6 +79,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
         )
 
     def get_measurement(self):
-        pass
-        #dhtDevice = DHT22(Pin(self.pin))
-        #return dhtDevice.temperature
+        dhtDevice = DHT22(Pin(self.pin))
+        value = dhtDevice.temperature
+        dhtDevice.exit()
+        return value

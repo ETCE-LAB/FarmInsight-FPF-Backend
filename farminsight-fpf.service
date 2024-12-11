@@ -1,0 +1,12 @@
+[Unit]
+Description=Django FPF
+Requires=dashboard-backend.service
+After=dashboard-backend.service
+RequiresMountsFor=/home/fpf/FarmInsight-FPF-Backend/django_server /home/fpf/env/bin/python /home/fpf/env/lib/python3.11/site-packages
+
+[Service]
+User=fpf
+ExecStart=/home/fpf/FarmInsight-FPF-Backend/startup.sh
+
+[Install]
+WantedBy=multi-user.target

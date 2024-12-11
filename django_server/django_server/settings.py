@@ -108,6 +108,9 @@ LOGGING = {
                 'CRITICAL': 'bold_red',
             },
         },
+        'plain': {  # Add a new plain formatter for the file handler
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        },
     },
     'handlers': {
         'console': {
@@ -115,15 +118,21 @@ LOGGING = {
             'formatter': 'colored',
             'level': 'DEBUG',
         },
+        'file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'plain',
+            'level': 'DEBUG',
+            'filename': '/home/fpf/FarmInsight-FPF-Backend/django_server/myapp.log',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': True,
         },
         'fpf_sensor_service': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
         },

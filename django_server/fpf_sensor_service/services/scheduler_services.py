@@ -2,7 +2,6 @@ import random
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-from requests.auth import HTTPBasicAuth
 
 from django_server import settings
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
@@ -11,7 +10,7 @@ from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(daemon=False)
 typed_sensor_factory = TypedSensorFactory()
 
 
@@ -56,7 +55,6 @@ def send_measurements(sensor_id):
 
         api_key = get_or_request_api_key()
         if api_key is not None:
-            #auth = HTTPBasicAuth('Token', api_key)
             response = requests.post(url, json=data, headers={
                 'Authorization': f'ApiKey {api_key}'
             })
@@ -121,7 +119,7 @@ def start_scheduler():
     logger.debug(f"Following sensors are configured: {sensors}")
     for sensor in sensors:
         add_scheduler_task(sensor)
-        logger.info(f"Scheduled task for sensor: {sensor.id}")
+        logger.info(f"Scheduled task for sensor: {sensor.id} every {sensor.intervalSeconds}s")
 
     scheduler.start()
 
