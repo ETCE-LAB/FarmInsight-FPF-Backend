@@ -1,16 +1,18 @@
 import random
-
 import requests
+from datetime import timedelta
+
+from django.utils import timezone
+from django_server import settings
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from django_server import settings
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
 from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
 from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
-scheduler = BackgroundScheduler(daemon=False)
+scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
 
 
@@ -67,7 +69,7 @@ def send_measurements(sensor_id):
                 logger.info('Error sending measurements, will retry.')
 
 
-def schedule_task(sensor: TypedSensor):
+def task(sensor: TypedSensor):
     """
     Function to trigger the measurement of the sensor and to send existing measurements.
     Gets called at the configured interval for the sensor.
@@ -103,11 +105,12 @@ def add_scheduler_task(sensor_config: SensorConfig):
     sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
     sensor = sensor_class(sensor_config)
     scheduler.add_job(
-        schedule_task,
+        task,
         trigger='interval',
         seconds=sensor_config.intervalSeconds,
         args=[sensor],
-        id=f"sensor_{sensor_config.id}"
+        id=f"sensor_{sensor_config.id}",
+        next_run_time=timezone.now() + timedelta(seconds=1)
     )
 
 
