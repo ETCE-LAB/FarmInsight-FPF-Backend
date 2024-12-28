@@ -22,7 +22,7 @@ else
 fi
 
 # Start the Django development server
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8001
 
 # Deactivate the virtual environment when done (optional)
 deactivate
