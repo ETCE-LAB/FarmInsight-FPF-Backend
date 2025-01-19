@@ -3,7 +3,7 @@ import json
 import requests
 
 from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
-    FieldType, IntRangeRuleInclusive
+    FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 
 #from adafruit_blinka.microcontroller.bcm283x.pin import Pin
 #from adafruit_dht import DHT22
@@ -110,11 +110,10 @@ class HttpDHT22HumiditySensor(TypedSensor):
             fields=[
                 FieldDescription(
                     name='http',
-                    type=FieldType.INTEGER,
+                    type=FieldType.STRING,
                     rules=[
-                        IntRangeRuleInclusive(
-                            min=1,
-                            max=40
+                        ValidHttpEndpointRule(
+                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
@@ -153,11 +152,10 @@ class HttpDHT22TemperatureSensor(TypedSensor):
             fields=[
                 FieldDescription(
                     name='http',
-                    type=FieldType.INTEGER,
+                    type=FieldType.STRING,
                     rules=[
-                        IntRangeRuleInclusive(
-                            min=1,
-                            max=40
+                        ValidHttpEndpointRule(
+                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
