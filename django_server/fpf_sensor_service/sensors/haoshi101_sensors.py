@@ -3,7 +3,7 @@ import json
 import requests
 
 from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
-    FieldType, FloatRangeRuleInclusive
+    FieldType, ValidHttpEndpointRule
 
 
 class HttpHaoshi101PhSensor(TypedSensor):
@@ -27,11 +27,10 @@ class HttpHaoshi101PhSensor(TypedSensor):
             fields=[
                 FieldDescription(
                     name='http',
-                    type=FieldType.FLOAT,
+                    type=FieldType.STRING,
                     rules=[
-                        FloatRangeRuleInclusive(
-                            min=0.0,
-                            max=14.0
+                        ValidHttpEndpointRule(
+                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
