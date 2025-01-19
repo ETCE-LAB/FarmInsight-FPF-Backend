@@ -13,7 +13,6 @@ class ConnectionType(Enum):
 
 class FieldType(Enum):
     INTEGER = 'int'
-    FLOAT = 'float'
     STRING = 'str'
     SELECT = 'select'
 
@@ -22,9 +21,8 @@ class IntRangeRuleInclusive(NamedTuple):
     min: int
     max: int
 
-class FloatRangeRuleInclusive(NamedTuple):
-    min: float
-    max: float
+class ValidHttpEndpointRule(NamedTuple):
+    regex: str
 
 class FieldDescription(NamedTuple):
     name: str
