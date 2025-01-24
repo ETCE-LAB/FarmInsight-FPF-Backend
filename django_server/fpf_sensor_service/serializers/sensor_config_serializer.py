@@ -1,12 +1,13 @@
 import json
 import uuid
+import re
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from fpf_sensor_service.models.sensor_config import SensorConfig
 from fpf_sensor_service.sensors import TypedSensorFactory
-from fpf_sensor_service.sensors.typed_sensor import FieldType, IntRangeRuleInclusive
+from fpf_sensor_service.sensors.typed_sensor import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 from fpf_sensor_service.utils import is_uuid
 
 
@@ -66,4 +67,9 @@ class SensorConfigSerializer(serializers.ModelSerializer):
                 if isinstance(rule, IntRangeRuleInclusive):
                     if value < rule.min or value > rule.max:
                         raise ValidationError({field.name: f'pin value out of range ({rule.min}, {rule.max}).'})
+                if isinstance(rule, ValidHttpEndpointRule):
+                    if not re.match(rule.regex, value):
+                        raise ValidationError({
+                            field.name: f'Invalid endpoint URL. Expected format: {rule.regex}'
+                        })
         return data
