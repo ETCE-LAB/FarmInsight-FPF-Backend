@@ -7,13 +7,12 @@ from fpf_sensor_service.models import SensorConfig
 
 class ConnectionType(Enum):
     PIN = 'Pin'
-    PICO = 'Pico'
+    HTTP = 'Http'
     FARMBOT = 'Farmbot'
 
 
 class FieldType(Enum):
     INTEGER = 'int'
-    FLOAT = 'float'
     STRING = 'str'
     SELECT = 'select'
 
@@ -22,6 +21,8 @@ class IntRangeRuleInclusive(NamedTuple):
     min: int
     max: int
 
+class ValidHttpEndpointRule(NamedTuple):
+    regex: str
 
 class FieldDescription(NamedTuple):
     name: str
