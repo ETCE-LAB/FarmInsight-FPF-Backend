@@ -43,10 +43,18 @@ class PinDHT22HumiditySensor(TypedSensor):
 
     def get_measurement(self):
         pass
-        #dhtDevice = DHT22(Pin(self.pin))
-        #value = dhtDevice.humidity
-        #dhtDevice.exit()
-        #return value
+        '''
+        dht_device = None
+        try:
+            dht_device = DHT22(Pin(self.pin))
+            value = dht_device.humidity
+            dht_device.exit()
+        except Exception as e:
+            if dht_device is not None:
+                dht_device.exit()
+            raise e
+        return value
+        '''
 
 
 class PinDHT22TemperatureSensor(TypedSensor):
@@ -83,10 +91,18 @@ class PinDHT22TemperatureSensor(TypedSensor):
 
     def get_measurement(self):
         pass
-        #dhtDevice = DHT22(Pin(self.pin))
-        #value = dhtDevice.temperature
-        #dhtDevice.exit()
-        #return value
+        '''
+        dht_device = None
+        try:
+            dht_device = DHT22(Pin(self.pin))
+            value = dht_device.temperature
+            dht_device.exit()
+        except Exception as e:
+            if dht_device is not None:
+                dht_device.exit()
+            raise e
+        return value
+        '''
 
 
 class HttpDHT22HumiditySensor(TypedSensor):

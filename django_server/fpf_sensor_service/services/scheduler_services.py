@@ -1,5 +1,6 @@
 import random
 import requests
+import time
 from datetime import timedelta
 
 from django.utils import timezone
@@ -123,6 +124,7 @@ def start_scheduler():
     for sensor in sensors:
         add_scheduler_task(sensor)
         logger.info(f"Scheduled task for sensor: {sensor.id} every {sensor.intervalSeconds}s")
+        time.sleep(1)
 
     scheduler.start()
 

@@ -14,6 +14,7 @@ SECRET_KEY = env('SECRET_KEY', default='your-default-secret-key')
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'django_server.wsgi.application'
+WSGI_APPLICATION = 'django_server.asgi.application'
 
 DATABASES = {
     'default': {

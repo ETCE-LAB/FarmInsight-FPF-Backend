@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Define the path to your virtual environment and Django project
-VENV_PATH="/home/fpf/env"
-PROJECT_PATH="/home/fpf/FarmInsight-FPF-Backend/django_server"
+VENV_PATH="/home/<USERNAME>/env"
+PROJECT_PATH="/home/<USERNAME>/FarmInsight-FPF-Backend/django_server"
 
 # Activate the virtual environment
 if [ -d "$VENV_PATH" ]; then
