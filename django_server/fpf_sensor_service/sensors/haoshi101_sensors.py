@@ -19,7 +19,7 @@ class HttpHaoshi101PhSensor(TypedSensor):
             sensor_class_id='a7552f08-427e-43f7-b07e-850db607db81',
             model='Haoshi101',
             connection=ConnectionType.HTTP,
-            parameter='pH',
+            parameter='pH;pH',
             unit='pH',
             tags={
                 'info': 'minimum interval 3 seconds.'
