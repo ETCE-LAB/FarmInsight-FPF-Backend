@@ -1,12 +1,11 @@
 import json
-
 import requests
 
 from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
     FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 
-#from adafruit_blinka.microcontroller.bcm283x.pin import Pin
-#from adafruit_dht import DHT22
+from adafruit_blinka.microcontroller.bcm283x.pin import Pin
+from adafruit_dht import DHT22
 
 
 class PinDHT22HumiditySensor(TypedSensor):
@@ -42,11 +41,17 @@ class PinDHT22HumiditySensor(TypedSensor):
         )
 
     def get_measurement(self):
-        pass
-        #dhtDevice = DHT22(Pin(self.pin))
-        #value = dhtDevice.humidity
-        #dhtDevice.exit()
-        #return value
+        dht_device = None
+        try:
+            dht_device = DHT22(Pin(self.pin))
+            value = dht_device.humidity
+            dht_device.exit()
+        except Exception as e:
+            if dht_device is not None:
+                dht_device.exit()
+            raise e
+
+        return value
 
 
 class PinDHT22TemperatureSensor(TypedSensor):
@@ -82,11 +87,16 @@ class PinDHT22TemperatureSensor(TypedSensor):
         )
 
     def get_measurement(self):
-        pass
-        #dhtDevice = DHT22(Pin(self.pin))
-        #value = dhtDevice.temperature
-        #dhtDevice.exit()
-        #return value
+        dht_device = None
+        try:
+            dht_device = DHT22(Pin(self.pin))
+            value = dht_device.temperature
+            dht_device.exit()
+        except Exception as e:
+            if dht_device is not None:
+                dht_device.exit()
+            raise e
+        return value
 
 
 class HttpDHT22HumiditySensor(TypedSensor):
@@ -167,7 +177,3 @@ class HttpDHT22TemperatureSensor(TypedSensor):
             response = requests.get(self.http_endpoint)
             response.raise_for_status()
             return response.json().get("value")
-
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to get measurement: {e}")
-            return None
