@@ -22,7 +22,7 @@ class PinDHT22HumiditySensor(TypedSensor):
             sensor_class_id='7711013a-d9f6-4990-9d9b-7222ff98ca9f',
             model='DHT22',
             connection=ConnectionType.PIN,
-            parameter='humidity',
+            parameter='humidity;feuchtigkeit',
             unit='%',
             tags={
                 'info': 'minimum interval 3 seconds.'
@@ -62,7 +62,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
             sensor_class_id='5464114a-443f-4c56-a864-abc415b3d3a2',
             model='DHT22',
             connection=ConnectionType.PIN,
-            parameter='temperature',
+            parameter='temperature;temperatur',
             unit='°C',
             tags={
                 'info': 'minimum interval 3 seconds.'
@@ -102,7 +102,7 @@ class HttpDHT22HumiditySensor(TypedSensor):
             sensor_class_id='c7fa5c6e-cb40-4f63-9d76-8a556d755b85',
             model='DHT22',
             connection=ConnectionType.HTTP,
-            parameter='humidity',
+            parameter='humidity;feuchtigkeit',
             unit='%',
             tags={
                 'info': 'minimum interval 3 seconds.'
@@ -144,7 +144,7 @@ class HttpDHT22TemperatureSensor(TypedSensor):
             sensor_class_id='fd45e455-57b5-4495-b326-a0cafdc3aa39',
             model='DHT22',
             connection=ConnectionType.HTTP,
-            parameter='temperature',
+            parameter='temperature;temperatur',
             unit='°C',
             tags={
                 'info': 'minimum interval 3 seconds.'
