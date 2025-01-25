@@ -54,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'django_server.asgi.application'
+ASGI_APPLICATION = 'django_server.asgi.application'
 
 DATABASES = {
     'default': {
