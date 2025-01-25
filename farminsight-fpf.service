@@ -1,7 +1,5 @@
 [Unit]
 Description=Django FPF
-Requires=dashboard-backend.service
-After=dashboard-backend.service
 RequiresMountsFor=/home/<USERNAME>/FarmInsight-FPF-Backend/django_server /home/<USERNAME>/env/bin/python
 
 [Service]
