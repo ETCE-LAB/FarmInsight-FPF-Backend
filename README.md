@@ -130,7 +130,7 @@ Project supervision:
 * Benjamin Leiding
 
 ## License
-
+This project is licensed under the [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) license.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [Python-img]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
@@ -139,3 +139,6 @@ Project supervision:
 [Django-url]: https://www.djangoproject.com/
 [SQLite-img]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
 [SQLite-url]: https://www.sqlite.org/
+
+---
+For more information or questions, please contact the ETCE-Lab team.
