@@ -6,7 +6,7 @@ from fpf_sensor_service.models import Configuration, ConfigurationKeys
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def post_fpf_id(request):
     Configuration.objects.create(
         key=ConfigurationKeys.FPF_ID.value,
@@ -16,7 +16,7 @@ def post_fpf_id(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def post_api_key(request):
     configuration = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
     if configuration is None:
