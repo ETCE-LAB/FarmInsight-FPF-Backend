@@ -1,9 +1,8 @@
 import json
-
 import requests
 
-from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
-    FieldType, ValidHttpEndpointRule
+from .typed_sensor import TypedSensor
+from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 
 
 class HttpHaoshi101PhSensor(TypedSensor):
@@ -21,9 +20,7 @@ class HttpHaoshi101PhSensor(TypedSensor):
             connection=ConnectionType.HTTP,
             parameter='pH;pH',
             unit='pH',
-            tags={
-                'info': 'minimum interval 3 seconds.'
-            },
+            tags={},
             fields=[
                 FieldDescription(
                     name='http',
