@@ -1,12 +1,16 @@
 import json
+import logging
+
 import requests
 
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
+from ..utils import get_logger
 
 #from adafruit_blinka.microcontroller.bcm283x.pin import Pin
 #from adafruit_dht import DHT22
 
+log = get_logger()
 
 class PinDHT22HumiditySensor(TypedSensor):
     pin = None
@@ -142,7 +146,7 @@ class HttpDHT22HumiditySensor(TypedSensor):
             return response.json().get("value")
 
         except requests.exceptions.RequestException as e:
-            print(f"Failed to get measurement: {e}")
+            log.error(f"Failed to get measurement: {e}")
             return None
 
 
@@ -184,5 +188,5 @@ class HttpDHT22TemperatureSensor(TypedSensor):
             return response.json().get("value")
 
         except requests.exceptions.RequestException as e:
-            print(f"Failed to get measurement: {e}")
+            log.error(f"Failed to get measurement: {e}")
             return None
