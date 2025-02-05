@@ -13,6 +13,11 @@ from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
+'''
+daemon=False is required in deployment to run correctly as a systemd service,
+but it play nice with running it in the IDE during development. 
+DO NOT OVERRIDE WHEN MERGING INTO DEPLOYMENT! 
+'''
 scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
 

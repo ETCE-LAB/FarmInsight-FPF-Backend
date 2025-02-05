@@ -1,5 +1,4 @@
 import json
-import uuid
 import re
 
 from rest_framework import serializers
@@ -7,8 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from fpf_sensor_service.models.sensor_config import SensorConfig
 from fpf_sensor_service.sensors import TypedSensorFactory
-from fpf_sensor_service.sensors.typed_sensor import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
-from fpf_sensor_service.utils import is_uuid
+from fpf_sensor_service.sensors.sensor_description import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 
 
 typed_sensor_factory = TypedSensorFactory()
