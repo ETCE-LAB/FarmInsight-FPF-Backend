@@ -54,6 +54,10 @@ TEMPLATES = [
     },
 ]
 
+'''
+We're using Daphne to host the FPF server, because of that it is an asgi application and can still be
+started using runserver as daphne is supposed to be production ready.
+'''
 ASGI_APPLICATION = 'django_server.asgi.application'
 
 DATABASES = {
@@ -78,6 +82,14 @@ DEBUG = env('DEBUG', default='True') == 'True'
 MEASUREMENTS_BASE_URL = env('MEASUREMENTS_BASE_URL')
 GENERATE_MEASUREMENTS = env('GENERATE_MEASUREMENTS', default='False') == 'True'
 
+
+'''
+DASHBOARD_BACKEND_USER_ID and RESOURCE_SERVER_INTROSPECTION_URL are intended to be used with an external identity server
+to ensure only a known dashboard backend can send configurations to the FPF.
+Since we currently don't have the external identity server, because of that at the moment we only check for the existence of the 
+mock token in the "custom_oauth_validator.py" this is insecure while this is on github, it would be better to move this token
+to an env for the FPF and the Dashboard backend in the future.s 
+'''
 DASHBOARD_BACKEND_USER_ID = env('DASHBOARD_BACKEND_USER_ID')
 
 OAUTH2_PROVIDER = {

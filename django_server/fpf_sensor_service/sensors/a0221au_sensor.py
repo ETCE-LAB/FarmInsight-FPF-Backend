@@ -2,8 +2,8 @@ import json
 
 import requests
 
-from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
-    FieldType, ValidHttpEndpointRule
+from .typed_sensor import TypedSensor
+from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 
 
 class HttpA0221AULevelSensor(TypedSensor):
@@ -22,7 +22,7 @@ class HttpA0221AULevelSensor(TypedSensor):
             parameter='level;füllstand',
             unit='l',
             tags={
-                'info': 'make sure the sensor is correctly configured.'
+                'info': 'expects specifically configured sensor calculation.'
             },
             fields=[
                 FieldDescription(

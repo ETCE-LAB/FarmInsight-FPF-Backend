@@ -2,7 +2,7 @@ from enum import Enum
 
 from rest_framework import serializers
 
-from fpf_sensor_service.sensors.typed_sensor import FieldType, ConnectionType, SensorDescription, IntRangeRuleInclusive
+from fpf_sensor_service.sensors.sensor_description import FieldType, ConnectionType, SensorDescription, IntRangeRuleInclusive
 from fpf_sensor_service.utils import is_named_tuple
 
 
