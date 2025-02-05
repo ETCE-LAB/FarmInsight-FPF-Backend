@@ -29,13 +29,18 @@ And install requirements for the django project:
 ```bash 
 pip install -r FarmInsight-FPF-Backend/django_server/requirements.txt 
 ```
-Edit the "FarmInsight-FPF-Backend/farminsight-fpf.service" file, replace the <USERNAME> with your username for example using nano.
+Edit the "FarmInsight-FPF-Backend/django_server/.env.dev" file and set the required variables, using a text editor for example nano:
+```bash 
+nano FarmInsight-FPF-Backend/django_server/.env.dev
+```
+Edit the "FarmInsight-FPF-Backend/farminsight-fpf.service" file, replace the <USERNAME> with your username:
 ```bash 
 nano FarmInsight-FPF-Backend/farminsight-fpf.service
 ```
-Do the same thing with the "FarmInsight-FPF-Backend/startup.sh" file:
+Do the same thing with the "FarmInsight-FPF-Backend/startup.sh" file and make the startup.sh script executable:
 ```bash 
 nano FarmInsight-FPF-Backend/startup.sh
+chmod +x FarmInsight-FPF-Backend/startup.sh
 ```
 Then copy it into /etc/systemd/system/ so it is available to start as a system service:
 ```bash 
