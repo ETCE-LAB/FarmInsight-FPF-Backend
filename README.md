@@ -13,6 +13,7 @@ A Django-based sensor service that allows configuring sensors, collecting sensor
 - [Development Setup](#development-setup)
 - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
+- [Add new sensor support](#add-new-sensor-support)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -115,6 +116,14 @@ Here are some of the key API endpoints :
 * POST /api/sensors - Create a new sensor
 * GET /api/sensors/{sensorId} - Get the config for given sensor
 * PUT /api/sensors/{sensorId} - Edit a sensor
+
+## Add new sensor support
+To add a new sensor:
+* First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
+* Use the boilerplate code from the typed_sensor.template file to setup the basic class structure, name the class accordingly.
+* Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
+* Implement the get_measurement() method and init_additional_information() if needed.
+* Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
 
 ## Contributing
 
