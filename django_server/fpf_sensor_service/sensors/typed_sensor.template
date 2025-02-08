@@ -1,0 +1,41 @@
+import json
+
+from .typed_sensor import TypedSensor
+from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType
+
+'''
+This is a class template to add a new TypedSensor to the project, copy into a .py file and fill out.
+The available types and enums for the sensor description are found in the sensor_description.py file,
+expand as needed but remember to correctly serialize new requirements and also correctly suppport them in the frontent!
+'''
+class TypedSensorTemplate(TypedSensor):
+    def init_additional_information(self):
+        additional_information = json.loads(self.sensor_config.additionalInformation)
+        # read fields from the additional information and store them in self
+
+    @staticmethod
+    def get_description() -> SensorDescription:
+        return SensorDescription(
+            sensor_class_id='<UUID>',
+            model='',
+            connection=ConnectionType.,
+            parameter='',
+            unit='',
+            tags={
+                'info': 'change or remove'
+            },
+            fields=[
+                FieldDescription(
+                    name='',
+                    type=FieldType.,
+                    rules=[
+                      # add relevant rules here 
+                    ]
+                ),
+            ]
+        )
+
+    def get_measurement(self):
+        # implement error retrieveal here
+        pass
+

@@ -7,11 +7,7 @@ To disable any Sensor just comment out the line by putting a # in front of it
 """
 
 
-from .dht22_sensors import PinDHT22HumiditySensor, PinDHT22TemperatureSensor
+from .dht22_sensors import PinDHT22HumiditySensor, PinDHT22TemperatureSensor, HttpDHT22HumiditySensor, HttpDHT22TemperatureSensor
+from .haoshi101_sensors import HttpHaoshi101PhSensor
 
 
-
-"""
-THIS HAS TO BE AT THE BOTTOM OF THE FILE BELOW ALL THE SENSOR CLASS IMPORTS TO FUNCTION!!!
-IT REPRESENTS A SINGLETON THAT SHOULD ALWAYS BE ACCESSED FROM HERE
-"""

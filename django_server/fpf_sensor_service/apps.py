@@ -7,6 +7,8 @@ import time
 import logging
 import os
 
+from fpf_sensor_service.utils import get_logger
+
 
 class SensorAppConfig(AppConfig):
     name = 'fpf_sensor_service'
@@ -14,7 +16,7 @@ class SensorAppConfig(AppConfig):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.log = logging.getLogger('fpf_sensor_service')
+        self.log = get_logger()
 
     def check_and_start_scheduler(self, max_retries=3, retry_interval=5):
         """

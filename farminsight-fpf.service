@@ -1,0 +1,10 @@
+[Unit]
+Description=Django FPF
+RequiresMountsFor=/home/<USERNAME>/FarmInsight-FPF-Backend/django_server /home/<USERNAME>/env/bin/python
+
+[Service]
+User=<USERNAME>
+ExecStart=/home/<USERNAME>/FarmInsight-FPF-Backend/startup.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -2,7 +2,6 @@ from typing import Type
 
 from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription
 from fpf_sensor_service.models import SensorConfig
-from fpf_sensor_service.serializers.sensor_description_serializer import SensorDescriptionSerializer
 
 
 class TypedSensorFactory:
