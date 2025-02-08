@@ -2,7 +2,7 @@ from enum import Enum
 
 from rest_framework import serializers
 
-from fpf_sensor_service.sensors.typed_sensor import FieldType, ConnectionType, SensorDescription, IntRangeRuleInclusive
+from fpf_sensor_service.sensors.sensor_description import FieldType, ConnectionType, SensorDescription, IntRangeRuleInclusive
 from fpf_sensor_service.utils import is_named_tuple
 
 
@@ -49,9 +49,10 @@ class FieldDescriptionSerializer(serializers.Serializer):
 
 class SensorDescriptionSerializer(serializers.Serializer):
     sensorClassId = serializers.CharField(source="sensor_class_id")
-    name = serializers.CharField()
+    model = serializers.CharField()
     connection = EnumField(enum_class=ConnectionType)
     parameter = serializers.CharField()
+    unit = serializers.CharField()
     tags = serializers.DictField(child=serializers.CharField())
     fields = FieldDescriptionSerializer(many=True)
 

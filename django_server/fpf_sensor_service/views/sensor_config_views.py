@@ -13,14 +13,14 @@ typed_sensor_factory = TypedSensorFactory()
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def post_sensor(request):
     serializer = create_sensor_config(request.data)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class SensorView(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     
     def get(self, request, sensor_id):
         serializer = get_sensor_config(sensor_id)
@@ -32,7 +32,7 @@ class SensorView(APIView):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def get_available_sensor_types(request):
     sensor_types = typed_sensor_factory.get_available_sensor_types()
     serializer = SensorDescriptionSerializer(sensor_types, many=True)

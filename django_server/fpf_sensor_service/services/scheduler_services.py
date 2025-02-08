@@ -1,36 +1,48 @@
 import random
-
 import requests
-from apscheduler.schedulers.background import BackgroundScheduler
-from requests.auth import HTTPBasicAuth
+import time
+from datetime import timedelta
 
+from django.utils import timezone
 from django_server import settings
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
 from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
 from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
-scheduler = BackgroundScheduler()
+'''
+daemon=False is required in deployment to run correctly as a systemd service,
+but it play nice with running it in the IDE during development. 
+DO NOT OVERRIDE WHEN MERGING INTO DEPLOYMENT! 
+'''
+scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
+
+
+def request_api_key() -> str or None:
+    fpf_config = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
+    if not fpf_config:
+        logger.error('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
+        return None
+
+    url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_config.value}/api-key"
+    response = requests.get(url)
+    if response.status_code != 200:
+        logger.error('!!! Request for new API Key failed !!!')
+        return None
+    else:
+        api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
+        if api_key:
+            return api_key.value
 
 
 def get_or_request_api_key() -> str or None:
     api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
     if not api_key:
-        fpf_id = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
-        if not fpf_id:
-            logger.error('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
-            return None
-
-        url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_id}/api-key"
-        response = requests.get(url)
-        if response.status_code != 200:
-            logger.error('!!! Request for new API Key failed !!!')
-        else:
-            api_key = Configuration.objects.filter(key=ConfigurationKeys.API_KEY.value).first()
-            if api_key:
-                return api_key.value
+        return request_api_key()
     return api_key.value
 
 
@@ -51,18 +63,19 @@ def send_measurements(sensor_id):
 
         api_key = get_or_request_api_key()
         if api_key is not None:
-            #auth = HTTPBasicAuth('Token', api_key)
             response = requests.post(url, json=data, headers={
                 'Authorization': f'ApiKey {api_key}'
             })
 
             if response.status_code == 201:
                 measurements.delete()
+            elif response.status_code == 403:
+                request_api_key()
             else:
                 logger.info('Error sending measurements, will retry.')
 
 
-def schedule_task(sensor: TypedSensor):
+def task(sensor: TypedSensor):
     """
     Function to trigger the measurement of the sensor and to send existing measurements.
     Gets called at the configured interval for the sensor.
@@ -71,7 +84,7 @@ def schedule_task(sensor: TypedSensor):
     logger.debug(f"Task triggered for sensor: {sensor.sensor_config.id}")
     try:
         if settings.GENERATE_MEASUREMENTS:
-            value = random.uniform(20.0, 100.0)
+            value = random.uniform(20.0, 20.5)
         else:
             value = sensor.get_measurement()
 
@@ -87,27 +100,23 @@ def schedule_task(sensor: TypedSensor):
 
 def reschedule_task(sensor_config: SensorConfig):
     job_id = f"sensor_{sensor_config.id}"
-
-
-    sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
-    sensor = sensor_class(sensor_config)
-
     job = scheduler.get_job(job_id)
     if job:
         scheduler.remove_job(job_id)
 
-    schedule_task(sensor)
+    add_scheduler_task(sensor_config)
 
 
 def add_scheduler_task(sensor_config: SensorConfig):
     sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
     sensor = sensor_class(sensor_config)
     scheduler.add_job(
-        schedule_task,
+        task,
         trigger='interval',
         seconds=sensor_config.intervalSeconds,
         args=[sensor],
-        id=f"sensor_{sensor_config.id}"
+        id=f"sensor_{sensor_config.id}",
+        next_run_time=timezone.now() + timedelta(seconds=1)
     )
 
 
@@ -119,7 +128,8 @@ def start_scheduler():
     logger.debug(f"Following sensors are configured: {sensors}")
     for sensor in sensors:
         add_scheduler_task(sensor)
-        logger.info(f"Scheduled task for sensor: {sensor.id}")
+        logger.info(f"Scheduled task for sensor: {sensor.id} every {sensor.intervalSeconds}s")
+        time.sleep(1)
 
     scheduler.start()
 
