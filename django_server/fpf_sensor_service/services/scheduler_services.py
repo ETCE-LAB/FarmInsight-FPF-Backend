@@ -104,10 +104,10 @@ def reschedule_task(sensor_config: SensorConfig):
     if job:
         scheduler.remove_job(job_id)
 
-    add_scheduler_task(sensor_config)
+    add_scheduler_task(sensor_config, 1)
 
 
-def add_scheduler_task(sensor_config: SensorConfig):
+def add_scheduler_task(sensor_config: SensorConfig, i):
     sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
     sensor = sensor_class(sensor_config)
     scheduler.add_job(
@@ -116,7 +116,7 @@ def add_scheduler_task(sensor_config: SensorConfig):
         seconds=sensor_config.intervalSeconds,
         args=[sensor],
         id=f"sensor_{sensor_config.id}",
-        next_run_time=timezone.now() + timedelta(seconds=1)
+        next_run_time=timezone.now() + timedelta(seconds=i)
     )
 
 
@@ -126,10 +126,11 @@ def start_scheduler():
     """
     sensors = SensorConfig.objects.all()
     logger.debug(f"Following sensors are configured: {sensors}")
+    i = 0
     for sensor in sensors:
-        add_scheduler_task(sensor)
+        i += 5
+        add_scheduler_task(sensor, i)
         logger.info(f"Scheduled task for sensor: {sensor.id} every {sensor.intervalSeconds}s")
-        time.sleep(1)
 
     scheduler.start()
 
