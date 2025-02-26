@@ -16,7 +16,7 @@ class HttpA0221AULevelSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='c7fa5c6e-cb40-4f63-9d76-8a556d755b85',
+            sensor_class_id='c40d2db9-c2d5-416a-9bae-6464720ff397',
             model='A0221AU',
             connection=ConnectionType.HTTP,
             parameter='level;füllstand',
