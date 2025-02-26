@@ -140,14 +140,9 @@ class HttpDHT22HumiditySensor(TypedSensor):
         )
 
     def get_measurement(self):
-        try:
-            response = requests.get(self.http_endpoint)
-            response.raise_for_status()
-            return response.json().get("value")
-
-        except requests.exceptions.RequestException as e:
-            log.error(f"Failed to get measurement: {e}")
-            return None
+        response = requests.get(self.http_endpoint)
+        response.raise_for_status()
+        return response.json().get("value")
 
 
 class HttpDHT22TemperatureSensor(TypedSensor):
@@ -182,11 +177,6 @@ class HttpDHT22TemperatureSensor(TypedSensor):
         )
 
     def get_measurement(self):
-        try:
-            response = requests.get(self.http_endpoint)
-            response.raise_for_status()
-            return response.json().get("value")
-
-        except requests.exceptions.RequestException as e:
-            log.error(f"Failed to get measurement: {e}")
-            return None
+        response = requests.get(self.http_endpoint)
+        response.raise_for_status()
+        return response.json().get("value")
