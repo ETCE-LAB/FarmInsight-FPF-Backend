@@ -35,11 +35,6 @@ class HttpHaoshi101PhSensor(TypedSensor):
         )
 
     def get_measurement(self):
-        try:
-            response = requests.get(self.http_endpoint)
-            response.raise_for_status()
-            return response.json().get("value")
-
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to get measurement: {e}")
-            return None
+        response = requests.get(self.http_endpoint)
+        response.raise_for_status()
+        return response.json().get("value")
