@@ -48,7 +48,7 @@ void setup() {
     ; // Wait till serial connection is created
   }
 
-  Serial.println("WiFi-Verbindung wird aufgebaut...");
+  Serial.println("Serial Monitor started, Establishing WIfi...");
 
   // check WLAN-module exists
   if (WiFi.status() == WL_NO_MODULE) {
@@ -61,7 +61,7 @@ void setup() {
 
   // WLAN connect with retries if not possible
   while (status != WL_CONNECTED) {
-    Serial.print("Verbinden mit: ");
+    Serial.print("Connected with: ");
     Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
 
@@ -69,8 +69,8 @@ void setup() {
   }
 
   // Print connection details
-  Serial.println("WLAN verbunden!");
-  Serial.print("IP-Adresse: ");
+  Serial.println("Wifi connected!");
+  Serial.print("IP-Adress: ");
   Serial.println(WiFi.localIP());
 
   // Start the server
