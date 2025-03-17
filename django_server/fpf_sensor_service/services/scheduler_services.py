@@ -1,6 +1,5 @@
 import random
 import requests
-import time
 from datetime import timedelta
 
 from django.utils import timezone
@@ -15,11 +14,29 @@ from fpf_sensor_service.utils import get_logger
 logger = get_logger()
 '''
 daemon=False is required in deployment to run correctly as a systemd service,
-but it play nice with running it in the IDE during development. 
+but it does not play nice with running it in the IDE during development. 
 DO NOT OVERRIDE WHEN MERGING INTO DEPLOYMENT! 
 '''
 scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
+
+
+def send_error_message(sensor_id, message):
+    """
+    Fire and forget tries to send an error message from reading a sensor to the dashboard backend.
+    TODO: would prefer a custom logger, that can handle and all messages
+    incl. setting it to info/debug for setting a new FPF up, but how does one get additional info like sensor id?
+    """
+    url = f"{settings.MEASUREMENTS_BASE_URL}/api/log_message"
+    data = {'sensorId': str(sensor_id), 'message': message, 'level': 'ERROR' ,'createdAt': timezone.now().isoformat()}
+    try:
+        api_key = get_or_request_api_key()
+        if api_key is not None:
+            requests.post(url, json=data, headers={
+                'Authorization': f'ApiKey {api_key}'
+            })
+    except:
+        pass  # ignore
 
 
 def request_api_key() -> str or None:
@@ -83,6 +100,7 @@ def task(sensor: TypedSensor):
     """
     logger.debug(f"Task triggered for sensor: {sensor.sensor_config.id}")
     try:
+        raise Exception('TEST')
         if settings.GENERATE_MEASUREMENTS:
             value = random.uniform(20.0, 20.5)
         else:
@@ -96,6 +114,7 @@ def task(sensor: TypedSensor):
         logger.debug(f"Task completed for sensor: {sensor.sensor_config.id}")
     except Exception as e:
         logger.error(f"Error processing sensor {sensor.sensor_config.id}: {e}")
+        send_error_message(sensor.sensor_config.id, f"{e}")
 
 
 def reschedule_task(sensor_config: SensorConfig):
