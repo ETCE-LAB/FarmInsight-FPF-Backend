@@ -20,7 +20,7 @@ Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); // TSL2591 Sensor
 unsigned long lastWiFiCheck = 0;
 const unsigned long wifiCheckInterval = 3600000; // 1 hour
 
-// Funktion, um den Wert der verschiedenen Sensor-Daten zu lesen
+// Read Sensor values
 String getSensorData(String type) {
   uint16_t broadband = tsl.getFullLuminosity() & 0xFFFF; // Gesamte Lichtintensität
   uint16_t infrared = tsl.getFullLuminosity() >> 16;     // Infrarotwert
@@ -37,7 +37,7 @@ String getSensorData(String type) {
   }
 }
 
-// HTTP Antwort senden
+// Send HTTP Answer
 void sendResponse(WiFiClient &client, String data) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: application/json");
@@ -46,7 +46,7 @@ void sendResponse(WiFiClient &client, String data) {
   client.println(data);
 }
 
-// WiFi Verbindung prüfen und wiederherstellen
+// check Wifi and Reconnect Logic
 void checkWiFiConnection() {
   if (WiFi.status() == WL_CONNECTED) return;
 
@@ -63,16 +63,12 @@ void checkWiFiConnection() {
   Serial.println(WiFi.status() == WL_CONNECTED ? "\nWiFi Reconnected!" : "\nFailed to reconnect.");
 }
 
-// Setup Funktion
+// Setup Function
 void setup() {
   Serial.begin(9600);
   Wire.begin();
 
-  // Initialisierung des TSL2591
-  if (!tsl.begin()) {
-    Serial.println("TSL2591 konnte nicht initialisiert werden. Überprüfe die Verkabelung.");
-    while (1);
-  }
+
   
   // Setup für den TSL2591 Sensor
   tsl.setGain(TSL2591_GAIN_MED); // Empfindlichkeit des Sensors (niedrig, mittel, hoch)
@@ -90,6 +86,12 @@ void setup() {
 
   Serial.println("WiFi Connected! IP: " + WiFi.localIP().toString());
   server.begin();
+
+  // start tsl sensor
+  while (!tsl.begin()) {
+    Serial.println("TSL2591 could not be initialized, please check cabels and connection!");
+    delay(2000);
+  }
 }
 
 // Main Loop
@@ -107,7 +109,7 @@ void loop() {
     String request = client.readStringUntil('\r');
     Serial.println("Request: " + request);
 
-    // Prüfen, welcher Endpoint angefragt wurde
+    // Handling Endpoints and requests
     if (request.startsWith("GET /measurements/lux")) {
       sendResponse(client, getSensorData("lux"));
     } else if (request.startsWith("GET /measurements/sumlight")) {
