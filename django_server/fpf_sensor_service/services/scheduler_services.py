@@ -100,7 +100,6 @@ def task(sensor: TypedSensor):
     """
     logger.debug(f"Task triggered for sensor: {sensor.sensor_config.id}")
     try:
-        raise Exception('TEST')
         if settings.GENERATE_MEASUREMENTS:
             value = random.uniform(20.0, 20.5)
         else:
