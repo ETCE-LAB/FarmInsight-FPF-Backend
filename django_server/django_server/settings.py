@@ -90,7 +90,7 @@ Since we currently don't have the external identity server, because of that at t
 mock token in the "custom_oauth_validator.py" this is insecure while this is on github, it would be better to move this token
 to an env for the FPF and the Dashboard backend in the future.s 
 '''
-DASHBOARD_BACKEND_USER_ID = env('DASHBOARD_BACKEND_USER_ID')
+# DASHBOARD_BACKEND_USER_ID = env('DASHBOARD_BACKEND_USER_ID')
 
 OAUTH2_PROVIDER = {
     'SCOPES': {"openid": ''},
