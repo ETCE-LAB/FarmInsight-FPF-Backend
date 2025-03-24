@@ -3,6 +3,7 @@ import logging
 
 import requests
 
+from . import MeasurementResult
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 from ..utils import get_logger
@@ -115,6 +116,7 @@ class HttpDHT22HumiditySensor(TypedSensor):
         additional_information = json.loads(self.sensor_config.additionalInformation)
         self.http_endpoint = additional_information['http']
 
+
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
@@ -139,10 +141,10 @@ class HttpDHT22HumiditySensor(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
+    def get_measurement(self)-> MeasurementResult:
         response = requests.get(self.http_endpoint)
         response.raise_for_status()
-        return response.json().get("value")
+        return MeasurementResult(value=response.json().get("value"))
 
 
 class HttpDHT22TemperatureSensor(TypedSensor):
@@ -176,7 +178,7 @@ class HttpDHT22TemperatureSensor(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
+    def get_measurement(self) -> MeasurementResult:
         response = requests.get(self.http_endpoint)
         response.raise_for_status()
-        return response.json().get("value")
+        return MeasurementResult(value=response.json().get("value"))
