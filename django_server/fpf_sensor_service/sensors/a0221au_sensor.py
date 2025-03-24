@@ -2,6 +2,7 @@ import json
 
 import requests
 
+from . import MeasurementResult
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 
@@ -37,7 +38,7 @@ class HttpA0221AULevelSensor(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
+    def get_measurement(self)-> MeasurementResult:
         response = requests.get(self.http_endpoint)
         response.raise_for_status()
-        return response.json().get("value")
+        return MeasurementResult(value=response.json().get("value"))
