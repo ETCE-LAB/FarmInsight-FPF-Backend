@@ -105,6 +105,16 @@ REST_FRAMEWORK = {
     ),
 }
 
+log_level_name_to_value = {
+    'CRITICAL': 50,
+    'FATAL': 50,
+    'ERROR': 40,
+    'WARN': 30,
+    'WARNING': 30,
+    'INFO': 20,
+    'DEBUG': 10,
+    'NOTSET': 0,
+}
 
 LOGGING = {
     'version': 1,
@@ -124,10 +134,13 @@ LOGGING = {
         'plain': {  # Add a new plain formatter for the file handler
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
+        'message_only': {
+            'format': '%(message)s',
+        }
     },
     'handlers': {
         'console': {
-            'class': 'logging.StreamHandler',
+            'class': 'django_server.custom_loggers.CustomConsoleLogger', # handles our extra information like sensorId
             'formatter': 'colored',
             'level': 'DEBUG',
         },
@@ -137,6 +150,13 @@ LOGGING = {
             'level': 'DEBUG',
             'filename': 'myapp.log',
         },
+        'api': {
+            'level': log_level_name_to_value[env('API_LOG_LEVEL', default='INFO')],
+            'class': 'django_server.custom_loggers.APILogHandler',
+            'api_url': f'{MEASUREMENTS_BASE_URL}/api/log_message',
+            'fpf_id': '',
+            'formatter': 'message_only',
+        },
     },
     'loggers': {
         'django': {
@@ -145,7 +165,7 @@ LOGGING = {
             'propagate': True,
         },
         'fpf_sensor_service': {
-            'handlers': ['console'],
+            'handlers': ['console', 'api'],
             'level': 'DEBUG',
             'propagate': False,
         },
