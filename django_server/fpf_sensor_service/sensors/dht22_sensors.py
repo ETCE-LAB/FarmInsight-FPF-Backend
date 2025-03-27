@@ -1,16 +1,12 @@
 import json
-import logging
-
-import requests
 
 from .typed_sensor import TypedSensor
+from .http_sensor import HttpSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
-from ..utils import get_logger
 
 #from adafruit_blinka.microcontroller.bcm283x.pin import Pin
 #from adafruit_dht import DHT22
 
-log = get_logger()
 
 class PinDHT22HumiditySensor(TypedSensor):
     pin = None
@@ -108,13 +104,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
         '''
 
 
-class HttpDHT22HumiditySensor(TypedSensor):
-    http_endpoint = None
-
-    def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-
+class HttpDHT22HumiditySensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
@@ -139,19 +129,8 @@ class HttpDHT22HumiditySensor(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
-        response = requests.get(self.http_endpoint)
-        response.raise_for_status()
-        return response.json().get("value")
 
-
-class HttpDHT22TemperatureSensor(TypedSensor):
-    http_endpoint = None
-
-    def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-
+class HttpDHT22TemperatureSensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
@@ -175,8 +154,3 @@ class HttpDHT22TemperatureSensor(TypedSensor):
                 ),
             ]
         )
-
-    def get_measurement(self):
-        response = requests.get(self.http_endpoint)
-        response.raise_for_status()
-        return response.json().get("value")

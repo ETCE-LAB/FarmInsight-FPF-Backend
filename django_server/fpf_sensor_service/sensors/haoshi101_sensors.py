@@ -1,17 +1,8 @@
-import json
-import requests
-
-from .typed_sensor import TypedSensor
+from .http_sensor import HttpSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 
 
-class HttpHaoshi101PhSensor(TypedSensor):
-    http_endpoint = None
-
-    def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-
+class HttpHaoshi101PhSensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
@@ -33,8 +24,3 @@ class HttpHaoshi101PhSensor(TypedSensor):
                 ),
             ]
         )
-
-    def get_measurement(self):
-        response = requests.get(self.http_endpoint)
-        response.raise_for_status()
-        return response.json().get("value")

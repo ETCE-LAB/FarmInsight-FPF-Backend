@@ -105,17 +105,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-log_level_name_to_value = {
-    'CRITICAL': 50,
-    'FATAL': 50,
-    'ERROR': 40,
-    'WARN': 30,
-    'WARNING': 30,
-    'INFO': 20,
-    'DEBUG': 10,
-    'NOTSET': 0,
-}
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -151,7 +140,7 @@ LOGGING = {
             'filename': 'myapp.log',
         },
         'api': {
-            'level': log_level_name_to_value[env('API_LOG_LEVEL', default='INFO')],
+            'level': env('API_LOG_LEVEL', default='ERROR'),
             'class': 'django_server.custom_loggers.APILogHandler',
             'api_url': f'{MEASUREMENTS_BASE_URL}/api/log_message',
             'fpf_id': '',
@@ -166,7 +155,7 @@ LOGGING = {
         },
         'fpf_sensor_service': {
             'handlers': ['console', 'api'],
-            'level': 'DEBUG',
+            'level': env('SENSOR_SERVICE_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
     },
