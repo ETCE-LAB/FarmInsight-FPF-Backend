@@ -12,7 +12,7 @@ class HttpA0221AULevelSensor(HttpSensor):
             parameter='level;füllstand',
             unit='l',
             tags={
-                'info': 'expects specifically configured sensor calculation.'
+                'info': 'expects specifically configured sensor calculation;Erwartet speziell konfigurierte Sensor Berechnung'
             },
             fields=[
                 FieldDescription(

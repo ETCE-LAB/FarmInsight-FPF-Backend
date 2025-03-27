@@ -22,7 +22,7 @@ class HttpSensor(TypedSensor):
             parameter='',
             unit='',
             tags={
-                'info': 'model, parameter and unit have to be entered manually.'
+                'info': 'model, parameter and unit have to be entered manually;Modell, Kennwert und Einheit müssen manuell eingetragen werden',
             },
             fields=[
                 FieldDescription(
