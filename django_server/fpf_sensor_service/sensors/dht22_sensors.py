@@ -24,7 +24,7 @@ class PinDHT22HumiditySensor(TypedSensor):
             parameter='humidity;feuchtigkeit',
             unit='%',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
@@ -72,7 +72,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
             parameter='temperature;temperatur',
             unit='°C',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
@@ -114,7 +114,7 @@ class HttpDHT22HumiditySensor(HttpSensor):
             parameter='humidity;feuchtigkeit',
             unit='%',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
@@ -140,7 +140,7 @@ class HttpDHT22TemperatureSensor(HttpSensor):
             parameter='temperature;temperatur',
             unit='°C',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
