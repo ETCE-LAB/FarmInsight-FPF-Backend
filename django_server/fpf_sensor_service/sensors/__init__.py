@@ -9,5 +9,5 @@ To disable any Sensor just comment out the line by putting a # in front of it
 
 from .dht22_sensors import PinDHT22HumiditySensor, PinDHT22TemperatureSensor, HttpDHT22HumiditySensor, HttpDHT22TemperatureSensor
 from .haoshi101_sensors import HttpHaoshi101PhSensor
-from .MeasurementResult import MeasurementResult
+from .measurement_result import MeasurementResult
 from .weather_station_sensors import HttpWeatherStationAirTemperatureSensor
