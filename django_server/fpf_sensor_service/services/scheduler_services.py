@@ -4,10 +4,11 @@ from datetime import timedelta
 
 from django.utils import timezone
 from django_server import settings
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
-from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
+from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory, MeasurementResult
 from fpf_sensor_service.utils import get_logger
 
 
@@ -91,7 +92,7 @@ def task(sensor: TypedSensor):
     logger.debug("Sensor task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         if settings.GENERATE_MEASUREMENTS:
-            result = random.uniform(20.0, 20.5)
+            result = MeasurementResult(value=random.uniform(20.0, 20.5))
         else:
             result = sensor.get_measurement()
 
