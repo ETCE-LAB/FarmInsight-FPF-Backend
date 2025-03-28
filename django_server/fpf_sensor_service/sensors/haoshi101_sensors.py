@@ -1,4 +1,9 @@
 from .http_sensor import HttpSensor
+import json
+import requests
+
+from .measurement_result import MeasurementResult
+from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 
 

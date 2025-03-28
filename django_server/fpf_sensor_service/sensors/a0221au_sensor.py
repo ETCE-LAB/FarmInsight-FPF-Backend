@@ -1,6 +1,11 @@
-from .http_sensor import HttpSensor
-from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
+import json
 
+import requests
+
+from . import MeasurementResult
+from .typed_sensor import TypedSensor
+from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
+from .http_sensor import HttpSensor
 
 class HttpA0221AULevelSensor(HttpSensor):
     @staticmethod
@@ -20,9 +25,14 @@ class HttpA0221AULevelSensor(HttpSensor):
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
+                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
             ]
         )
+
+    def get_measurement(self)-> MeasurementResult:
+        response = requests.get(self.http_endpoint)
+        response.raise_for_status()
+        return MeasurementResult(value=response.json().get("value"))

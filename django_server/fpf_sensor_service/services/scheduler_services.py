@@ -91,13 +91,14 @@ def task(sensor: TypedSensor):
     logger.debug("Sensor task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         if settings.GENERATE_MEASUREMENTS:
-            value = random.uniform(20.0, 20.5)
+            result = random.uniform(20.0, 20.5)
         else:
-            value = sensor.get_measurement()
+            result = sensor.get_measurement()
 
         SensorMeasurement.objects.create(
             sensor_id=sensor.sensor_config.id,
-            value=value
+            value=result.value,
+            measuredAt=result.timestamp
         )
         send_measurements(sensor.sensor_config.id)
         logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
