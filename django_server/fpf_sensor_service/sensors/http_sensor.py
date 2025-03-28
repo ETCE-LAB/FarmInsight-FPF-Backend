@@ -2,22 +2,27 @@ import json
 
 import requests
 
-from . import MeasurementResult
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
-from .http_sensor import HttpSensor
 
-class HttpA0221AULevelSensor(HttpSensor):
+
+class HttpSensor(TypedSensor):
+    http_endpoint = None
+
+    def init_additional_information(self):
+        additional_information = json.loads(self.sensor_config.additionalInformation)
+        self.http_endpoint = additional_information['http']
+
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='c40d2db9-c2d5-416a-9bae-6464720ff397',
-            model='A0221AU',
+            sensor_class_id='d6d89f89-a5ae-48ed-9bd4-6e6645135f14',
+            model='',
             connection=ConnectionType.HTTP,
-            parameter='level;füllstand',
-            unit='l',
+            parameter='',
+            unit='',
             tags={
-                'info': 'expects specifically configured sensor calculation;Erwartet speziell konfigurierte Sensor Berechnung'
+                'info': 'model, parameter and unit have to be entered manually;Modell, Kennwert und Einheit müssen manuell eingetragen werden',
             },
             fields=[
                 FieldDescription(
@@ -25,14 +30,14 @@ class HttpA0221AULevelSensor(HttpSensor):
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
+                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
             ]
         )
 
-    def get_measurement(self)-> MeasurementResult:
+    def get_measurement(self):
         response = requests.get(self.http_endpoint)
         response.raise_for_status()
-        return MeasurementResult(value=response.json().get("value"))
+        return response.json().get("value")
