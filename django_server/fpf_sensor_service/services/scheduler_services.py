@@ -21,31 +21,20 @@ scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
 
 
-def send_error_message(sensor_id, message):
-    """
-    Fire and forget tries to send an error message from reading a sensor to the dashboard backend.
-    TODO: would prefer a custom logger, that can handle and all messages
-    incl. setting it to info/debug for setting a new FPF up, but how does one get additional info like sensor id?
-    """
-    url = f"{settings.MEASUREMENTS_BASE_URL}/api/log_message"
-    data = {'sensorId': str(sensor_id), 'message': message, 'level': 'ERROR' ,'createdAt': timezone.now().isoformat()}
-    try:
-        api_key = get_or_request_api_key()
-        if api_key is not None:
-            requests.post(url, json=data, headers={
-                'Authorization': f'ApiKey {api_key}'
-            })
-    except:
-        pass  # ignore
+def get_fpf_id() -> str or None:
+    fpf_config = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
+    if not fpf_config:
+        logger.debug('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
+        return None
+    return fpf_config.value
 
 
 def request_api_key() -> str or None:
-    fpf_config = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
-    if not fpf_config:
-        logger.error('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
+    fpf_id = get_fpf_id()
+    if fpf_id is None:
         return None
 
-    url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_config.value}/api-key"
+    url = f"{settings.MEASUREMENTS_BASE_URL}/api/fpfs/{fpf_id}/api-key"
     response = requests.get(url)
     if response.status_code != 200:
         logger.error('!!! Request for new API Key failed !!!')
@@ -86,10 +75,11 @@ def send_measurements(sensor_id):
 
             if response.status_code == 201:
                 measurements.delete()
+                logger.debug('Successfully sent measurements.', extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
             elif response.status_code == 403:
                 request_api_key()
             else:
-                logger.info('Error sending measurements, will retry.')
+                logger.error('Error sending measurements, will retry.', extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
 
 
 def task(sensor: TypedSensor):
@@ -98,7 +88,7 @@ def task(sensor: TypedSensor):
     Gets called at the configured interval for the sensor.
     :param sensor: Sensor of which values are to be processed.
     """
-    logger.debug(f"Task triggered for sensor: {sensor.sensor_config.id}")
+    logger.debug("Sensor task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         if settings.GENERATE_MEASUREMENTS:
             result = random.uniform(20.0, 20.5)
@@ -111,10 +101,9 @@ def task(sensor: TypedSensor):
             measuredAt=result.timestamp
         )
         send_measurements(sensor.sensor_config.id)
-        logger.debug(f"Task completed for sensor: {sensor.sensor_config.id}")
+        logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
-        logger.error(f"Error processing sensor {sensor.sensor_config.id}: {e}")
-        send_error_message(sensor.sensor_config.id, f"{e}")
+        logger.error(f"Error processing sensor: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
 
 
 def reschedule_task(sensor_config: SensorConfig):
@@ -144,12 +133,12 @@ def start_scheduler():
     Get all sensor configurations from sqlite db and schedule jobs based on set intervals.
     """
     sensors = SensorConfig.objects.all()
-    logger.debug(f"Following sensors are configured: {sensors}")
+    logger.debug(f"Following sensors are configured: {sensors}", extra={'extra': {'fpfId': get_fpf_id(), 'api_key': get_or_request_api_key()}})
     i = 0
     for sensor in sensors:
         i += 5
         add_scheduler_task(sensor, i)
-        logger.info(f"Scheduled task for sensor: {sensor.id} every {sensor.intervalSeconds}s")
+        logger.debug(f"Scheduled task every {sensor.intervalSeconds}s", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
 
     scheduler.start()
 
@@ -159,4 +148,4 @@ def stop_scheduler():
     Stop the scheduler
     """
     scheduler.shutdown()
-    logger.debug("APScheduler shutdown")
+    logger.debug("APScheduler shutdown", extra={'extra': {'fpfId': get_fpf_id(), 'api_key': get_or_request_api_key()}})

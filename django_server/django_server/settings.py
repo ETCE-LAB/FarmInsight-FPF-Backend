@@ -90,7 +90,7 @@ Since we currently don't have the external identity server, because of that at t
 mock token in the "custom_oauth_validator.py" this is insecure while this is on github, it would be better to move this token
 to an env for the FPF and the Dashboard backend in the future.s 
 '''
-DASHBOARD_BACKEND_USER_ID = env('DASHBOARD_BACKEND_USER_ID')
+# DASHBOARD_BACKEND_USER_ID = env('DASHBOARD_BACKEND_USER_ID')
 
 OAUTH2_PROVIDER = {
     'SCOPES': {"openid": ''},
@@ -104,7 +104,6 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
 }
-
 
 LOGGING = {
     'version': 1,
@@ -124,10 +123,13 @@ LOGGING = {
         'plain': {  # Add a new plain formatter for the file handler
             'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
+        'message_only': {
+            'format': '%(message)s',
+        }
     },
     'handlers': {
         'console': {
-            'class': 'logging.StreamHandler',
+            'class': 'django_server.custom_loggers.CustomConsoleLogger', # handles our extra information like sensorId
             'formatter': 'colored',
             'level': 'DEBUG',
         },
@@ -137,6 +139,13 @@ LOGGING = {
             'level': 'DEBUG',
             'filename': 'myapp.log',
         },
+        'api': {
+            'level': env('API_LOG_LEVEL', default='ERROR'),
+            'class': 'django_server.custom_loggers.APILogHandler',
+            'api_url': f'{MEASUREMENTS_BASE_URL}/api/log_message',
+            'fpf_id': '',
+            'formatter': 'message_only',
+        },
     },
     'loggers': {
         'django': {
@@ -145,8 +154,8 @@ LOGGING = {
             'propagate': True,
         },
         'fpf_sensor_service': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'api'],
+            'level': env('SENSOR_SERVICE_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
     },

@@ -9,3 +9,6 @@ class SensorConfig(models.Model):
     intervalSeconds = models.IntegerField(blank=False)
     sensorClassId = models.UUIDField()
     additionalInformation = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'ID: {self.id} class: {self.sensorClassId} interval seconds: {self.intervalSeconds} additional: {self.additionalInformation}'
