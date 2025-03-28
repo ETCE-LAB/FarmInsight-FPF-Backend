@@ -1,7 +1,7 @@
 import json
 import requests
 
-from . import MeasurementResult
+from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 

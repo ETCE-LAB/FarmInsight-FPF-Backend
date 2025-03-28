@@ -31,7 +31,7 @@ class HttpA0221AULevelSensor(TypedSensor):
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
+                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),

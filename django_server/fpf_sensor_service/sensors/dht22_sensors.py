@@ -3,7 +3,7 @@ import logging
 
 import requests
 
-from . import MeasurementResult
+from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 from ..utils import get_logger
@@ -134,7 +134,7 @@ class HttpDHT22HumiditySensor(TypedSensor):
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
+                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
@@ -171,7 +171,7 @@ class HttpDHT22TemperatureSensor(TypedSensor):
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
+                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
                         ),
                     ]
                 ),
