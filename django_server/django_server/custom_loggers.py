@@ -37,7 +37,7 @@ class APILogHandler(logging.Handler):
 
         try:
             requests.post(self.api_url, json=payload, headers={
-                'Authorization': f'ApiKey {extra_info['api_key']}'
+                'Authorization': f"ApiKey {extra_info['api_key']}"
             })
         except requests.RequestException as e:
             self.handleError(record)
