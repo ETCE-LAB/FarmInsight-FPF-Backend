@@ -1,13 +1,13 @@
 import random
 import requests
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 from django.utils import timezone
 from django_server import settings
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
-from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
+from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory, MeasurementResult
 from fpf_sensor_service.utils import get_logger
 
 
@@ -91,19 +91,15 @@ def task(sensor: TypedSensor):
     logger.debug("Sensor task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         if settings.GENERATE_MEASUREMENTS:
-            result = random.uniform(20.0, 20.5)
-            SensorMeasurement.objects.create(
-                sensor_id=sensor.sensor_config.id,
-                value=result,
-                measuredAt=datetime.now()
-            )
+            result = MeasurementResult(value=random.uniform(20.0, 20.5))
         else:
             result = sensor.get_measurement()
-            SensorMeasurement.objects.create(
-                sensor_id=sensor.sensor_config.id,
-                value=result.value,
-                measuredAt=result.timestamp
-            )
+
+        SensorMeasurement.objects.create(
+            sensor_id=sensor.sensor_config.id,
+            value=result.value,
+            measuredAt=result.timestamp
+        )
         send_measurements(sensor.sensor_config.id)
         logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
