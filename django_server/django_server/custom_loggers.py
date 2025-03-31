@@ -40,7 +40,7 @@ class APILogHandler(logging.Handler):
                 'Authorization': f"ApiKey {extra_info['api_key']}"
             })
         except requests.RequestException as e:
-            self.handleError(record)
+            pass # ignore here, to log somewhere locally another logger can be configured
 
 
 class CustomConsoleLogger(logging.StreamHandler):

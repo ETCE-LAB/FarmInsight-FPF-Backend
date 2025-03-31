@@ -52,34 +52,47 @@ def get_or_request_api_key() -> str or None:
     return api_key.value
 
 
+def send_package(sensor_id, measurements, recurse_on_forbidden=True):
+    api_key = get_or_request_api_key()
+    if api_key is not None:
+        data = [
+            {'measuredAt': m.measuredAt.isoformat(), 'value': m.value}
+            for m in measurements
+        ]
+
+        response = requests.post(f"{settings.MEASUREMENTS_BASE_URL}/api/measurements/{sensor_id}", json=data, headers={
+            'Authorization': f'ApiKey {api_key}'
+        })
+
+        if response.status_code == 201:
+            SensorMeasurement.objects.filter(measuredAt__lte=measurements[-1].measuredAt).delete()
+            logger.debug('Successfully sent measurements.',
+                         extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
+            return True
+        elif response.status_code == 403:
+            request_api_key()
+            if recurse_on_forbidden:
+                return send_package(sensor_id, measurements, recurse_on_forbidden=False)
+        else:
+            logger.error('Error sending measurements, will retry later.',
+                         extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
+
+        return False
+
+
 def send_measurements(sensor_id):
     """
     For given sensor, try to send all measurements to central app.
     If succeeded, delete entries from local database.
     :param sensor_id: GUID of sensor
     """
-    measurements = SensorMeasurement.objects.filter(sensor_id=sensor_id)
+    measurements = SensorMeasurement.objects.filter(sensor_id=sensor_id).order_by('measuredAt').all()
+    package_size = settings.MEASUREMENT_PACKAGE_SIZE
     if measurements.exists():
-        data = [
-            {'measuredAt': m.measuredAt.isoformat(), 'value': m.value}
-            for m in measurements
-        ]
-
-        url = f"{settings.MEASUREMENTS_BASE_URL}/api/measurements/{sensor_id}"
-
-        api_key = get_or_request_api_key()
-        if api_key is not None:
-            response = requests.post(url, json=data, headers={
-                'Authorization': f'ApiKey {api_key}'
-            })
-
-            if response.status_code == 201:
-                measurements.delete()
-                logger.debug('Successfully sent measurements.', extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
-            elif response.status_code == 403:
-                request_api_key()
-            else:
-                logger.error('Error sending measurements, will retry.', extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
+        packages = (len(measurements) // package_size) + 1
+        for i in range(packages):
+            if not send_package(sensor_id, measurements[i * package_size: (i + 1) * package_size]):
+                break
 
 
 def task(sensor: TypedSensor):

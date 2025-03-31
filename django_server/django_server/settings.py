@@ -81,6 +81,7 @@ DEBUG = env('DEBUG', default='True') == 'True'
 
 MEASUREMENTS_BASE_URL = env('MEASUREMENTS_BASE_URL')
 GENERATE_MEASUREMENTS = env('GENERATE_MEASUREMENTS', default='False') == 'True'
+MEASUREMENT_PACKAGE_SIZE = env('MEASUREMENT_PACKAGE_SIZE', cast=int, default=50)
 
 
 '''
