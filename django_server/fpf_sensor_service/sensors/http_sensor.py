@@ -30,9 +30,7 @@ class HttpSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
             ]

@@ -37,9 +37,7 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -100,9 +98,7 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex=r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -163,9 +159,7 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -226,9 +220,7 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -289,9 +281,7 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -352,9 +342,7 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -415,9 +403,7 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
@@ -478,9 +464,7 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
