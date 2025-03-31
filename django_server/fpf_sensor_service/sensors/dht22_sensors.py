@@ -1,6 +1,5 @@
 import json
 
-from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
 from .http_sensor import HttpSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
@@ -122,9 +121,7 @@ class HttpDHT22HumiditySensor(HttpSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
             ]
@@ -148,9 +145,7 @@ class HttpDHT22TemperatureSensor(HttpSensor):
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex = r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
             ]

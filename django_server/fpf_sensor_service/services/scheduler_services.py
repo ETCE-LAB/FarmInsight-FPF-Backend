@@ -1,6 +1,6 @@
 import random
 import requests
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.utils import timezone
 from django_server import settings
@@ -92,14 +92,18 @@ def task(sensor: TypedSensor):
     try:
         if settings.GENERATE_MEASUREMENTS:
             result = random.uniform(20.0, 20.5)
+            SensorMeasurement.objects.create(
+                sensor_id=sensor.sensor_config.id,
+                value=result,
+                measuredAt=datetime.now()
+            )
         else:
             result = sensor.get_measurement()
-
-        SensorMeasurement.objects.create(
-            sensor_id=sensor.sensor_config.id,
-            value=result.value,
-            measuredAt=result.timestamp
-        )
+            SensorMeasurement.objects.create(
+                sensor_id=sensor.sensor_config.id,
+                value=result.value,
+                measuredAt=result.timestamp
+            )
         send_measurements(sensor.sensor_config.id)
         logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
@@ -112,7 +116,8 @@ def reschedule_task(sensor_config: SensorConfig):
     if job:
         scheduler.remove_job(job_id)
 
-    add_scheduler_task(sensor_config, 1)
+    if sensor_config.isActive:
+        add_scheduler_task(sensor_config, 1)
 
 
 def add_scheduler_task(sensor_config: SensorConfig, i):
@@ -136,9 +141,14 @@ def start_scheduler():
     logger.debug(f"Following sensors are configured: {sensors}", extra={'extra': {'fpfId': get_fpf_id(), 'api_key': get_or_request_api_key()}})
     i = 0
     for sensor in sensors:
-        i += 5
-        add_scheduler_task(sensor, i)
-        logger.debug(f"Scheduled task every {sensor.intervalSeconds}s", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
+        if sensor.isActive:
+            i += 5
+            add_scheduler_task(sensor, i)
+            logger.debug(f"Scheduled task every {sensor.intervalSeconds}s", extra={
+                'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
+        else:
+            logger.debug(f"Skipped scheduling task", extra={
+                'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
 
     scheduler.start()
 

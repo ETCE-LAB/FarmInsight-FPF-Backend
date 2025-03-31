@@ -32,8 +32,10 @@ class IntRangeRuleInclusive(NamedTuple):
     min: int
     max: int
 
+
 class ValidHttpEndpointRule(NamedTuple):
-    regex: str
+    pass
+
 
 '''
 The type of a field needs to be correctly validated the same as any rules applying to the field!  
@@ -42,10 +44,12 @@ class FieldType(Enum):
     INTEGER = 'int'
     STRING = 'str'
 
+
 class FieldDescription(NamedTuple):
     name: str
     type: FieldType
     rules: List[object]
+
 
 '''
 The connection type is required and shows up as a column in the frontend.
@@ -54,6 +58,7 @@ class ConnectionType(Enum):
     PIN = 'Pin'
     HTTP = 'Http'
     FARMBOT = 'Farmbot'
+
 
 '''
 Every sensor class needs to correctly return a full sensor description object on getDescription()
