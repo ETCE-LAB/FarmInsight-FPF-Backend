@@ -143,7 +143,7 @@ LOGGING = {
         'api': {
             'level': env('API_LOG_LEVEL', default='ERROR'),
             'class': 'django_server.custom_loggers.APILogHandler',
-            'api_url': f'{MEASUREMENTS_BASE_URL}/api/log_message',
+            'api_url': f'{MEASUREMENTS_BASE_URL}/api/log_messages',
             'fpf_id': '',
             'formatter': 'message_only',
         },
@@ -156,7 +156,7 @@ LOGGING = {
         },
         'fpf_sensor_service': {
             'handlers': ['console', 'api'],
-            'level': env('SENSOR_SERVICE_LOG_LEVEL', default='INFO'),
+            'level': env('SENSOR_SERVICE_LOG_LEVEL', default='DEBUG'),
             'propagate': False,
         },
     },
