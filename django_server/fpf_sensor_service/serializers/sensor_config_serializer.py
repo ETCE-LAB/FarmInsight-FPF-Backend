@@ -68,6 +68,6 @@ class SensorConfigSerializer(serializers.ModelSerializer):
                 if isinstance(rule, ValidHttpEndpointRule):
                     if not re.match(r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/\S*)?$", value):
                         raise ValidationError({
-                            field.name: f'Invalid endpoint URL. Expected format: {r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/\S*)?$"}'
+                            field.name: 'Invalid endpoint URL. Expected format: ^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/\S*)?$'
                         })
         return data
