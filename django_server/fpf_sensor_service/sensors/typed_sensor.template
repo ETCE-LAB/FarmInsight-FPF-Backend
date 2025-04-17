@@ -1,10 +1,12 @@
 import json
 
-from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, FieldType
+from .typed_sensor import TypedSensor
+from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType
 
 '''
 This is a class template to add a new TypedSensor to the project, copy into a .py file and fill out.
-The avaliable types and enums for the sensor description are found in the typed_sensor.py file, expand as needed but remember to correctly serialize new requirements and also correctly suppport them in the frontent!
+The available types and enums for the sensor description are found in the sensor_description.py file,
+expand as needed but remember to correctly serialize new requirements and also correctly suppport them in the frontent!
 '''
 class TypedSensorTemplate(TypedSensor):
     def init_additional_information(self):

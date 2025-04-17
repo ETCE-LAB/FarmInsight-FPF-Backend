@@ -20,7 +20,7 @@ def create_sensor_config(data) -> SensorConfigSerializer:
         sensor_config.id = data['id']
         sensor_config.save()
 
-        add_scheduler_task(sensor_config)
+        add_scheduler_task(sensor_config, 1)
 
         return SensorConfigSerializer(sensor_config)
 

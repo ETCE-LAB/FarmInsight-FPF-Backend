@@ -1,5 +1,4 @@
 import json
-import uuid
 import re
 
 from rest_framework import serializers
@@ -7,8 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from fpf_sensor_service.models.sensor_config import SensorConfig
 from fpf_sensor_service.sensors import TypedSensorFactory
-from fpf_sensor_service.sensors.typed_sensor import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
-from fpf_sensor_service.utils import is_uuid
+from fpf_sensor_service.sensors.sensor_description import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 
 
 typed_sensor_factory = TypedSensorFactory()
@@ -31,7 +29,7 @@ class SensorConfigSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SensorConfig
-        fields = ['id', 'intervalSeconds', 'sensorClassId', 'additionalInformation']
+        fields = ['id', 'intervalSeconds', 'sensorClassId', 'additionalInformation', 'isActive']
 
     def validate_intervalSeconds(self, value):
         """Ensure intervalSeconds is greater than 0."""
@@ -68,8 +66,8 @@ class SensorConfigSerializer(serializers.ModelSerializer):
                     if value < rule.min or value > rule.max:
                         raise ValidationError({field.name: f'pin value out of range ({rule.min}, {rule.max}).'})
                 if isinstance(rule, ValidHttpEndpointRule):
-                    if not re.match(rule.regex, value):
+                    if not re.match(r"^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/\S*)?$", value):
                         raise ValidationError({
-                            field.name: f'Invalid endpoint URL. Expected format: {rule.regex}'
+                            field.name: 'Invalid endpoint URL. Expected format: ^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/\S*)?$'
                         })
         return data

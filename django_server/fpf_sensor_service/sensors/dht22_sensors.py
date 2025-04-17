@@ -24,7 +24,7 @@ class PinDHT22HumiditySensor(TypedSensor):
             parameter='humidity;feuchtigkeit',
             unit='%',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
@@ -70,7 +70,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
             parameter='temperature;temperatur',
             unit='°C',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
@@ -99,13 +99,8 @@ class PinDHT22TemperatureSensor(TypedSensor):
         return value
 
 
-class HttpDHT22HumiditySensor(TypedSensor):
-    http_endpoint = None
 
-    def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-
+class HttpDHT22HumiditySensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
@@ -115,39 +110,21 @@ class HttpDHT22HumiditySensor(TypedSensor):
             parameter='humidity;feuchtigkeit',
             unit='%',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
             ]
         )
 
-    def get_measurement(self):
-        try:
-            response = requests.get(self.http_endpoint)
-            response.raise_for_status()
-            return response.json().get("value")
 
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to get measurement: {e}")
-            return None
-
-
-class HttpDHT22TemperatureSensor(TypedSensor):
-    http_endpoint = None
-
-    def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-
+class HttpDHT22TemperatureSensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
@@ -157,27 +134,15 @@ class HttpDHT22TemperatureSensor(TypedSensor):
             parameter='temperature;temperatur',
             unit='°C',
             tags={
-                'info': 'minimum interval 3 seconds.'
+                'info': 'minimum interval 3 seconds;Kleinstes Intervall 3 Sekunden'
             },
             fields=[
                 FieldDescription(
                     name='http',
                     type=FieldType.STRING,
                     rules=[
-                        ValidHttpEndpointRule(
-                            regex="^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]{1,5})?(\/[^\s]*)?$"
-                        ),
+                        ValidHttpEndpointRule(),
                     ]
                 ),
             ]
         )
-
-    def get_measurement(self):
-        try:
-            response = requests.get(self.http_endpoint)
-            response.raise_for_status()
-            return response.json().get("value")
-
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to get measurement: {e}")
-            return None

@@ -5,20 +5,57 @@
 A Django-based sensor service that allows configuring sensors, collecting sensor data, and sending it to a remote system based on configurable intervals.
 
 ## Table of Contents
+- [The FarmInsight Project](#the-farminsight-project)
+  - [Core vision](#core-vision)
 - [Overview](#overview)
+  - [Built with](#built-with)
 - [Features](#features)
 - [Development Setup](#development-setup)
 - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
-- [Deploy](#deploy-the-application-on-raspberrypi)
+- [Add new sensor support](#add-new-sensor-support)
 - [Contributing](#contributing)
 - [License](#license)
 
+## The FarmInsight Project
+Welcome to the FarmInsight Project by ETCE!
+
+The FarmInsight platform brings together advanced monitoring of "Food Production Facilities" (FPF), enabling users to 
+document, track, and optimize every stage of food production seamlessly.
+
+All FarmInsight Repositories:
+* <a href="https://github.com/ETCE-LAB/FarmInsight-Dashboard-Frontend">Dashboard-Frontend</a>
+* <a href="https://github.com/ETCE-LAB/FarmInsight-Dashboard-Backend">Dashboard-Backend</a>
+* <a href="https://github.com/ETCE-LAB/FarmInsight-FPF-Backend">FPF-Backend</a>
+
+### Core vision
+
+<img src="/.documentation/FarmInsightOverview.jpg">
+
+FarmInsight empowers users to manage food production facilities with precision and ease. 
+
+Key features include:
+
+* User Management: Set up organizations with role-based access control for secure and personalized use.
+* FPF Management: Configure and manage Food Production Facilities (FPFs), each equipped with sensors and cameras.
+* Sensor & Camera Integration: Collect sensor data and capture images or livestreams at configurable intervals, all 
+accessible through the web application.
+* Harvest Documentation: Log and track harvests for each plant directly from the frontend interface.
+* Data Visualization: Visualize sensor data with intuitive graphs and charts.
+* Media Display: View and manage captured images and livestreams for real-time monitoring.
+
 ## Overview
-The Sensor Service application collects data from all configured sensors and sends measurements to a remote system based on user-configured intervals.
+The FPF (Food Production Facility) Backend application collects data from all configured sensors and sends 
+measurements to the FarmInsights Dashboard-Backend based on user-configured intervals.
+
+### Built with
+
+[![Python][Python-img]][Python-url] <br>
+[![Django][Django-img]][Django-url] <br>
+[![SQLite][SQLite-img]][SQLite-url]
 
 ## Features
-- Manage sensor configurations.
+- Manage sensor configurations remotely via API.
 - Schedule sensor data collection based on configurable intervals.
 - Send sensor measurements to a remote API.
 - API support for managing sensor configurations.
@@ -50,7 +87,7 @@ Example of .env file:
 MEASUREMENTS_BASE_URL=http://localhost:3001
 GENERATE_MEASUREMENTS=True
 
-RESOURCE_SERVER_INTROSPECTION_URL=https://development-isse-identityserver.azurewebsites.net/connect/introspect
+RESOURCE_SERVER_INTROSPECTION_URL=<URL HERE>
 DASHBOARD_BACKEND_USER_ID=<ID HERE>
 ```
 
@@ -73,62 +110,44 @@ python manage.py runserver 8002
 On server startup, the scheduler starts automatically.
 
 ## API Endpoints
-Here are some of the key API endpoints for the sensor service:
+Here are some of the key API endpoints :
 
-* POST /api/sensorInterval/{sensorId} - Update the interval for a sensor.
+* GET /api/sensors/types - It will return all available sensor configs
+* POST /api/sensors - Create a new sensor
+* GET /api/sensors/{sensorId} - Get the config for given sensor
+* PUT /api/sensors/{sensorId} - Edit a sensor
 
-## Deploy the Application on Raspberrypi
-
-Install Python:
-```bash
-sudo apt-get update
-sudo apt-get -y upgrade
-sudo apt-get install python3-pip python3-venv
-```
-Run these inside the /home directory to setup the virtual environment:
-```bash
-python3 -m venv env --system-site-packages
-```
-Activate the virtual environment when installing any python libraries:
-```bash 
-source env/bin/activate
-```
-Git clone the FPF-Backend into the home folder.
-And install requirements for the django project:
-```bash 
-pip install -r FarmInsight-FPF-Backend/django_server/requirements.txt 
-```
-Edit the "farminsight-fpf.service" file depending on the user and exact path to the django project, then copy it into /etc/systemd/system/ so it is available as /etc/systemd/system/farminsight-fpf.service:
-```bash 
-cp ~/FarmInsight-FPF-Backend/farminsight-fpf.service /etc/systemd/system/farminsight-fpf.service
-```
-Now enable the service to start at reboot:
-```bash 
-systemctl enable farminsight-fpf
-```
-You can also manually start it to test 
-```bash 
-systemctl start farminsight-fpf
-```
-Edit the startup.sh file to change the port of the fpf server (from our default 8001) or what outside connections it allows.
-
-Now make sure that you have all the sensor types you need in your 
-FarmInsight-FPF-Backend/django_server/fpf_sensor_service/sensors folder and are loading them into the module in the __init__.py file it is also best to disable any sensors you don't support.
-
-### How to Install DHT Libraries if required for direct sensor access:
-First step is to setup adafruit-blinka ([adafruit docs](https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/installing-circuitpython-on-raspberry-pi)):
-```bash
-sudo apt install --upgrade python3-setuptools
-pip3 install --upgrade adafruit-python-shell
-wget https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/raspi-blinka.py
-sudo -E env PATH=$PATH python3 raspi-blinka.py
-```
-Next is to install adafruit CircuitPythons DHT library ([adafruit docs](https://learn.adafruit.com/dht-humidity-sensing-on-raspberry-pi-with-gdocs-logging/python-setup)):
-```bash 
-pip3 install adafruit-circuitpython-dht
-sudo apt-get install libgpiod2
-```
+## Add new sensor support
+To add a new sensor:
+* First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
+* Use the boilerplate code from the typed_sensor.template file to setup the basic class structure, name the class accordingly.
+* Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
+* Implement the get_measurement() method and init_additional_information() if needed.
+* Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
 
 ## Contributing
 
+This project was developed as part of the Digitalisierungsprojekt at DigitalTechnologies WS24/25 by:
+* Tom Luca Heering
+* Theo Lesser
+* Mattes Knigge
+* Julian Schöpe
+* Marius Peter
+
+Project supervision:
+* Johannes Meier
+* Benjamin Leiding
+
 ## License
+This project is licensed under the [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) license.
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[Python-img]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[Python-url]: https://www.python.org/
+[Django-img]: https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white
+[Django-url]: https://www.djangoproject.com/
+[SQLite-img]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
+[SQLite-url]: https://www.sqlite.org/
+
+---
+For more information or questions, please contact the ETCE-Lab team.

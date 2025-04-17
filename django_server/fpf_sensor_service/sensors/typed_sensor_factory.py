@@ -2,8 +2,11 @@ from typing import Type
 
 from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription
 from fpf_sensor_service.models import SensorConfig
-from fpf_sensor_service.serializers.sensor_description_serializer import SensorDescriptionSerializer
 
+def all_subclasses(cls):
+    # Required to also handle deeper subclasses!
+    return set(cls.__subclasses__()).union(
+        [s for c in cls.__subclasses__() for s in all_subclasses(c)])
 
 class TypedSensorFactory:
     registry = None
@@ -11,7 +14,7 @@ class TypedSensorFactory:
     def __init__(self, **kwargs):
         if self.registry is None:
             self.registry = {}
-            for sensor_class in TypedSensor.__subclasses__():
+            for sensor_class in all_subclasses(TypedSensor):
                 description = sensor_class.get_description()
                 if description.sensor_class_id in self.registry:
                     raise Exception("Multiple typed sensors with the same id detected!!")
