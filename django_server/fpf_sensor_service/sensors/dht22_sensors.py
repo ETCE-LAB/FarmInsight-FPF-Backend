@@ -1,8 +1,8 @@
 import json
-import requests
 
-from fpf_sensor_service.sensors.typed_sensor import TypedSensor, SensorDescription, ConnectionType, FieldDescription, \
-    FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
+from .typed_sensor import TypedSensor
+from .http_sensor import HttpSensor
+from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 
 from adafruit_blinka.microcontroller.bcm283x.pin import Pin
 from adafruit_dht import DHT22
