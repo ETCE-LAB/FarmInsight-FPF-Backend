@@ -1,27 +1,25 @@
 #include <WiFiNINA.h>
 #include <Adafruit_ADS1X15.h>
 
-// Enter WLAN Access Credentials
-const char ssid[] = "SSID";
-const char pass[] = "PASSWORD";
+// WiFi Credentials
+const char ssid[] = "DIGIT-RasPi";
+const char pass[] = "r6HYUaJ19kRQQT9E5EGw";
 
-// Enter the static network information
-IPAddress local_IP(0, 0, 0, 0);
-IPAddress gateway(0, 0, 0, 0);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(8, 8, 8, 8);
+// Static IP Configuration (Optional)
+IPAddress local_IP(139, 174, 57, 12);     // IP-Adresse des Arduino
+IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
+IPAddress subnet(255, 255, 255, 192);       // Subnetzmaske
+IPAddress dns(8, 8, 8, 8);                // DNS-Server (Google DNS als Beispiel)
 
-// Status of connection
-int status = WL_IDLE_STATUS;
+int status = WL_IDLE_STATUS; // WiFi Status
+
+WiFiServer server(80);
 
 // Create an ADS1115 object
 Adafruit_ADS1115 ads;
 
 // Setting gain for ADS1115
 adsGain_t gain = GAIN_TWOTHIRDS;
-
-// Wi-Fi server object
-WiFiServer server(80);
 
 // Function to convert ADC reading to voltage
 float ads1115_to_voltage(int16_t adcValue, adsGain_t gain) {
@@ -42,97 +40,77 @@ float ads1115_to_voltage(int16_t adcValue, adsGain_t gain) {
   return adcValue * lsb;
 }
 
-void setup() {
-  Serial.begin(9600);
-  while (!Serial) {
-    ; // Wait till serial connection is created
-  }
+String getSensorData() {
+    // Perform the measurement
+  int16_t adc1 = ads.readADC_SingleEnded(1);
+  float voltage = ads1115_to_voltage(adc1, gain);
 
-  Serial.println("Serial Monitor started, Establishing WIfi...");
+  float neutralVoltage = 1.5;
+  float acidVoltage = 2.05;
 
-  // check WLAN-module exists
-  if (WiFi.status() == WL_NO_MODULE) {
-    Serial.println("WLAN-Modul nicht gefunden!");
-    while (true); // Endlosschleife, da kein WLAN-Modul vorhanden
-  }
+  float slope = (6.8 - 4.0) / ((neutralVoltage - 1.5) / 3.0 - (acidVoltage - 1.5) / 3.0);
+  float intercept = 6.8 - slope * (neutralVoltage - 1.5) / 3.0;
+  float phValue = slope * (voltage - 1.5) / 3.0 + intercept;
+  
+  return "{\"value\": " + String(phValue, 2) + "}";
+}
 
-  // apply WLAN config
+// Send HTTP Response
+void sendResponse(WiFiClient &client, String data) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: application/json");
+  client.println("Connection: close");
+  client.println();
+  client.println(data);
+}
+
+// WiFi Reconnection
+void reconnectWiFiConnection() {
+  if (WiFi.status() == WL_CONNECTED) return;
+
+  WiFi.disconnect();
   WiFi.config(local_IP, gateway, subnet);
-
-  // WLAN connect with retries if not possible
   while (status != WL_CONNECTED) {
-    Serial.print("Connected with: ");
-    Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
-
     delay(10000);
   }
 
-  // Print connection details
-  Serial.println("Wifi connected!");
-  Serial.print("IP-Adress: ");
-  Serial.println(WiFi.localIP());
-
-  // Start the server
-  server.begin();
-
-  // Initialize ADS1115
-  if (!ads.begin()) {
-    Serial.println("Failed to find ADS1115 chip");
-    while (1);
+  if (!server) {
+    server.begin();
   }
-  ads.setGain(gain);
-  Serial.println("ADS1115 initialized");
 }
 
+// Setup Function
+void setup() {
+  reconnectWiFiConnection();
+
+  // Initialize ADS1115
+  while (!ads.begin()) {
+    delay(2000);
+  }
+  ads.setGain(gain);
+}
+
+// restart the arduino from code
+int requests_until_reboot = 24; // since we know typically 1 value per day, this is once daily
+void(* resetFunc) (void) = 0;
+
+// Main Loop
 void loop() {
-  // Check if a client is connected
+  reconnectWiFiConnection();
+
   WiFiClient client = server.available();
   if (client) {
-    Serial.println("New client connected");
-
-    // Wait for the client to send a request
-    while (client.connected() && !client.available()) {
-      delay(1);
-    }
-
-    // Read the request
+    while (client.connected() && !client.available()) delay(1);
     String request = client.readStringUntil('\r');
-    Serial.print("Request: ");
-    Serial.println(request);
-
-    // Parse the request
+  
     if (request.startsWith("GET /measurements/ph")) {
-
-      // Perform the measurement
-      int16_t adc1 = ads.readADC_SingleEnded(1);
-      float voltage = ads1115_to_voltage(adc1, gain);
-
-      float neutralVoltage = 1.5;
-      float acidVoltage = 2.05;
-
-      float slope = (6.8 - 4.0) / ((neutralVoltage - 1.5) / 3.0 - (acidVoltage - 1.5) / 3.0);
-
-      float intercept = 6.8 - slope * (neutralVoltage - 1.5) / 3.0;
-
-      float phValue = slope * (voltage - 1.5) / 3.0 + intercept;
-
-      // Create JSON response
-      String jsonResponse = "{";
-      jsonResponse += "\"sensor_id\": 1,";
-      jsonResponse += "\"value\": " + String(phValue, 2);
-      jsonResponse += "}";
-
-      // Send HTTP response
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: application/json");
-      client.println("Connection: close");
-      client.println();
-      client.println(jsonResponse);
-
-      Serial.println("Response sent");
+      sendResponse(client, getSensorData());
+      requests_until_reboot -= 1;
+      if (requests_until_reboot <= 0) {
+        resetFunc();
+      }
     } else {
-      // Handle unknown request
       client.println("HTTP/1.1 404 Not Found");
       client.println("Content-Type: text/plain");
       client.println("Connection: close");
@@ -140,8 +118,6 @@ void loop() {
       client.println("404 Not Found");
     }
 
-    // Close the connection
     client.stop();
-    Serial.println("Client disconnected");
   }
 }
