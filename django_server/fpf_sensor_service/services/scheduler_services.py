@@ -1,4 +1,6 @@
 import random
+import time
+
 import requests
 from datetime import timedelta
 
@@ -106,7 +108,19 @@ def task(sensor: TypedSensor):
         if settings.GENERATE_MEASUREMENTS:
             result = MeasurementResult(value=random.uniform(20.0, 20.5))
         else:
-            result = sensor.get_measurement()
+            i = 0
+            while i < settings.MEASUREMENT_RETRY_COUNT:
+                i += 1
+                try:
+                    result = sensor.get_measurement()
+                    break
+                except Exception as e:
+                    print(f'attempt {i}')
+                    # only raise the error outwards if it's the last attempt
+                    if i == settings.MEASUREMENT_RETRY_COUNT:
+                        raise e
+                    else:
+                        time.sleep(settings.MEASUREMENT_RETRY_SLEEP_BETWEEN_S)
 
         SensorMeasurement.objects.create(
             sensor_id=sensor.sensor_config.id,
@@ -119,17 +133,17 @@ def task(sensor: TypedSensor):
         logger.error(f"Error processing sensor: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
 
 
-def reschedule_task(sensor_config: SensorConfig):
+def reschedule_task(sensor_config: SensorConfig, instances: int):
     job_id = f"sensor_{sensor_config.id}"
     job = scheduler.get_job(job_id)
     if job:
         scheduler.remove_job(job_id)
 
     if sensor_config.isActive:
-        add_scheduler_task(sensor_config, 1)
+        add_scheduler_task(sensor_config, instances, 1)
 
 
-def add_scheduler_task(sensor_config: SensorConfig, i):
+def add_scheduler_task(sensor_config: SensorConfig, instances: int, i: int):
     sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
     sensor = sensor_class(sensor_config)
     scheduler.add_job(
@@ -138,7 +152,8 @@ def add_scheduler_task(sensor_config: SensorConfig, i):
         seconds=sensor_config.intervalSeconds,
         args=[sensor],
         id=f"sensor_{sensor_config.id}",
-        next_run_time=timezone.now() + timedelta(seconds=i)
+        next_run_time=timezone.now() + timedelta(seconds=i),
+        max_instances=instances  # "for this job" reads like this wouldn't help but let's try anyway
     )
 
 
@@ -147,12 +162,13 @@ def start_scheduler():
     Get all sensor configurations from sqlite db and schedule jobs based on set intervals.
     """
     sensors = SensorConfig.objects.all()
+    instances = len(sensors)
     logger.debug(f"Following sensors are configured: {sensors}", extra={'extra': {'fpfId': get_fpf_id(), 'api_key': get_or_request_api_key()}})
     i = 0
     for sensor in sensors:
         if sensor.isActive:
             i += 5
-            add_scheduler_task(sensor, i)
+            add_scheduler_task(sensor, instances, i)
             logger.debug(f"Scheduled task every {sensor.intervalSeconds}s", extra={
                 'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
         else:
