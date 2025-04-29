@@ -20,7 +20,8 @@ def create_sensor_config(data) -> SensorConfigSerializer:
         sensor_config.id = data['id']
         sensor_config.save()
 
-        add_scheduler_task(sensor_config, 1)
+        instances = len(SensorConfig.objects.all())
+        add_scheduler_task(sensor_config, instances, 1)
 
         return SensorConfigSerializer(sensor_config)
 
@@ -35,7 +36,8 @@ def update_sensor_config(data, sensor_id) -> SensorConfigSerializer:
     sensor = SensorConfig.objects.get(id=sensor_id)
     serializer = SensorConfigSerializer(sensor, data=data, partial=True)
     if serializer.is_valid(raise_exception=True):
+        instances = len(SensorConfig.objects.all())
         sensor_config = serializer.save()
-        reschedule_task(sensor_config)
+        reschedule_task(sensor_config, instances)
 
     return serializer
