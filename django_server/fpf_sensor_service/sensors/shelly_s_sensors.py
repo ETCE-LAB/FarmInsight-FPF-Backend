@@ -10,8 +10,8 @@ class ShellySSensor(HttpSensor):
             sensor_class_id='63cd9dc2-ac79-4720-9f66-7ba902cdd541',
             model='Shelly S Smartplug',
             connection=ConnectionType.HTTP,
-            parameter='Ampere;Ampere',
-            unit='ampere',
+            parameter='watt;Watt',
+            unit='w',
             tags={},
             fields=[
                 FieldDescription(
