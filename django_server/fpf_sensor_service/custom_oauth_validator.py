@@ -43,7 +43,7 @@ class CustomOAuth2Validator(OAuth2Validator):
             user, _ = UserModel.objects.get_or_create(**{UserModel.USERNAME_FIELD: 'mock-user', UserModel.EMAIL_FIELD: 'mock@mail.com'})
 
             expires = make_aware(
-                datetime.now(), timezone=get_timezone(oauth2_settings.AUTHENTICATION_SERVER_EXP_TIME_ZONE)
+                datetime.now() + timedelta(minutes=10), timezone=get_timezone(oauth2_settings.AUTHENTICATION_SERVER_EXP_TIME_ZONE)
             )
 
             access_token, _created = AccessToken.objects.update_or_create(
