@@ -37,6 +37,6 @@ class HttpSensor(TypedSensor):
         )
 
     def get_measurement(self) -> MeasurementResult:
-        response = requests.get(self.http_endpoint)
+        response = requests.get(self.http_endpoint, timeout=10)
         response.raise_for_status()
         return MeasurementResult(value=response.json().get("value"))
