@@ -11,7 +11,7 @@ class ShellySSensor(HttpSensor):
             model='Shelly S Smartplug',
             connection=ConnectionType.HTTP,
             parameter='watt;Watt',
-            unit='w',
+            unit='W',
             tags={},
             fields=[
                 FieldDescription(
