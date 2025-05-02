@@ -156,7 +156,7 @@ LOGGING = {
             'propagate': True,
         },
         'fpf_sensor_service': {
-            'handlers': ['console'],
+            'handlers': ['file', 'api'],
             'level': env('SENSOR_SERVICE_LOG_LEVEL', default='DEBUG'),
             'propagate': False,
         },
