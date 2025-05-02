@@ -149,7 +149,7 @@ def add_scheduler_task(sensor_config: SensorConfig, instances: int, i: int):
         args=[sensor],
         id=f"sensor_{sensor_config.id}",
         next_run_time=timezone.now() + timedelta(seconds=i),
-        max_instances=instances  # "for this job" reads like this wouldn't help but let's try anyway
+        max_instances=instances+1  # "for this job" reads like this wouldn't help but let's try anyway
     )
 
 
