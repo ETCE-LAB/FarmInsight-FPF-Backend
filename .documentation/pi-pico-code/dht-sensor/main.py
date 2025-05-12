@@ -37,20 +37,31 @@ def connect_to_wifi():
 wlan = connect_to_wifi()
 
 # Set up the socket
-addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-s = socket.socket()
-s.bind(addr)
-s.listen(1)
-s.settimeout(10)  # Set a timeout for socket operations
-print('Listening on', addr)
+def bind_socket():
+    addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+    s = socket.socket()
+    s.bind(addr)
+    s.listen(1)
+    s.settimeout(10)  # Set a timeout for socket operations
+    print('Listening on', addr)
+    return s
+
+s = bind_socket()
 
 # Serve HTTP requests
 while True:
-    gc.collect()
     try:
+        gc.collect()
         # Reconnect to WiFi if disconnected
         if wlan.status() != 3:
             wlan = connect_to_wifi()
+            try:
+                s.close()
+            finally:
+                s = None
+
+        if s is None:
+            s = bind_socket()
 
         cl, addr = s.accept()
         cl.settimeout(5)  # Set timeout for client socket operations
