@@ -150,7 +150,7 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Light Intensity;Licht Stärke',
-            unit='°C',
+            unit='lux',
             tags={
                 'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
             },
