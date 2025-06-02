@@ -4,7 +4,7 @@
 
 // WiFi Credentials
 const char ssid[] = "ssid";
-const char pass[] = "password";
+const char pass[] = "pw";
 
 // Static IP Configuration (Optional)
 IPAddress local_IP(1, 1, 1, 1);     // IP-Adresse des Arduino 214
@@ -32,11 +32,11 @@ void sendResponse(WiFiClient &client, String data) {
 }
 
 // WiFi Reconnection
-void reconnectWiFiConnection() {
-  if (WiFi.status() == WL_CONNECTED) return;
-
-  WiFi.disconnect();
-  WiFi.config(local_IP, gateway, subnet);
+void checkWiFiConnection() {
+  status = WiFi.status();
+  if (status == WL_CONNECTED) return;
+  
+  Serial.println("Reconnecting to WiFi...");
   while (status != WL_CONNECTED) {
     status = WiFi.begin(ssid, pass);
     delay(10000);
@@ -44,27 +44,36 @@ void reconnectWiFiConnection() {
   if (!server) {
     server.begin();
   }
+  
+  Serial.println("WiFi Reconnected!");
 }
 
 // Setup Function
 void setup() {
+  Serial.begin(9600);
   Wire.begin();
 
-  reconnectWiFiConnection();
+  WiFi.config(local_IP, gateway, subnet);
+  checkWiFiConnection();
+  Serial.println("WiFi Connected! IP: " + WiFi.localIP().toString());
 
   while(!sht31.begin(0x44)) {
+    Serial.println("SHT could not be initialized, please check cabels and connection!");
     delay(2000);
   }
 }
 
 // Main Loop
 void loop() {
-  reconnectWiFiConnection();
+  checkWiFiConnection();
 
   WiFiClient client = server.available();
   if (client) {
+	Serial.println("New client connected");
+  
     while (client.connected() && !client.available()) delay(1);
     String request = client.readStringUntil('\r');
+	Serial.println("Request: " + request);
   
     if (request.startsWith("GET /measurements/humidity")) sendResponse(client, getSensorData(0));
     else if (request.startsWith("GET /measurements/temperature")) sendResponse(client, getSensorData(1));
@@ -73,9 +82,10 @@ void loop() {
       client.println("Content-Type: text/plain");
       client.println("Connection: close");
       client.println();
-      client.println("404 Not Found");
+      client.println("{\"error\": \"404 Not Found\"}");
     }
 
     client.stop();
+	Serial.println("Client disconnected");
   }
 }
