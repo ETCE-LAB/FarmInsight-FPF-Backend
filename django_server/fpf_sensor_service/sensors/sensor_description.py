@@ -58,7 +58,7 @@ class ConnectionType(Enum):
     PIN = 'Pin'
     HTTP = 'Http'
     FARMBOT = 'Farmbot'
-
+    MQTT = 'MQTT'
 
 '''
 Every sensor class needs to correctly return a full sensor description object on getDescription()

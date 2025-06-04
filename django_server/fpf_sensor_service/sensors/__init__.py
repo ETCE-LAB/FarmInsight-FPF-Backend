@@ -12,3 +12,5 @@ from .haoshi101_sensors import HttpHaoshi101PhSensor
 from .measurement_result import MeasurementResult
 from .weather_station_sensors import HttpWeatherStationAirTemperatureSensor
 from .http_sensor import HttpSensor
+from .mqtt_sensors import MqttSensor
+from .shelly_s_sensors import MQTTShellySSensor, ShellySSensor

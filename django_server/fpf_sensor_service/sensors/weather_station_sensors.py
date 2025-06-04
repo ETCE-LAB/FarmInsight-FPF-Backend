@@ -371,7 +371,7 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
+
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationRainGaugeSensor(TypedSensor):
@@ -455,7 +455,7 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Barometric Pressure;Barometischer Druck',
-            unit='mm',
+            unit='Pa',
             tags={
                 'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
             },

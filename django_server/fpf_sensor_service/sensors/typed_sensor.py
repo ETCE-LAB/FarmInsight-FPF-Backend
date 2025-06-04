@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from fpf_sensor_service.models import SensorConfig
+from fpf_sensor_service.models import SensorConfig, SensorMeasurement
 from .sensor_description import SensorDescription
 
 
@@ -19,5 +19,5 @@ class TypedSensor(ABC):
         pass
 
     @abstractmethod
-    def get_measurement(self):
+    def get_measurement(self, payload=None)->SensorMeasurement:
         pass

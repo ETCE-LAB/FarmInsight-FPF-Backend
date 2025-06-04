@@ -27,11 +27,11 @@ String getSensorData(String type) {
   float lux = tsl.calculateLux(broadband, infrared);
 
   if (type == "lux") {
-    return "{\"lux\": " + String(lux, 2) + "}";
+    return "{\"value\": " + String(lux, 2) + "}";
   } else if (type == "sumlight") {
-    return "{\"sumlight\": " + String(broadband) + "}";
+    return "{\"value\": " + String(broadband) + "}";
   } else if (type == "infrared") {
-    return "{\"infrared\": " + String(infrared) + "}";
+    return "{\"value\": " + String(infrared) + "}";
   } else {
     return "{\"error\": \"Invalid type\"}";
   }

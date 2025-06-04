@@ -92,7 +92,11 @@ void loop() {
     String request = client.readStringUntil('\r');
     Serial.println("Request: " + request);
 
-    if (request.startsWith("GET /measurements/humidity")) sendResponse(client, getSensorData("humidity"));
+    if (request.startsWith("GET /measurements/humidity")) {
+        float hum = sht31.readHumidity();
+        if (isnan(hum)) sendError(client, "Humidity read failed");
+            sendResponse(client, getSensorData("humidity"))
+    };
     else if (request.startsWith("GET /measurements/temperature")) sendResponse(client, getSensorData("temperature"));
     else {
       client.println("HTTP/1.1 404 Not Found");
