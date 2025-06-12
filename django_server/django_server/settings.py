@@ -107,6 +107,13 @@ REST_FRAMEWORK = {
     ),
 }
 
+MQTT_CONFIG = {
+    "HOST": env("MQTT_HOST", default="localhost"),
+    "PORT": env.int("MQTT_PORT", default=1883),
+    "USERNAME": env("MQTT_USERNAME", default=None),
+    "PASSWORD": env("MQTT_PASSWORD", default=None),
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

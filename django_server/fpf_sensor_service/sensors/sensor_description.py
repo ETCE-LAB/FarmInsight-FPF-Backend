@@ -58,6 +58,8 @@ class ConnectionType(Enum):
     PIN = 'Pin'
     HTTP = 'Http'
     FARMBOT = 'Farmbot'
+    MQTT = 'MQTT'
+    HTTP_MQTT = 'HTTP_MQTT'
 
 
 '''
