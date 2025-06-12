@@ -60,6 +60,7 @@ class ConnectionType(Enum):
     FARMBOT = 'Farmbot'
     MQTT = 'MQTT'
 
+
 '''
 Every sensor class needs to correctly return a full sensor description object on getDescription()
 These get drawn in frontend as hardware connection.

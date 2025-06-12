@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from fpf_sensor_service.models import SensorConfig
+from .sensor_description import SensorDescription
+
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement
 from .sensor_description import SensorDescription
 

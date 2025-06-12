@@ -2,11 +2,11 @@
 #include <Adafruit_ADS1X15.h>
 
 // WiFi Credentials
-const char ssid[] = "DIGIT-RasPi";
-const char pass[] = "r6HYUaJ19kRQQT9E5EGw";
+const char ssid[] = "ssid";
+const char pass[] = "pw";
 
 // Static IP Configuration (Optional)
-IPAddress local_IP(139, 174, 57, 12);     // IP-Adresse des Arduino
+IPAddress local_IP(1, 1, 1, 1);     // IP-Adresse des Arduino
 IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
 IPAddress subnet(255, 255, 255, 192);       // Subnetzmaske
 IPAddress dns(8, 8, 8, 8);                // DNS-Server (Google DNS als Beispiel)

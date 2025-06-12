@@ -1,5 +1,4 @@
 import json
-
 from . import MeasurementResult, TypedSensor
 from .http_sensor import HttpSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
