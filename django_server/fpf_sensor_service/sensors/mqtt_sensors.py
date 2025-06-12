@@ -37,10 +37,8 @@ class MqttSensor(TypedSensor):
 
     def get_measurement(self, payload) -> MeasurementResult:
         try:
-            data = json.loads(payload)
-            value = data['value']
-
-            timestamp = data.get('timestamp')
+            value = payload['value']
+            timestamp = payload.get('timestamp')
             if timestamp is not None:
                 return MeasurementResult(value=value, timestamp=timestamp)
             else:

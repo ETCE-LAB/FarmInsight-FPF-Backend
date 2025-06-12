@@ -59,6 +59,7 @@ class ConnectionType(Enum):
     HTTP = 'Http'
     FARMBOT = 'Farmbot'
     MQTT = 'MQTT'
+    HTTP_MQTT = 'HTTP_MQTT'
 
 
 '''

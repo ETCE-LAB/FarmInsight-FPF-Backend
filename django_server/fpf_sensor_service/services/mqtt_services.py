@@ -71,7 +71,7 @@ class MQTTService:
             curr_sensor = sensor_class(sensor)
 
             # Only with connection type == MQTT
-            if curr_sensor.get_description().connection == ConnectionType.MQTT:
+            if curr_sensor.get_description().connection == ConnectionType.MQTT or curr_sensor.get_description().connection == ConnectionType.HTTP_MQTT:
 
                 try:
                     additional_info = json.loads(sensor.additionalInformation)
@@ -90,10 +90,8 @@ class MQTTService:
 
     def on_message(self, client, userdata, msg):
         try:
-            print(msg)
             payload = json.loads(msg.payload.decode())
             topic = msg.topic
-            print(payload)
             # Try to find the sensor config with this topic
             matching_sensor = None
             for sensor in SensorConfig.objects.filter(isActive=True):
