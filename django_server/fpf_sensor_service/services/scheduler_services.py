@@ -1,6 +1,4 @@
 import random
-import time
-
 import requests
 import time
 from datetime import timedelta
@@ -10,12 +8,19 @@ from django_server import settings
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
+from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory, MeasurementResult
+from fpf_sensor_service.sensors.sensor_description import ConnectionType
 from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory
 from fpf_sensor_service.utils import get_logger
 
 
 logger = get_logger()
-scheduler = BackgroundScheduler(daemon=False)
+'''
+daemon=False is required in deployment to run correctly as a systemd service,
+but it does not play nice with running it in the IDE during development. 
+DO NOT OVERRIDE WHEN MERGING INTO DEPLOYMENT! 
+'''
+scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
 
 
@@ -118,13 +123,18 @@ def task(sensor: TypedSensor):
                     else:
                         time.sleep(settings.MEASUREMENT_RETRY_SLEEP_BETWEEN_S)
 
-        SensorMeasurement.objects.create(
-            sensor_id=sensor.sensor_config.id,
-            value=result.value,
-            measuredAt=result.timestamp
-        )
-        send_measurements(sensor.sensor_config.id)
-        logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+        if result.value is not None:
+            SensorMeasurement.objects.create(
+                sensor_id=sensor.sensor_config.id,
+                value=result.value,
+                measuredAt=result.timestamp
+            )
+            send_measurements(sensor.sensor_config.id)
+            logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+        else:
+            logger.warning("Sensor Task skipped as value is None", extra={
+                'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id,
+                          'api_key': get_or_request_api_key()}})
     except Exception as e:
         logger.error(f"Error processing sensor: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
 
@@ -142,15 +152,18 @@ def reschedule_task(sensor_config: SensorConfig, instances: int):
 def add_scheduler_task(sensor_config: SensorConfig, instances: int, i: int):
     sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
     sensor = sensor_class(sensor_config)
-    scheduler.add_job(
-        task,
-        trigger='interval',
-        seconds=sensor_config.intervalSeconds,
-        args=[sensor],
-        id=f"sensor_{sensor_config.id}",
-        next_run_time=timezone.now() + timedelta(seconds=i),
-        max_instances=instances+1  # "for this job" reads like this wouldn't help but let's try anyway
-    )
+
+    # Don't add MQTT sensor tasks to the scheduler
+    if sensor.get_description().connection != ConnectionType.MQTT:
+        scheduler.add_job(
+            task,
+            trigger='interval',
+            seconds=sensor_config.intervalSeconds,
+            args=[sensor],
+            id=f"sensor_{sensor_config.id}",
+            next_run_time=timezone.now() + timedelta(seconds=i),
+            max_instances=instances+1  # "for this job" reads like this wouldn't help but let's try anyway
+        )
 
 
 def start_scheduler():

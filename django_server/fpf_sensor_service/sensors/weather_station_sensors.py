@@ -66,7 +66,6 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationAirHumiditySensor(TypedSensor):
@@ -127,7 +126,6 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationLightIntensitySensor(TypedSensor):
@@ -150,7 +148,7 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Light Intensity;Licht Stärke',
-            unit='°C',
+            unit='lux',
             tags={
                 'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
             },
@@ -188,7 +186,6 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationUVIndexSensor(TypedSensor):
@@ -249,7 +246,6 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationWindSpeedSensor(TypedSensor):
@@ -310,7 +306,6 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationWindDirectionSensor(TypedSensor):
@@ -371,7 +366,7 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
+
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationRainGaugeSensor(TypedSensor):
@@ -432,7 +427,6 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationBarometricPressureSensor(TypedSensor):
@@ -455,7 +449,7 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Barometric Pressure;Barometischer Druck',
-            unit='mm',
+            unit='Pa',
             tags={
                 'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
             },
@@ -493,5 +487,4 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-        print(value, timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)

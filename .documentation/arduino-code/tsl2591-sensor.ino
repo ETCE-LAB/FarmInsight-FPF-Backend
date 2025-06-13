@@ -27,11 +27,11 @@ String getSensorData(String type) {
   float lux = tsl.calculateLux(broadband, infrared);
 
   if (type == "lux") {
-    return "{\"value\": " + String(lux, 2) + "}";
+    return "{\"lux\": " + String(lux, 2) + "}";
   } else if (type == "sumlight") {
-    return "{\"value\": " + String(broadband) + "}";
+    return "{\"sumlight\": " + String(broadband) + "}";
   } else if (type == "infrared") {
-    return "{\"value\": " + String(infrared) + "}";
+    return "{\"infrared\": " + String(infrared) + "}";
   } else {
     return "{\"error\": \"Invalid type\"}";
   }
@@ -48,27 +48,23 @@ void sendResponse(WiFiClient &client, String data) {
 
 // check Wifi and Reconnect Logic
 void checkWiFiConnection() {
-  if (WiFi.status() == WL_CONNECTED) return;
+  status = WiFi.status();
+  if (status == WL_CONNECTED) return;
 
   Serial.println("Reconnecting to WiFi...");
-  WiFi.disconnect();
-  WiFi.begin(ssid, pass);
-
-  unsigned long startTime = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - startTime < 30000) {
+  while (status != WL_CONNECTED) {
+    WiFi.begin(ssid, pass);
     Serial.print(".");
     delay(1000);
   }
 
-  Serial.println(WiFi.status() == WL_CONNECTED ? "\nWiFi Reconnected!" : "\nFailed to reconnect.");
+  Serial.println("WiFi Reconnected!");
 }
 
 // Setup Function
 void setup() {
   Serial.begin(9600);
   Wire.begin();
-
-
   
   // Setup für den TSL2591 Sensor
   tsl.setGain(TSL2591_GAIN_MED); // Empfindlichkeit des Sensors (niedrig, mittel, hoch)
@@ -77,12 +73,7 @@ void setup() {
   // WiFi Verbindung herstellen
   Serial.println("Connecting to WiFi...");
   WiFi.config(local_IP, gateway, subnet);
-  while (status != WL_CONNECTED) {
-    Serial.print("Connecting to: ");
-    Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
-    delay(10000);
-  }
+  checkWiFiConnection();
 
   Serial.println("WiFi Connected! IP: " + WiFi.localIP().toString());
   server.begin();
@@ -96,10 +87,7 @@ void setup() {
 
 // Main Loop
 void loop() {
-  if (millis() - lastWiFiCheck > wifiCheckInterval) {
-    lastWiFiCheck = millis();
-    checkWiFiConnection();
-  }
+  checkWiFiConnection();
 
   WiFiClient client = server.available();
   if (client) {
@@ -121,7 +109,7 @@ void loop() {
       client.println("Content-Type: text/plain");
       client.println("Connection: close");
       client.println();
-      client.println("404 Not Found");
+      client.println("{\"error\": \"404 Not Found\"}");
     }
 
     client.stop();

@@ -38,6 +38,14 @@ class SensorAppConfig(AppConfig):
                         self.log.info("APScheduler started successfully.")
                     except Exception as e:
                         self.log.error(f"Error starting APScheduler: {e}")
+
+                    try:
+                        from fpf_sensor_service.services.mqtt_services import MQTTService
+                        mqtt_service = MQTTService()
+                        mqtt_service.start()
+                        self.log.info("MQTT Service started successfully.")
+                    except Exception as e:
+                        self.log.error(f"Error starting MQTTService: {e}")
                     break
             except OperationalError as e:
                 self.log.error(f"Database not ready yet: {e}")
