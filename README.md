@@ -42,6 +42,8 @@ Key features include:
 accessible through the web application.
 * Harvest Documentation: Log and track harvests for each plant directly from the frontend interface.
 * Data Visualization: Visualize sensor data with intuitive graphs and charts.
+* Controllable Action: To control the FPF you can add controllable actions which can perform actions on hardware which is reachable via network.
+* Weather forecast: You can configure a location for your FPF for which a weather forecast will be gathered. 
 * Media Display: View and manage captured images and livestreams for real-time monitoring.
 
 ## Overview
@@ -124,6 +126,20 @@ To add a new sensor:
 * Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
 * Implement the get_measurement() method and init_additional_information() if needed.
 * Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
+
+If you want to add MQTT functionalities, make sure to pass 'payload' to the get_measurement function, just like in all other MQTT classes.
+This will be the payload of the sensor.
+
+
+## MQTT support
+To enable MQTT, a MQTT broker must be running in the network, so the FPF can connect to it.
+A common setup is to have a mosquitto broker running on the same raspberry PI. A guide to set it up can be found in the MOSQUITTO.md.
+Once it is set up, you need to configure the MQTT setting in the env.dev file
+e.g.
+`MQTT_HOST=192.168.178.54
+MQTT_PORT=1883`
+Optionally add username and password in case you configured the broker with it.
+The FPF will connect to the broker on startup and listens for incoming messages of the sensors which are communicating via MQTT.
 
 ## Contributing
 
