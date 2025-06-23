@@ -119,6 +119,13 @@ Here are some of the key API endpoints :
 * GET /api/sensors/{sensorId} - Get the config for given sensor
 * PUT /api/sensors/{sensorId} - Edit a sensor
 
+
+## Sensor scripts
+
+In this repository, you can find PiPico or Arduino Nano IOT 33 code in the .documentation folder.
+There, you can also find a template script for HTTP and HTTP + MQTT communication.
+
+
 ## Add new sensor support
 To add a new sensor:
 * First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
