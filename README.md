@@ -128,11 +128,11 @@ There, you can also find a template script for HTTP and HTTP + MQTT communicatio
 
 ## Add new sensor support
 To add a new sensor:
-* First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
-* Use the boilerplate code from the typed_sensor.template file to setup the basic class structure, name the class accordingly.
-* Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
-* Implement the get_measurement() method and init_additional_information() if needed.
-* Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
+1. First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
+2. Use the boilerplate code from the typed_sensor.template file to setup the basic class structure, name the class accordingly.
+3. Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
+4. Implement the get_measurement() method and init_additional_information() if needed.
+5. Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
 
 If you want to add MQTT functionalities, make sure to pass 'payload' to the get_measurement function, just like in all other MQTT classes.
 This will be the payload of the sensor.
