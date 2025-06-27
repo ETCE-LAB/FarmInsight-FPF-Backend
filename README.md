@@ -158,7 +158,7 @@ This project was developed as part of the Digitalisierungsprojekt at DigitalTech
 * Marius Peter
 
 Project supervision:
-* Johannes Meier
+* Johannes Mayer
 * Benjamin Leiding
 
 ## License
