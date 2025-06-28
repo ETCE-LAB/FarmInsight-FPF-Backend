@@ -133,20 +133,20 @@ There, you can also find a template script for HTTP and HTTP + MQTT communicatio
 
 Available sensor scripts in this repository:
 
-| Platform         | Sensor Type            | Script / Folder Name                                                                          | Notes                     |
-|------------------|------------------------|-----------------------------------------------------------------------------------------------|---------------------------|
-| arduino-code     | Ultrasonic             | [A02YYUW-ultrasonic-sensor](./.documentation/arduino-code/A02YYUW-ultrasonic-sensor.ino)      | A02YYUW sensor            |
-| arduino-code     | Atlas Kit              | [atlas-kit-sensor](./.documentation/arduino-code/atlas-kit-sensor.ino)                        | General Atlas sensor setup |
-| arduino-code     | Atlas Kit              | [atlas-kit-sensor-calibration](./.documentation/arduino-code/atlas-kit-sensor-calibration.ino) | Calibration routine       |
-| arduino-code     | pH Sensor              | [Haoshi101-ph-sensor](./.documentation/arduino-code/Haoshi101-ph-sensor.ino)                  | Haoshi 101 pH             |
-| arduino-code     | Soil Sensor            | [npk-soil-sensor](./.documentation/arduino-code/npk-soil-sensor.ino)                          | NPK (nutrient) sensor     |
-| arduino-code     | Soil Moisture          | [v2-soil-moisture-sensor](./.documentation/arduino-code/v2-soil-moisture-sensor.ino)          | Moisture sensor v2        |
-| arduino-code     | Temperature & Humidity | [sht-31-sensor](./.documentation/arduino-code/sht-31-sensor.ino)                              | SHT-31 sensor             |
-| arduino-code     | Light Sensor           | [tsl2591-sensor](./.documentation/arduino-code/tsl2591-sensor.ino)                            | Appears twice (duplicate?) |
-| arduino-code     | Template               | [template-sensor](./.documentation/arduino-code/template-sensor.ino)                          | Basic sensor template     |
-| arduino-code     | Template               | [template-sensor-mqtt](./.documentation/arduino-code/template-sensor-mqtt.ino)                | With MQTT integration     |
-| pi-pico-code     | CO Sensor              | [co-sensor](./.documentation/pi-pico-code/co-sensor/)                                         |  |
-| pi-pico-code     | DHT Sensor             | [dht-sensor](./.documentation/pi-pico-code/dht-sensor/)                                       | DHT22  |
+| Platform         | Sensor Type            | Script / Folder Name                                                                           | Notes                    |
+|------------------|------------------------|------------------------------------------------------------------------------------------------|--------------------------|
+| arduino-code     | Ultrasonic             | [A02YYUW-ultrasonic-sensor](./.documentation/arduino-code/A02YYUW-ultrasonic-sensor.ino)       | A02YYUW sensor           |
+| arduino-code     | Atlas Kit              | [atlas-kit-sensor](./.documentation/arduino-code/atlas-kit-sensor.ino)                         | General Atlas sensor kit |
+| arduino-code     | Atlas Kit              | [atlas-kit-sensor-calibration](./.documentation/arduino-code/atlas-kit-sensor-calibration.ino) | Calibration routine      |
+| arduino-code     | pH Sensor              | [Haoshi101-ph-sensor](./.documentation/arduino-code/Haoshi101-ph-sensor.ino)                   | Haoshi 101 pH            |
+| arduino-code     | Soil Sensor            | [npk-soil-sensor](./.documentation/arduino-code/npk-soil-sensor.ino)                           | NPK (nutrient) sensor    |
+| arduino-code     | Soil Moisture          | [v2-soil-moisture-sensor](./.documentation/arduino-code/v2-soil-moisture-sensor.ino)           | Moisture sensor v2       |
+| arduino-code     | Temperature & Humidity | [sht-31-sensor](./.documentation/arduino-code/sht-31-sensor.ino)                               | SHT-31 sensor            |
+| arduino-code     | Light Sensor           | [tsl2591-sensor](./.documentation/arduino-code/tsl2591-sensor.ino)                             | TSL2591 sensor           |
+| arduino-code     | Template               | [template-sensor](./.documentation/arduino-code/template-sensor.ino)                           | Basic sensor template    |
+| arduino-code     | Template               | [template-sensor-mqtt](./.documentation/arduino-code/template-sensor-mqtt.ino)                 | With MQTT integration    |
+| pi-pico-code     | CO Sensor              | [co-sensor](./.documentation/pi-pico-code/co2-sensor/)                                         |                          |
+| pi-pico-code     | DHT Sensor             | [dht-sensor](./.documentation/pi-pico-code/dht-sensor/)                                        | DHT22                    |
 
 ## Sensor types supported by the FPF
 
