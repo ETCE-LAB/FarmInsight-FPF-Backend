@@ -216,11 +216,15 @@ MQTT_PORT=1883`
 Optionally add username and password in case you configured the broker with it.
 The FPF will connect to the broker on startup and listens for incoming messages of the sensors which are communicating via MQTT.
 
+## 🔄 Contribute to FarmInsight
+We welcome contributions! Please follow these steps:
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature`
+3. Make your changes and commit them: `git commit -m 'Add new feature'`
+4. Push the branch: `git push origin feature/your-feature`
+5. Create a pull request.
 
-
-
-
-## Contributing
+## Past/Present Contributors
 
 This project was developed as part of the Digitalisierungsprojekt at DigitalTechnologies WS24/25 by:
 * Tom Luca Heering
