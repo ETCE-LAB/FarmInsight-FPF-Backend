@@ -15,9 +15,9 @@ class AnkerSolarbankPowerSensor(HttpSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.account = additional_information['account']
+        self.account = additional_information['email']
         self.password = additional_information['password']
-        self.country = additional_information['country']
+        self.country = additional_information['country_code']
         self.serial = additional_information['device_serial']
         self.logger = get_logger()
 
@@ -34,7 +34,7 @@ class AnkerSolarbankPowerSensor(HttpSensor):
             },
             fields=[
                 FieldDescription(
-                    name='account',
+                    name='email',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -44,7 +44,7 @@ class AnkerSolarbankPowerSensor(HttpSensor):
                     rules=[]
                 ),
                 FieldDescription(
-                    name='country',
+                    name='country_code',
                     type=FieldType.STRING,
                     #hint='Country ID (e.g. DE)',
                     rules=[]
