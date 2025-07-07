@@ -48,6 +48,7 @@ class FieldType(Enum):
 class FieldDescription(NamedTuple):
     name: str
     type: FieldType
+    #hint: str
     rules: List[object]
 
 
