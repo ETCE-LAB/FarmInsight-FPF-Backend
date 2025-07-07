@@ -4,8 +4,6 @@ from .http_sensor import HttpSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
 import requests
 
-from ..models import SensorMeasurement
-
 
 class ShellySSensor(HttpSensor):
     @staticmethod

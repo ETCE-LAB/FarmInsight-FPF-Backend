@@ -1,7 +1,5 @@
 import json
 
-import requests
-
 from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
 from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
@@ -9,7 +7,6 @@ from .sensor_description import SensorDescription, ConnectionType, FieldDescript
 
 class MqttSensor(TypedSensor):
     mqtt_topic = None
-
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)

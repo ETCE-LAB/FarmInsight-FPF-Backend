@@ -28,6 +28,8 @@ All FarmInsight Repositories:
 * <a href="https://github.com/ETCE-LAB/FarmInsight-Dashboard-Backend">Dashboard-Backend</a>
 * <a href="https://github.com/ETCE-LAB/FarmInsight-FPF-Backend">FPF-Backend</a>
 
+Link to our productive System:<a href="https://farminsight.etce.isse.tu-clausthal.de"> FarmInsight.etce.isse.tu-clausthal.de</a>
+
 ### Core vision
 
 <img src="/.documentation/FarmInsightOverview.jpg">
@@ -42,6 +44,8 @@ Key features include:
 accessible through the web application.
 * Harvest Documentation: Log and track harvests for each plant directly from the frontend interface.
 * Data Visualization: Visualize sensor data with intuitive graphs and charts.
+* Controllable Action: To control the FPF you can add controllable actions which can perform actions on hardware which is reachable via network.
+* Weather forecast: You can configure a location for your FPF for which a weather forecast will be gathered. 
 * Media Display: View and manage captured images and livestreams for real-time monitoring.
 
 ## Overview
@@ -89,6 +93,10 @@ GENERATE_MEASUREMENTS=True
 
 RESOURCE_SERVER_INTROSPECTION_URL=<URL HERE>
 DASHBOARD_BACKEND_USER_ID=<ID HERE>
+
+MQTT_HOST=<IP of MQTT broker HERE>
+MQTT_PORT=<Port of MQTT broker HERE (default is:1883)>
+
 ```
 
 Run the server via the IDE or via:
@@ -117,15 +125,106 @@ Here are some of the key API endpoints :
 * GET /api/sensors/{sensorId} - Get the config for given sensor
 * PUT /api/sensors/{sensorId} - Edit a sensor
 
+
+## Sensor scripts
+
+In this repository, you can find PiPico or Arduino Nano IOT 33 code in the .documentation folder.
+There, you can also find a template script for HTTP and HTTP + MQTT communication.
+
+Available sensor scripts in this repository:
+
+| Platform         | Sensor Type            | Script / Folder Name                                                                           | Notes                    |
+|------------------|------------------------|------------------------------------------------------------------------------------------------|--------------------------|
+| arduino-code     | Ultrasonic             | [A02YYUW-ultrasonic-sensor](./.documentation/arduino-code/A02YYUW-ultrasonic-sensor.ino)       | A02YYUW sensor           |
+| arduino-code     | Atlas Kit              | [atlas-kit-sensor](./.documentation/arduino-code/atlas-kit-sensor.ino)                         | General Atlas sensor kit |
+| arduino-code     | Atlas Kit              | [atlas-kit-sensor-calibration](./.documentation/arduino-code/atlas-kit-sensor-calibration.ino) | Calibration routine      |
+| arduino-code     | pH Sensor              | [Haoshi101-ph-sensor](./.documentation/arduino-code/Haoshi101-ph-sensor.ino)                   | Haoshi 101 pH            |
+| arduino-code     | Soil Sensor            | [npk-soil-sensor](./.documentation/arduino-code/npk-soil-sensor.ino)                           | NPK (nutrient) sensor    |
+| arduino-code     | Soil Moisture          | [v2-soil-moisture-sensor](./.documentation/arduino-code/v2-soil-moisture-sensor.ino)           | Moisture sensor v2       |
+| arduino-code     | Temperature & Humidity | [sht-31-sensor](./.documentation/arduino-code/sht-31-sensor.ino)                               | SHT-31 sensor            |
+| arduino-code     | Light Sensor           | [tsl2591-sensor](./.documentation/arduino-code/tsl2591-sensor.ino)                             | TSL2591 sensor           |
+| arduino-code     | Template               | [template-sensor](./.documentation/arduino-code/template-sensor.ino)                           | Basic sensor template    |
+| arduino-code     | Template               | [template-sensor-mqtt](./.documentation/arduino-code/template-sensor-mqtt.ino)                 | With MQTT integration    |
+| pi-pico-code     | CO Sensor              | [co-sensor](./.documentation/pi-pico-code/co2-sensor/)                                         |                          |
+| pi-pico-code     | DHT Sensor             | [dht-sensor](./.documentation/pi-pico-code/dht-sensor/)                                        | DHT22                    |
+
+## Sensor types supported by the FPF
+
+For most cases you can use a standard `http_sensor`, `mqtt_sensor` or `http_mqtt_sensor` type but if you require special processing of the values you get from the microcontroller for example
+you can implement your own type as described below.
+
+Follow the template or the existing classes in this [sensors package](./django_server/fpf_sensor_service/sensors/).
+
+
+### 🔗 Http Endpoint Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+  "value": 42.5
+}
+```
+
+---
+
+### 📦 2. MQTT Topic & Payload
+```
+measurements/sensor-id-123
+```
+```json
+{
+  "value": 42.5,
+  "timestamp": "2025-06-28T14:35:00Z"
+}
+```
+or
+```json
+{
+  "value": 42.5
+}
+```
+
+When no timestamp is provided, the FPF will insert the current time automatically.
+
 ## Add new sensor support
 To add a new sensor:
-* First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
-* Use the boilerplate code from the typed_sensor.template file to setup the basic class structure, name the class accordingly.
-* Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
-* Implement the get_measurement() method and init_additional_information() if needed.
-* Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
+1. First create a new file in fpf_sensor_service/sensors/ <sensor_model>_sensors.py.
+2. Use the boilerplate code from the typed_sensor.template file to setup the basic class structure, name the class accordingly.
+3. Fill out the SensorDescription in get_description() so the frontend can correctly display it as a hardware configuration, for more details on all the types and how to fill it there is further documentation in the sensor_description.py.
+4. Implement the get_measurement() method and init_additional_information() if needed.
+5. Import the sensor class to the \_\_init\_\_.py file so it gets loaded with the rest of the sensor module and the TypedSensorFactory can pick up on it.
 
-## Contributing
+If you want to add MQTT functionalities, make sure to pass 'payload' to the get_measurement function, just like in all other MQTT classes.
+This will be the payload of the sensor.
+
+
+## MQTT support
+To enable MQTT, a MQTT broker must be running in the network, so the FPF can connect to it.
+A common setup is to have a mosquitto broker running on the same raspberry PI. 
+A guide to set it up can be found in the MOSQUITTO.md.
+
+👉 [MOSQUITTO.md — Full Setup Guide](./MOSQUITTO.md)
+
+
+Once it is set up, you need to configure the MQTT setting in the env.dev file
+e.g.
+`MQTT_HOST=192.168.178.54
+MQTT_PORT=1883`
+Optionally add username and password in case you configured the broker with it.
+The FPF will connect to the broker on startup and listens for incoming messages of the sensors which are communicating via MQTT.
+
+## 🔄 Contribute to FarmInsight
+We welcome contributions! Please follow these steps:
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature`
+3. Make your changes and commit them: `git commit -m 'Add new feature'`
+4. Push the branch: `git push origin feature/your-feature`
+5. Create a pull request.
+
+## Past/Present Contributors
 
 This project was developed as part of the Digitalisierungsprojekt at DigitalTechnologies WS24/25 by:
 * Tom Luca Heering
@@ -135,7 +234,7 @@ This project was developed as part of the Digitalisierungsprojekt at DigitalTech
 * Marius Peter
 
 Project supervision:
-* Johannes Meier
+* Johannes Mayer
 * Benjamin Leiding
 
 ## License

@@ -1,0 +1,3 @@
+[submodule "django_server/anker_solix_api"]
+	path = django_server/anker_solix_api
+	url = https://github.com/thomluther/anker-solix-api.git
