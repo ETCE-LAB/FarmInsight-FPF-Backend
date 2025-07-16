@@ -3,13 +3,12 @@
 
 // WiFi Credentials
 const char ssid[] = "ssid";
-const char pass[] = "pw";
+const char pw[] = "pw";
 
 // Static IP Configuration (Optional)
-IPAddress local_IP(1, 1, 1, 1);     // IP-Adresse des Arduino
+IPAddress local_IP(139, 174, 57, XX);     // IP-Adresse des Arduino
 IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
 IPAddress subnet(255, 255, 255, 192);       // Subnetzmaske
-IPAddress dns(8, 8, 8, 8);                // DNS-Server (Google DNS als Beispiel)
 
 int status = WL_IDLE_STATUS; // WiFi Status
 
@@ -65,39 +64,59 @@ void sendResponse(WiFiClient &client, String data) {
 }
 
 // WiFi Reconnection
-void reconnectWiFiConnection() {
-  if (WiFi.status() == WL_CONNECTED) return;
+void checkWiFiConnection() {
+  status = WiFi.status();
+  if (status == WL_CONNECTED) return;
 
-  WiFi.disconnect();
-  WiFi.config(local_IP, gateway, subnet);
+  Serial.println("WiFI not connected");
+
+  Serial.print("Connecting to WiFi..");
   while (status != WL_CONNECTED) {
-    status = WiFi.begin(ssid, pass);
+    status = WiFi.begin(ssid, pw);
+    Serial.print(".");
     delay(10000);
   }
 
-  if (!server) {
+  Serial.println();
+  Serial.println("Connected to WiFi");
+}
+
+void checkServerStatus() {
+  if (server.status() != 1) {
+    Serial.println("Server not listening");
+    Serial.println("Starting server");
+    
     server.begin();
+
+    if (server.status() == 1) {
+      Serial.println("Server start successful");
+    } else {
+      Serial.println("Server start failed");
+    }
   }
 }
 
 // Setup Function
 void setup() {
-  reconnectWiFiConnection();
+  Serial.begin(9600);
+
+  WiFi.config(local_IP, gateway, subnet);
+  checkWiFiConnection();
+  Serial.println("WiFi Connected! IP: " + WiFi.localIP().toString());
 
   // Initialize ADS1115
   while (!ads.begin()) {
     delay(2000);
   }
   ads.setGain(gain);
-}
 
-// restart the arduino from code
-int requests_until_reboot = 24; // since we know typically 1 value per day, this is once daily
-void(* resetFunc) (void) = 0;
+  server.begin();
+}
 
 // Main Loop
 void loop() {
-  reconnectWiFiConnection();
+  checkWiFiConnection();
+  checkServerStatus();
 
   WiFiClient client = server.available();
   if (client) {
