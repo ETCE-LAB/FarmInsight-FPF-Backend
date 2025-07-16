@@ -1,31 +1,24 @@
 #include <WiFiNINA.h>
 #include <Adafruit_ADS1X15.h>
 
-float latestDistance = 0.0;
-unsigned long lastReadTime = 0;
-
 // Enter WLAN Access Credentials
 const char ssid[] = "ssid";
-const char pass[] = "pw";
-
-const float BASE_CM = 30.0;
-const float HEIGHT_CM = 60.0;
+const char pw[] = "pw";
 
 // Enter the static network information
-IPAddress local_IP(1, 1, 1, 1);
+IPAddress local_IP(139, 174, 57, XX);
 IPAddress gateway(1, 1, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(8, 8, 8, 8);
 
 // Status of connection
 int status = WL_IDLE_STATUS;
 
+const float BASE_CM = 30.0;
+const float HEIGHT_CM = 60.0;
+
 // Declare an array named 'data' with 4 elements, all initialized to 0
 // This array will store the bytes received from the distance sensor
 unsigned char data[4] = {};
-
-// Declare a floating-point variable to store the measured distance
-float distance;
 
 // Wi-Fi server object
 WiFiServer server(80);
@@ -91,7 +84,37 @@ float calculateVolume(float distance_cm) {
   return volume_liters;
 }
 
+void checkWiFiConnection() {
+  status = WiFi.status();
+  if (status == WL_CONNECTED) return;
 
+  Serial.println("WiFI not connected");
+
+  Serial.print("Connecting to WiFi..");
+  while (status != WL_CONNECTED) {
+    status = WiFi.begin(ssid, pw);
+    Serial.print(".");
+    delay(10000);
+  }
+
+  Serial.println();
+  Serial.println("Connected to WiFi");
+}
+
+void checkServerStatus() {
+  if (server.status() != 1) {
+    Serial.println("Server not listening");
+    Serial.println("Starting server");
+    
+    server.begin();
+
+    if (server.status() == 1) {
+      Serial.println("Server start successful");
+    } else {
+      Serial.println("Server start failed");
+    }
+  }
+}
 
 void setup() {
   Serial1.begin(9600);
@@ -104,29 +127,18 @@ void setup() {
 
   // apply WLAN config
   WiFi.config(local_IP, gateway, subnet);
-
-  // WLAN connect with retries if not possible
-  while (status != WL_CONNECTED) {
-    Serial.print("Connected with: ");
-    Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
-
-    delay(10000);
-  }
+  checkWiFiConnection();
 
   // Print connection details
-  Serial.println("Wifi Connected!");
   Serial.print("IP-Adresse: ");
   Serial.println(WiFi.localIP());
 
-  // Start the server
   server.begin();
-
 }
 
 void loop() {
-  // Continuously update distance
-
+  checkWiFiConnection();
+  checkServerStatus();
 
   WiFiClient client = server.available();
   if (client) {
@@ -140,7 +152,7 @@ void loop() {
     Serial.println(request);
 
     if (request.startsWith("GET /measurements/distance")) {
-       float distance = readDistance();
+      float distance = readDistance();
       float volume = calculateVolume(distance);
 
       String jsonResponse = "{";
