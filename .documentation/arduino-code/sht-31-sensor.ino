@@ -3,11 +3,11 @@
 #include <Adafruit_SHT31.h>
 
 // WiFi Credentials
-const char ssid[] = "ssid";
-const char pw[] = "pw";
+const char ssid[] = "";
+const char pw[] = "";
 
 // Static IP Configuration (Optional)
-IPAddress local_IP(139, 174, 57, XX);     // IP-Adresse des Arduino 214
+IPAddress local_IP(139, 174, 57, xx);    
 IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
 IPAddress subnet(255, 255, 255, 192);       // Subnetzmaske
 
@@ -49,7 +49,7 @@ void checkWiFiConnection() {
 }
 
 void checkServerStatus() {
-  if (server.status() != 1) {
+  if (server.status() != 1 && status == WL_CONNECTED) {
     Serial.println("Server not listening");
     Serial.println("Starting server");
     
@@ -66,6 +66,7 @@ void checkServerStatus() {
 // Setup Function
 void setup() {
   Serial.begin(9600);
+  delay(100);
   Wire.begin();
 
   WiFi.config(local_IP, gateway, subnet);
@@ -83,7 +84,6 @@ void setup() {
 // Main Loop
 void loop() {
   checkWiFiConnection();
-  checkServerStatus();
 
   WiFiClient client = server.available();
   if (client) {
@@ -107,4 +107,6 @@ void loop() {
     client.stop();
 	  Serial.println("Client disconnected");
   }
+
+  checkServerStatus();
 }

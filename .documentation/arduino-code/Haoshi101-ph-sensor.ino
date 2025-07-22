@@ -2,11 +2,11 @@
 #include <Adafruit_ADS1X15.h>
 
 // WiFi Credentials
-const char ssid[] = "ssid";
-const char pw[] = "pw";
+const char ssid[] = "";
+const char pw[] = "";
 
 // Static IP Configuration (Optional)
-IPAddress local_IP(139, 174, 57, XX);     // IP-Adresse des Arduino
+IPAddress local_IP(139, 174, 57, xx);     // IP-Adresse des Arduino
 IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
 IPAddress subnet(255, 255, 255, 192);       // Subnetzmaske
 
@@ -82,7 +82,7 @@ void checkWiFiConnection() {
 }
 
 void checkServerStatus() {
-  if (server.status() != 1) {
+  if (server.status() != 1 && status == WL_CONNECTED) {
     Serial.println("Server not listening");
     Serial.println("Starting server");
     
@@ -116,7 +116,6 @@ void setup() {
 // Main Loop
 void loop() {
   checkWiFiConnection();
-  checkServerStatus();
 
   WiFiClient client = server.available();
   if (client) {
@@ -125,10 +124,6 @@ void loop() {
   
     if (request.startsWith("GET /measurements/ph")) {
       sendResponse(client, getSensorData());
-      requests_until_reboot -= 1;
-      if (requests_until_reboot <= 0) {
-        resetFunc();
-      }
     } else {
       client.println("HTTP/1.1 404 Not Found");
       client.println("Content-Type: text/plain");
@@ -139,4 +134,6 @@ void loop() {
 
     client.stop();
   }
+
+  checkServerStatus();
 }
