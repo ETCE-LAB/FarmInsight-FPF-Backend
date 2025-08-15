@@ -1,3 +1,14 @@
+/*
+	The sensor we use is the A02YYUW Waterproof Ultrasonic Sensor https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311
+	
+	The sensor comes with a UART cable and 4 pin cables.
+	https://content.arduino.cc/assets/Pinout-NANO33IoT_latest.pdf
+	Red		-> 3V3 or 5V
+	Black 	-> Ground pin
+	Blue 	-> TX
+	Green 	-> RX
+*/
+
 #include <WiFiNINA.h>
 #include <Adafruit_ADS1X15.h>
 

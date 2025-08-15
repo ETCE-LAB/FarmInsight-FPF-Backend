@@ -1,3 +1,13 @@
+/*
+	The sensor we use is the Adafruit TSL2591 High Dynamic Range Digital Light Sensor https://www.adafruit.com/product/1980
+	
+	This means for the ardino nano the following pins will be connected (https://content.arduino.cc/assets/Pinout-NANO33IoT_latest.pdf):
+	3Vo	-> 3V3
+	GND	-> Ground pin
+	SCL	-> A5 (SCL)
+	SDA	-> A4 (SDA)
+*/
+
 #include <Wire.h>
 #include <WiFiNINA.h>
 #include <Adafruit_TSL2591.h>
@@ -7,7 +17,7 @@ const char ssid[] = "SSID";
 const char pass[] = "PW";
 
 // Static IP Configuration (Optional)
-IPAddress local_IP(1, 1, 1, 1);     // IP-Adresse des Arduino 214
+IPAddress local_IP(139, 174, 57, xx);    // IP-Adresse des Arduino
 IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
 IPAddress subnet(255, 255, 255, 192);      // Subnetzmaske
 IPAddress dns(8, 8, 8, 8);                 // DNS-Server (Google DNS als Beispiel)
