@@ -99,6 +99,12 @@ MQTT_PORT=<Port of MQTT broker HERE (default is:1883)>
 
 ```
 
+Pull the git submodule:
+```
+git submodule init
+git submodule update
+```
+
 Run the server via the IDE or via:
 ```
 python manage.py runserver

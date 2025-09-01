@@ -1,3 +1,14 @@
+/*
+	The sensor we use is the Adafruit SHT 30 Mesh-protected Weather-proof sensor https://www.adafruit.com/product/4099
+	It's cables are: Brown/Red = VCC (3-5VDC), Black = Ground, Yellow = Clock, Green/Blue = Data (sometimes we hear of sensors where data and clock are swapped so please try both ways)
+	
+	This means for the ardino nano the following pins will be connected (https://content.arduino.cc/assets/Pinout-NANO33IoT_latest.pdf):
+	Brown/red 	-> 3V3 or 5V
+	Black 		-> Ground pin
+	Yellow 		-> A5 (SCL)
+	Green/Blue 	-> A4 (SDA)
+*/
+
 #include <Wire.h>
 #include <WiFiNINA.h>
 #include <Adafruit_SHT31.h>

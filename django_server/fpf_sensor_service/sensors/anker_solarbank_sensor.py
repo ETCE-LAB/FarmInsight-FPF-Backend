@@ -30,7 +30,7 @@ class AnkerSolarbankPowerSensor(HttpSensor):
             parameter='watts;watt',
             unit='W',
             tags={
-                'info': 'uses an unofficial api library, can break with updates'
+                'info': 'uses an unofficial api library, can break with updates;verwendet eine inoffizielle API Bücherei, anker updates können diese mit Updates ändern'
             },
             fields=[
                 FieldDescription(
@@ -46,7 +46,6 @@ class AnkerSolarbankPowerSensor(HttpSensor):
                 FieldDescription(
                     name='country_code',
                     type=FieldType.STRING,
-                    #hint='Country ID (e.g. DE)',
                     rules=[]
                 ),
                 FieldDescription(
