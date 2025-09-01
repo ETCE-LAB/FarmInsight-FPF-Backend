@@ -2,19 +2,16 @@
 #include <Adafruit_ADS1X15.h>
 
 // Enter WLAN Access Credentials
-const char ssid[] = "ssid";
-const char pw[] = "pw";
+const char ssid[] = "SSID";
+const char pw[] = "pass";
 
 // Enter the static network information
-IPAddress local_IP(139, 174, 57, XX);
+IPAddress local_IP(139, 174, 57, xx);
 IPAddress gateway(1, 1, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 // Status of connection
 int status = WL_IDLE_STATUS;
-
-const float BASE_CM = 30.0;
-const float HEIGHT_CM = 60.0;
 
 // Declare an array named 'data' with 4 elements, all initialized to 0
 // This array will store the bytes received from the distance sensor
@@ -65,15 +62,26 @@ float readDistance(unsigned long timeout = 1000) {
   return 0.0;
 }
 
+const float MAX_DIST_CM = 78.0;
+const float MIN_DIST_CM = 3.0;
+const float WATER_FULL_L = 210;
+
 float calculateVolume(float distance_cm) {
-  if (distance_cm < BASE_CM || distance_cm > HEIGHT_CM) {
-    Serial.println("Out of range (too close or overflow)");
+  // -1.574 * 10^-5 * x^3 + 0.01306 * x^2 - 3.617 * x + 210
+
+  if (distance_cm > MAX_DIST_CM) { // shouldn't happen if sensor is installed correctly inside the container
     return 0.0;
+  } else if (distance_cm < MIN_DIST_CM) { // Overflow should prevent this from ever happening but better to catch it
+    return WATER_FULL_L;
   }
 
-  float water_height = HEIGHT_CM - distance_cm;
-  float volume_cm3 = 65.0 * 45.0 * water_height;
-  float volume_liters = volume_cm3 / 1000.0;
+  // -1.574 * 10^-5 * d^3 + 0.01306 * d^2 - 3.617 * d + 210
+  float d = distance_cm;
+  float volume_liters = -1.574 * 0.00001 * d * d * d + 0.01306 * d * d - 3.617 * d + 210;
+
+  if (volume_liters < 0) {
+    volume_liters = 0.0;
+  }
 
   Serial.print("Distance: ");
   Serial.print(distance_cm);
@@ -119,6 +127,7 @@ void checkServerStatus() {
 void setup() {
   Serial1.begin(9600);
   Serial.begin(9600);
+
   // check WLAN-module exists
   if (WiFi.status() == WL_NO_MODULE) {
     Serial.println("WIFI-module not found!");
