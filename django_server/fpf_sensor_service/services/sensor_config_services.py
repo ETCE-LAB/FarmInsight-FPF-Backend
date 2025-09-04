@@ -1,5 +1,5 @@
 from fpf_sensor_service.services import add_scheduler_task
-from fpf_sensor_service.services.scheduler_services import scheduler, reschedule_task
+from fpf_sensor_service.services.scheduler_services import reschedule_task
 from fpf_sensor_service.utils.logging_utils import get_logger
 from fpf_sensor_service.models.sensor_config import SensorConfig
 from fpf_sensor_service.serializers.sensor_config_serializer import SensorConfigSerializer

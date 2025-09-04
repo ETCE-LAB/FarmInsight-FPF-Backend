@@ -10,6 +10,7 @@ class SensorConfig(models.Model):
     sensorClassId = models.UUIDField()
     isActive = models.BooleanField(default=True)
     additionalInformation = models.TextField(blank=True)
+    sensorType = models.CharField(max_length=24, blank=False, default='sensor')
 
     def __str__(self):
         return f'ID: {self.id} class: {self.sensorClassId} interval seconds: {self.intervalSeconds} additional: {self.additionalInformation}'

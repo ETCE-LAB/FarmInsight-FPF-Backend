@@ -29,7 +29,12 @@ class SensorConfigSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SensorConfig
-        fields = ['id', 'intervalSeconds', 'sensorClassId', 'additionalInformation', 'isActive']
+        fields = ['id', 'intervalSeconds', 'sensorClassId', 'additionalInformation', 'isActive', 'sensorType']
+
+    def valudate_sensorType(self, value):
+        if value not in ['sensor', 'camera']:
+            raise serializers.ValidationError("sensorType must be either sensor or camera")
+        return value
 
     def validate_intervalSeconds(self, value):
         """Ensure intervalSeconds is greater than 0."""

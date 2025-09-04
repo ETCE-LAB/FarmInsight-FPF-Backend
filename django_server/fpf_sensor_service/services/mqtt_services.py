@@ -1,27 +1,17 @@
-# fpf_sensor_service/mqtt_service.py
 import paho.mqtt.client as mqtt
 import threading
-import time
 import json
 from django.conf import settings
 
-from fpf_sensor_service.models import SensorConfig, SensorMeasurement, sensor_config
-from fpf_sensor_service.sensors import typed_sensor_factory
-from fpf_sensor_service.sensors.sensor_description import ConnectionType
-from fpf_sensor_service.services.scheduler_services import send_measurements, get_fpf_id
-from fpf_sensor_service.utils import get_logger
-import random
-import time
+from fpf_sensor_service.sensors import typed_sensor_factory, ConnectionType
+from .sensor_services import send_measurements
+from .auth_services import get_fpf_id
 
-import requests
-from datetime import timedelta
-
-from django.utils import timezone
 from django_server import settings
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from fpf_sensor_service.models import SensorConfig, SensorMeasurement, Configuration, ConfigurationKeys
-from fpf_sensor_service.sensors import TypedSensor, TypedSensorFactory, MeasurementResult
+from fpf_sensor_service.models import SensorConfig, SensorMeasurement
+from fpf_sensor_service.sensors import TypedSensorFactory
 from fpf_sensor_service.utils import get_logger
 
 

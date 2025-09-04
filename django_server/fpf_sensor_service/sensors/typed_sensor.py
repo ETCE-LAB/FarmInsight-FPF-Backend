@@ -19,5 +19,5 @@ class TypedSensor(ABC):
         pass
 
     @abstractmethod
-    def get_measurement(self, payload=None)->SensorMeasurement:
+    def get_measurement(self, payload=None) -> SensorMeasurement:
         pass

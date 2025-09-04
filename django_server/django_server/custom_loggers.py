@@ -35,6 +35,9 @@ class APILogHandler(logging.Handler):
         if 'sensorId' in extra_info:
             payload['sensorId'] = str(extra_info['sensorId'])
 
+        if 'cameraId' in extra_info:
+            payload['cameraId'] = str(extra_info['cameraId'])
+
         try:
             requests.post(self.api_url, json=payload, headers={
                 'Authorization': f"ApiKey {extra_info['api_key']}"

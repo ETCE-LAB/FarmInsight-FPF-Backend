@@ -30,7 +30,7 @@ class AnkerSolarbankPowerSensor(HttpSensor):
             parameter='watts;watt',
             unit='W',
             tags={
-                'info': 'uses an unofficial api library, can break with updates;verwendet eine inoffizielle API Bücherei, anker updates können diese mit Updates ändern'
+                'info': 'uses an unofficial api library, can break with updates;verwendet eine inoffizielle API library, Anker updates können die Kompatibilität stören'
             },
             fields=[
                 FieldDescription(

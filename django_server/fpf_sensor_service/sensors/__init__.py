@@ -1,5 +1,6 @@
 from .typed_sensor import TypedSensor
 from .typed_sensor_factory import TypedSensorFactory
+from .sensor_description import ConnectionType
 
 """
 ONLY Sensor classes imported here will be visible to the program and count as supported.

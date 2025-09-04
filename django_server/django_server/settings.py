@@ -85,6 +85,9 @@ MEASUREMENT_PACKAGE_SIZE = env('MEASUREMENT_PACKAGE_SIZE', default=50)
 MEASUREMENT_RETRY_COUNT = env('MEASUREMENT_RETRY_COUNT', default=3)
 MEASUREMENT_RETRY_SLEEP_BETWEEN_S = env('MEASUREMENT_RETRY_SLEEP_BETWEEN_S', default=5)
 
+USE_DEFAULT_IMAGE = env('USE_DEFAULT_IMAGE', default='False') == 'True'
+DEFAULT_IMAGE_PATH = env('DEFAULT_IMAGE_PATH', default=os.path.join(BASE_DIR, 'test.jpg'))
+
 '''
 DASHBOARD_BACKEND_USER_ID and RESOURCE_SERVER_INTROSPECTION_URL are intended to be used with an external identity server
 to ensure only a known dashboard backend can send configurations to the FPF.
