@@ -1,4 +1,3 @@
-import json
 import os
 import time
 import uuid
@@ -12,9 +11,9 @@ from django.core.files import File
 
 from django_server import settings
 from fpf_sensor_service.utils import get_logger
-from fpf_sensor_service.models import Image, SensorConfig
+from fpf_sensor_service.models import Image
 from .auth_services import get_fpf_id, get_or_request_api_key, request_api_key
-
+from ..sensors import Camera
 
 logger = get_logger()
 
@@ -52,13 +51,13 @@ def send_images(camera_id):
                 break
 
 
-def camera_task(camera: SensorConfig):
+def camera_task(camera: Camera):
     """
     Function to trigger the measurement of the sensor and to send existing images.
     Gets called at the configured interval for the sensor.
     :param camera: Camera of which images are to be processed.
     """
-    logger.debug("Camera task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': camera.id, 'api_key': get_or_request_api_key()}})
+    logger.debug("Camera task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         result = None
         if settings.USE_DEFAULT_IMAGE:
@@ -67,14 +66,12 @@ def camera_task(camera: SensorConfig):
                 file.save(stream, "PNG")
             result = File(stream, f"{str(uuid.uuid4())}.png")
         else:
-            additional_information = json.loads(camera.additionalInformation)
-
             i = 0
             while i < settings.MEASUREMENT_RETRY_COUNT:
                 i += 1
                 try:
-                    response = requests.get(additional_information['snapshotUrl'], stream=True)
-                    result = File(response.raw, f"{str(uuid.uuid4())}.jpg")
+                    img_data = camera.get_image()
+                    result = File(img_data, f"{str(uuid.uuid4())}.jpg")
                     break
                 except Exception as e:
                     # only raise the error outwards if it's the last attempt
@@ -86,12 +83,12 @@ def camera_task(camera: SensorConfig):
         if result is not None:
             Image.objects.create(
                 image=result,
-                camera_id=camera.id,
+                camera_id=camera.sensor_config.id,
             )
-            send_images(camera.id)
-            logger.debug("Camera Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': camera.id, 'api_key': get_or_request_api_key()}})
+            send_images(camera.sensor_config.id)
+            logger.debug("Camera Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
         else:
             logger.warning("Camera Task skipped as value is None", extra={
-                'extra': {'fpfId': get_fpf_id(), 'sensorId': camera.id, 'api_key': get_or_request_api_key()}})
+                'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
-        logger.error(f"Error processing camera: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': camera.id, 'api_key': get_or_request_api_key()}})
+        logger.error(f"Error processing camera: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})

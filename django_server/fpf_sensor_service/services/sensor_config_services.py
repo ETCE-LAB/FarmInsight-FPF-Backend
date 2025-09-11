@@ -20,8 +20,9 @@ def create_sensor_config(data) -> SensorConfigSerializer:
         sensor_config.id = data['id']
         sensor_config.save()
 
-        instances = len(SensorConfig.objects.all())
-        add_scheduler_task(sensor_config, instances, 1)
+        if sensor_config.isActive:
+            instances = len(SensorConfig.objects.all())
+            add_scheduler_task(sensor_config, instances, 1)
 
         return SensorConfigSerializer(sensor_config)
 

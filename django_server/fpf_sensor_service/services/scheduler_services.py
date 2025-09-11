@@ -4,7 +4,7 @@ from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from fpf_sensor_service.models import SensorConfig
-from fpf_sensor_service.sensors import TypedSensorFactory
+from fpf_sensor_service.sensors import TypedSensorFactory, SensorType
 from fpf_sensor_service.sensors.sensor_description import ConnectionType
 from fpf_sensor_service.utils import get_logger
 from .auth_services import get_or_request_api_key, get_fpf_id
@@ -33,30 +33,19 @@ def reschedule_task(sensor_config: SensorConfig, instances: int):
 
 
 def add_scheduler_task(sensor_config: SensorConfig, instances: int, i: int):
-    if sensor_config.sensorType == 'sensor':
-        sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
-        sensor = sensor_class(sensor_config)
+    sensor_class = typed_sensor_factory.get_typed_sensor_class(str(sensor_config.sensorClassId))
+    sensor = sensor_class(sensor_config)
 
-        # Don't add MQTT sensor tasks to the scheduler
-        if sensor.get_description().connection != ConnectionType.MQTT:
-            scheduler.add_job(
-                sensor_task,
-                trigger='interval',
-                seconds=sensor_config.intervalSeconds,
-                args=[sensor],
-                id=f"sensor_{sensor_config.id}",
-                next_run_time=timezone.now() + timedelta(seconds=i),
-                max_instances=instances+1  # "for this job" reads like this wouldn't help but let's try anyway
-            )
-    else:
+    # Don't add MQTT sensor tasks to the scheduler
+    if sensor.get_description().connection != ConnectionType.MQTT:
         scheduler.add_job(
-            camera_task,
+            sensor_task if sensor_class.get_type() == SensorType.Sensor else camera_task,
             trigger='interval',
             seconds=sensor_config.intervalSeconds,
-            args=[sensor_config],
+            args=[sensor],
             id=f"sensor_{sensor_config.id}",
             next_run_time=timezone.now() + timedelta(seconds=i),
-            max_instances=instances + 1  # "for this job" reads like this wouldn't help but let's try anyway
+            max_instances=instances+1  # "for this job" reads like this wouldn't help but let's try anyway
         )
 
 

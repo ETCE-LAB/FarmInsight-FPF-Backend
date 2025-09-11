@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from fpf_sensor_service.models import SensorConfig
 from fpf_sensor_service.serializers import SensorDescriptionSerializer
 from fpf_sensor_service.services import create_sensor_config, update_sensor_config, get_sensor_config
 from fpf_sensor_service.sensors import TypedSensorFactory
@@ -29,6 +30,11 @@ class SensorView(APIView):
     def put(self, request, sensor_id):
         serializer = update_sensor_config(request.data, sensor_id)
         return Response(serializer.data)
+
+    def delete(self, request, sensor_id):
+        sensor_config = SensorConfig.objects.get(id=sensor_id)
+        sensor_config.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])

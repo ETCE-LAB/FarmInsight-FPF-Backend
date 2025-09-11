@@ -4,9 +4,8 @@ import re
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from fpf_sensor_service.models.sensor_config import SensorConfig
-from fpf_sensor_service.sensors import TypedSensorFactory
-from fpf_sensor_service.sensors.sensor_description import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
+from fpf_sensor_service.models import SensorConfig
+from fpf_sensor_service.sensors import TypedSensorFactory, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule, SensorType
 
 
 typed_sensor_factory = TypedSensorFactory()
@@ -31,21 +30,20 @@ class SensorConfigSerializer(serializers.ModelSerializer):
         model = SensorConfig
         fields = ['id', 'intervalSeconds', 'sensorClassId', 'additionalInformation', 'isActive', 'sensorType']
 
-    def valudate_sensorType(self, value):
-        if value not in ['sensor', 'camera']:
-            raise serializers.ValidationError("sensorType must be either sensor or camera")
+    def validate_sensorType(self, value):
+        if value not in SensorType.list():
+            raise serializers.ValidationError(f"SensorType must be one of: {SensorType.list()}")
         return value
 
     def validate_intervalSeconds(self, value):
         """Ensure intervalSeconds is greater than 0."""
         if value <= 0:
-            raise serializers.ValidationError("intervalSeconds must be greater than 0.")
+            raise serializers.ValidationError("IntervalSeconds must be greater than 0.")
         return value
 
     def validate_sensorClassId(self, value):
         if not str(value) in typed_sensor_factory.registry:
-            raise serializers.ValidationError("selected sensor is not registered in FPF Backend.")
-
+            raise serializers.ValidationError("Selected sensor is not registered in FPF backend.")
         return value
 
     def validate(self, data):
