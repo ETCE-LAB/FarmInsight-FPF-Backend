@@ -1,8 +1,10 @@
-from fpf_sensor_service.services import add_scheduler_task
-from fpf_sensor_service.services.scheduler_services import reschedule_task
+from rest_framework.exceptions import NotFound
+
+from fpf_sensor_service.services import add_scheduler_task, reschedule_task
 from fpf_sensor_service.utils.logging_utils import get_logger
 from fpf_sensor_service.models.sensor_config import SensorConfig
 from fpf_sensor_service.serializers.sensor_config_serializer import SensorConfigSerializer
+
 
 logger = get_logger()
 
@@ -34,7 +36,11 @@ def update_sensor_config(data, sensor_id) -> SensorConfigSerializer:
     :param sensor_id: GUID of sensor which must already exist in the database
     :return: Response data and status
     """
-    sensor = SensorConfig.objects.get(id=sensor_id)
+    try:
+        sensor = SensorConfig.objects.get(id=sensor_id)
+    except SensorConfig.DoesNotExist:
+        raise NotFound()
+
     serializer = SensorConfigSerializer(sensor, data=data, partial=True)
     if serializer.is_valid(raise_exception=True):
         instances = len(SensorConfig.objects.all())
