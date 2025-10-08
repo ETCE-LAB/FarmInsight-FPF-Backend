@@ -1,3 +1,5 @@
+from rest_framework.exceptions import NotFound
+
 from fpf_sensor_service.models import Hardware
 from fpf_sensor_service.serializers import HardwareSerializer
 
@@ -9,30 +11,21 @@ def get_hardware() -> HardwareSerializer:
     return HardwareSerializer(Hardware.objects, many=True)
 
 
-def get_or_create_hardware(hardware_name):
-    """
-    Creates a new Hardware object from the given data.
-    """
-    if not hardware_name:
-        raise ValueError("Hardware name must not be empty.")
-
-    existing_hardware = Hardware.objects.filter(name=hardware_name).first()
-
-    if existing_hardware:
-        return existing_hardware
-
+def get_hardware_by_name(hardware_name):
     try:
-        hardware = Hardware.objects.create(name=hardware_name)
-        return hardware
-    except Exception as e:
-        raise RuntimeError(f"Error creating the Hardware: {str(e)}")
+        existing_hardware = Hardware.objects.filter(name=hardware_name).first()
+    except Hardware.DoesNotExist:
+        raise NotFound()
+    return existing_hardware
 
 
 def create_hardware(data) -> HardwareSerializer:
     serializer = HardwareSerializer(data=data)
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
-    return serializer
+        hardware = Hardware(**serializer.validated_data)
+        hardware.id = data['id']
+        hardware.save()
+        return HardwareSerializer(hardware)
 
 
 def set_hardware_order(ids: list[str]) -> HardwareSerializer:
@@ -45,7 +38,11 @@ def set_hardware_order(ids: list[str]) -> HardwareSerializer:
 
 
 def update_hardware(hardware_id:str, data) -> HardwareSerializer:
-    hardware = Hardware.objects.get(id=hardware_id)
+    try:
+        hardware = Hardware.objects.get(id=hardware_id)
+    except Hardware.DoesNotExist:
+        raise NotFound()
+
     serializer = HardwareSerializer(hardware, data=data)
     if serializer.is_valid(raise_exception=True):
         serializer.save()

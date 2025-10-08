@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from fpf_sensor_service.serializers import ActionScriptDescriptionSerializer
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.services import create_action, delete_action, get_action_by_id, set_is_automated, update_action, \
-    get_or_create_hardware, get_active_state_of_action, process_action_queue, create_manual_triggered_action_in_queue, \
+    get_hardware_by_name, get_active_state_of_action, process_action_queue, create_manual_triggered_action_in_queue, \
     create_auto_triggered_actions_in_queue, get_action_queue_for_fpf, set_action_order
 from fpf_sensor_service.action_scripts import TypedActionScriptFactory
 
@@ -20,7 +20,7 @@ class ActionView(views.APIView):
 
     def post(self, request):
         if request.data.get('hardware').get('name'):
-            hardware = get_or_create_hardware(request.data.get('hardware').get('name'))
+            hardware = get_hardware_by_name(request.data.get('hardware').get('name'))
             request.data['hardwareId'] = hardware.id
 
         action = create_action(request.data)

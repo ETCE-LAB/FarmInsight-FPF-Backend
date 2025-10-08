@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import NotFound
 
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.models import ActionTrigger
@@ -8,11 +9,13 @@ from fpf_sensor_service.serializers import ActionTriggerSerializer, ActionQueueS
 logger = get_logger()
 
 
-def create_action_trigger(action_trigger_data:dict) -> ActionTriggerSerializer:
+def create_action_trigger(action_trigger_data: dict) -> ActionTriggerSerializer:
     serializer = ActionTriggerSerializer(data=action_trigger_data, partial=True)
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
-    return serializer
+        trigger = ActionTrigger(**serializer.validated_data)
+        trigger.id = action_trigger_data['id']
+        trigger.save()
+        return ActionTriggerSerializer(trigger)
 
 
 def get_action_trigger(action_trigger_id):
@@ -50,7 +53,11 @@ def get_all_active_auto_triggers(action_id=None):
 
 
 def update_action_trigger(action_trigger_id, data) -> ActionTriggerSerializer:
-    action_trigger = ActionTrigger.objects.get(id=action_trigger_id)
+    try:
+        action_trigger = ActionTrigger.objects.get(id=action_trigger_id)
+    except ActionTrigger.DoesNotExist:
+        raise NotFound()
+
     data["actionId"] = action_trigger.action_id
     data["id"] = action_trigger_id
     serializer = ActionTriggerSerializer(action_trigger, data=data)

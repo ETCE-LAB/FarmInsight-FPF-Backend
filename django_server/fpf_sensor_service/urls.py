@@ -13,10 +13,10 @@ urlpatterns = [
     path('sensors/<str:sensor_id>', SensorView.as_view(), name='sensor_views'),
 
     path('actions', ActionView.as_view(), name='post_action'),
+    path('actions/scripts', get_available_action_script_types, name='get_available_action_script_types'),
     path('actions/sort-order', post_action_order, name='post_action_order'),
     path('actions/<str:action_id>', ActionView.as_view(), name='action_operations'),
     path('execute-actions/<str:action_id>/<str:trigger_id>', execute_action, name='execute_action'),
-    path('action-scripts/types', get_available_action_script_types, name='get_available_action_script_types'),
 
     path('action-triggers', ActionTriggerView.as_view(),name='post_action_trigger'),
     path('action-triggers/<str:action_trigger_id>', ActionTriggerView.as_view(), name='action_trigger_operations'),

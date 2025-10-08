@@ -2,7 +2,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
 
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.services.action_trigger_services import update_action_trigger
@@ -16,11 +15,11 @@ class ActionTriggerView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        trigger = create_action_trigger(request.data)
+        serializer = create_action_trigger(request.data)
 
         # logger.info(f"Action trigger {request.data['description']} created successfully", extra={'resource_id': request.data['actionId']})
 
-        return Response(trigger.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, action_trigger_id):
         serializer = update_action_trigger(action_trigger_id, request.data)

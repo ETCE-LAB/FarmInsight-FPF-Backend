@@ -22,22 +22,24 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ['id',
-                  'name',
-                  'actionClassId',
-                  'actionScriptName',
-                  'isActive',
-                  'isAutomated',
-                  'maximumDurationSeconds',
-                  'additionalInformation',
-                  'hardwareId',
-                  'hardware',
-                  'trigger',
-                  'status',
-                  'orderIndex',
-                  ]
+        fields = [
+            'id',
+            'name',
+            'actionClassId',
+            'actionScriptName',
+            'isActive',
+            'isAutomated',
+            'maximumDurationSeconds',
+            'additionalInformation',
+            'hardwareId',
+            'hardware',
+            'trigger',
+            'status',
+            'orderIndex',
+        ]
 
     def get_status(self, obj):
+        print(obj)
         latest_entry = ActionQueue.objects.filter(
             action__id=obj.id
         ).order_by('-endedAt', '-createdAt').first()
