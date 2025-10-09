@@ -64,11 +64,9 @@ def start_scheduler():
         if sensor.isActive:
             i += 5
             add_scheduler_task(sensor, instances, i)
-            logger.debug(f"Scheduled task every {sensor.intervalSeconds}s", extra={
-                'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
+            logger.debug(f"Scheduled task every {sensor.intervalSeconds}s", extra={'extra': {'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
         else:
-            logger.debug(f"Skipped scheduling task", extra={
-                'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
+            logger.debug(f"Skipped scheduling task", extra={'extra': {'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
 
     scheduler.start()
 

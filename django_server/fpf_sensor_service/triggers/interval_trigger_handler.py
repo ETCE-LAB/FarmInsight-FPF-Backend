@@ -61,6 +61,6 @@ def enqueue_interval_action(trigger_id):
 
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                logger.info(f"Queued by interval trigger {trigger.description} with value {trigger.actionValue}", extra={'resource_id': trigger.action.id})
+                logger.info(f"Queued by interval trigger {trigger.description} with value {trigger.actionValue}", extra={'action_id': trigger.action.id})
 
             process_action_queue()

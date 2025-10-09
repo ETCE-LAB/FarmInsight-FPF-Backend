@@ -17,14 +17,14 @@ class ActionTriggerView(APIView):
     def post(self, request):
         serializer = create_action_trigger(request.data)
 
-        # logger.info(f"Action trigger {request.data['description']} created successfully", extra={'resource_id': request.data['actionId']})
+        # logger.info(f"Action trigger {request.data['description']} created successfully", extra={'action_id': request.data['actionId']})
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, action_trigger_id):
         serializer = update_action_trigger(action_trigger_id, request.data)
 
-        #logger.info(f'Action trigger {request.data['description']} updated', extra={'resource_id': request.data['actionId']})
+        #logger.info(f'Action trigger {request.data['description']} updated', extra={'action_id': request.data['actionId']})
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 

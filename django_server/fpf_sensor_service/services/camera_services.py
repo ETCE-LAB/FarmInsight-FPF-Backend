@@ -31,15 +31,14 @@ def send_image(camera_id, image: Image, recurse_on_forbidden=True):
         if response.status_code == 201:
             os.remove(image.image.path)
             image.delete()
-            logger.debug('Successfully sent image.', extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera_id, 'api_key': api_key}})
+            logger.debug('Successfully sent image.', extra={'extra': {'camera_id': camera_id, 'api_key': api_key}})
             return True
         elif response.status_code == 403:
             request_api_key()
             if recurse_on_forbidden:
                 return send_image(camera_id, image, recurse_on_forbidden=False)
         else:
-            logger.error('Error sending image, will retry later.',
-                         extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera_id, 'api_key': api_key}})
+            logger.error('Error sending image, will retry later.', extra={'extra': {'camera_id': camera_id, 'api_key': api_key}})
     return False
 
 
@@ -57,7 +56,7 @@ def camera_task(camera: Camera):
     Gets called at the configured interval for the sensor.
     :param camera: Camera of which images are to be processed.
     """
-    logger.debug("Camera task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+    logger.debug("Camera task triggered", extra={'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         result = None
         if settings.USE_DEFAULT_IMAGE:
@@ -86,9 +85,9 @@ def camera_task(camera: Camera):
                 camera_id=camera.sensor_config.id,
             )
             send_images(camera.sensor_config.id)
-            logger.debug("Camera Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+            logger.debug("Camera Task completed", extra={'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
         else:
             logger.warning("Camera Task skipped as value is None", extra={
-                'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+                'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
-        logger.error(f"Error processing camera: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'cameraId': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+        logger.error(f"Error processing camera: {e}", extra={'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})

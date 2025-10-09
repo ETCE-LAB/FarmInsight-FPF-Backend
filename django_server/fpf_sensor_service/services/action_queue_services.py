@@ -90,13 +90,13 @@ def process_action_queue():
 
         # Don't execute actions for inactive controllable action
         if not action.isActive:
-            logger.debug(f"Skipping action because it is not active.", extra={'resource_id':action.id})
+            logger.info(f"Skipping action because it is not active.", extra={'action_id':action.id})
             continue
 
         # Don't execute auto actions if manual action is active, cancel the auto action in the queue
         # New auto action would need to be triggered again
         if trigger.type != 'manual' and not action.isAutomated:
-            logger.info(f"Cancel execution, because action is set to manual.", extra={'resource_id':action.id})
+            logger.info(f"Cancel execution, because action is set to manual.", extra={'action_id':action.id})
             queue_entry.endedAt = now()
             queue_entry.save()
             continue
@@ -109,7 +109,7 @@ def process_action_queue():
                 startedAt__isnull=False,
             ).order_by('-endedAt').first()
             if last_action and last_action.endedAt > now():
-                logger.info(f"Skipping execution, hardware {hardware} is busy until {last_action.endedAt}", extra={'resource_id':action.id})
+                logger.info(f"Skipping execution, hardware {hardware} is busy until {last_action.endedAt}", extra={'action_id':action.id})
                 continue
 
             # Don't execute if other actions with the same hardware are on Manual mode while this one is on auto.
@@ -125,7 +125,7 @@ def process_action_queue():
             # No other active manual action for the same hardware when the action is in manual mode
             # when this action is in auto mode
             if manual_action and not manual_action.action.isAutomated and action.isAutomated:
-                logger.info(f"Skipping execution, hardware {hardware} has another action in MANUAL mode, which is blocking this auto trigger.", extra={'resource_id':action.id})
+                logger.info(f"Skipping execution, hardware {hardware} has another action in MANUAL mode, which is blocking this auto trigger.", extra={'action_id':action.id})
                 continue
 
         # Execute the action

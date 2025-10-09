@@ -3,7 +3,7 @@ import threading
 import json
 from django.conf import settings
 
-from fpf_sensor_service.sensors import typed_sensor_factory, ConnectionType
+from fpf_sensor_service.sensors import ConnectionType
 from .sensor_services import send_measurements
 from .auth_services import get_fpf_id
 
@@ -24,7 +24,6 @@ DO NOT OVERRIDE WHEN MERGING INTO DEPLOYMENT!
 scheduler = BackgroundScheduler() # daemon=False)
 typed_sensor_factory = TypedSensorFactory()
 
-logger = get_logger()
 
 class MQTTService:
     def __init__(self):
@@ -121,15 +120,7 @@ class MQTTService:
 
             send_measurements(sensor_id=matching_sensor.id)
 
-            logger.debug("Sensor MQTT measurements sent", extra={
-                'extra': {'fpfId': get_fpf_id(), 'sensorId': matching_sensor.id}
-            })
+            logger.debug("Sensor MQTT measurements sent", extra={'extra': {'sensorId': matching_sensor.id}})
 
         except Exception as e:
-            logger.error(f"Error processing MQTT measurement: {e}", extra={
-                'extra': {'fpfId': get_fpf_id()}
-            })
-
-
-    #def on_log(self, client, userdata, level, buf):
-    #    print(f"[MQTT LOG] {buf}")
+            logger.error(f"Error processing MQTT measurement: {e}", extra={'extra': {'fpfId': get_fpf_id()}})

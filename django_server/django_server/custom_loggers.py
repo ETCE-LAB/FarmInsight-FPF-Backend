@@ -27,19 +27,16 @@ class APILogHandler(logging.Handler):
             'createdAt': timezone.now().isoformat(),
         }
 
-        if 'fpfId' in extra_info:
+        if 'sensorId' in extra_info:
+            payload['sensorId'] = str(extra_info['sensorId'])
+        elif 'camera_id' in extra_info:
+            payload['cameraId'] = str(extra_info['camera_id'])
+        elif 'action_id' in extra_info:
+            payload['actionId'] = str(extra_info['action_id'])
+        elif 'fpfId' in extra_info:
             payload['fpfId'] = str(extra_info['fpfId'])
         elif self.fpf_id != '':
             payload['fpfId'] = self.fpf_id
-
-        if 'sensorId' in extra_info:
-            payload['sensorId'] = str(extra_info['sensorId'])
-
-        if 'cameraId' in extra_info:
-            payload['cameraId'] = str(extra_info['cameraId'])
-
-        if 'actionId' in extra_info:
-            payload['actionId'] = str(extra_info['actionId'])
 
         try:
             requests.post(self.api_url, json=payload, headers={

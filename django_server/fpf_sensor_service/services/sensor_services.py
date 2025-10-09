@@ -27,7 +27,7 @@ def send_package(sensor_id, measurements, recurse_on_forbidden=True):
         if response.status_code == 201:
             SensorMeasurement.objects.filter(measuredAt__lte=measurements[-1].measuredAt).delete()
             logger.debug('Successfully sent measurements.',
-                         extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
+                         extra={'extra': {'sensorId': sensor_id, 'api_key': api_key}})
             return True
         elif response.status_code == 403:
             request_api_key()
@@ -35,7 +35,7 @@ def send_package(sensor_id, measurements, recurse_on_forbidden=True):
                 return send_package(sensor_id, measurements, recurse_on_forbidden=False)
         else:
             logger.error('Error sending measurements, will retry later.',
-                         extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor_id, 'api_key': api_key}})
+                         extra={'extra': {'sensorId': sensor_id, 'api_key': api_key}})
     return False
 
 
@@ -60,7 +60,7 @@ def sensor_task(sensor: TypedSensor):
     Gets called at the configured interval for the sensor.
     :param sensor: Sensor of which values are to be processed.
     """
-    logger.debug("Sensor task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+    logger.debug("Sensor task triggered", extra={'extra': {'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         result = None
         if settings.GENERATE_MEASUREMENTS:
@@ -86,10 +86,8 @@ def sensor_task(sensor: TypedSensor):
                 measuredAt=result.timestamp
             )
             send_measurements(sensor.sensor_config.id)
-            logger.debug("Sensor Task completed", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+            logger.debug("Sensor Task completed", extra={'extra': {'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
         else:
-            logger.warning("Sensor Task skipped as value is None", extra={
-                'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id,
-                          'api_key': get_or_request_api_key()}})
+            logger.warning("Sensor Task skipped as value is None", extra={'extra': { 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
-        logger.error(f"Error processing sensor: {e}", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+        logger.error(f"Error processing sensor: {e}", extra={'extra': {'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
