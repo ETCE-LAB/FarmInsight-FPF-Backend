@@ -172,7 +172,6 @@ def is_new_action(action_id, trigger_id):
     We call this function to prevent spamming the queue with the same action multiple times.
     :return:
     """
-
     if get_action_by_id(action_id).hardware is not None:
         active_state = get_active_state_of_hardware(get_action_by_id(action_id).hardware.id)
     else:

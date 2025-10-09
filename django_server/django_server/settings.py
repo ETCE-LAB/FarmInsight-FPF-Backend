@@ -88,6 +88,8 @@ MEASUREMENT_RETRY_SLEEP_BETWEEN_S = env('MEASUREMENT_RETRY_SLEEP_BETWEEN_S', def
 USE_DEFAULT_IMAGE = env('USE_DEFAULT_IMAGE', default='False') == 'True'
 DEFAULT_IMAGE_PATH = env('DEFAULT_IMAGE_PATH', default=os.path.join(BASE_DIR, 'test.jpg'))
 
+DB_QUEUE_RETENTION_DAYS = env('DB_QUEUE_RETENTION_DAYS', default=7)
+
 '''
 DASHBOARD_BACKEND_USER_ID and RESOURCE_SERVER_INTROSPECTION_URL are intended to be used with an external identity server
 to ensure only a known dashboard backend can send configurations to the FPF.

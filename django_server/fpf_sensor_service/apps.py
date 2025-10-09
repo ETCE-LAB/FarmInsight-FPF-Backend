@@ -31,13 +31,13 @@ class SensorAppConfig(AppConfig):
                     time.sleep(retry_interval)
                     retry_count += 1
                 else:
-                    self.log.info("Starting APScheduler...")
+                    self.log.info("Starting Schedulers...")
                     try:
                         from fpf_sensor_service.services import start_scheduler
                         start_scheduler()
-                        self.log.info("APScheduler started successfully.")
+                        self.log.info("Schedulers started successfully.")
                     except Exception as e:
-                        self.log.error(f"Error starting APScheduler: {e}")
+                        self.log.error(f"Error starting Schedulers: {e}")
 
                     try:
                         from fpf_sensor_service.services.mqtt_services import MQTTService

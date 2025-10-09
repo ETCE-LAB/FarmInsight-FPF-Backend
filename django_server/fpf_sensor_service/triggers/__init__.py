@@ -4,3 +4,4 @@ from .manual_trigger_handler import ManualTriggerHandler
 from .time_of_day_trigger_handler import TimeOfDayTriggerHandler
 from .interval_trigger_handler import IntervalTriggerHandler
 from .measurement_trigger_handler import MeasurementTriggerHandler
+from .measurement_trigger_manager import MeasurementTriggerManager

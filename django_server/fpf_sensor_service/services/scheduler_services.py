@@ -10,6 +10,9 @@ from fpf_sensor_service.utils import get_logger
 from .auth_services import get_or_request_api_key, get_fpf_id
 from .sensor_services import sensor_task
 from .camera_services import camera_task
+from .data_retention_services import DataRetentionScheduler
+from .auto_trigger_scheduler_services import AutoTriggerScheduler
+from fpf_sensor_service.triggers import MeasurementTriggerManager
 
 
 logger = get_logger()
@@ -68,6 +71,10 @@ def start_scheduler():
                 'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.id, 'api_key': get_or_request_api_key()}})
 
     scheduler.start()
+
+    DataRetentionScheduler.get_instance().start()
+    AutoTriggerScheduler.get_instance().start()
+    MeasurementTriggerManager.build_trigger_mapping()
 
 
 def stop_scheduler():

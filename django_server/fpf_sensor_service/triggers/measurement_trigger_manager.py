@@ -1,6 +1,6 @@
 import json
 
-from farminsight_dashboard_backend.models import ActionTrigger
+from fpf_sensor_service.models import ActionTrigger
 
 
 class MeasurementTriggerManager:
