@@ -76,8 +76,12 @@ measurements to the FarmInsights Dashboard-Backend based on user-configured inte
 
 ### Step-by-Step Guide
 
-Install the required dependencies for the project using `pip`:
+1. After cloning the repository, move into the following folder
+```
+cd .\django_server\
+```
 
+2. Install the required dependencies for the project using `pip`:
 ```
 pip install -r requirements.txt
 ```
@@ -99,13 +103,13 @@ MQTT_PORT=<Port of MQTT broker HERE (default is:1883)>
 
 ```
 
-Pull the git submodule:
+3. Pull the git submodule:
 ```
 git submodule init
 git submodule update
 ```
 
-Run the server via the IDE or via:
+4. Run the server via the IDE or via:
 ```
 python manage.py runserver
 ```
