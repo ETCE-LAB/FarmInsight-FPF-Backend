@@ -73,6 +73,10 @@ measurements to the FarmInsights Dashboard-Backend based on user-configured inte
 - SQLite
 - `pip` (Python package manager)
 - `virtualenv` (recommended for isolated environments)
+  You need to activate the virtual environment with
+```
+source .venv/bin/activate
+```
 
 ### Step-by-Step Guide
 
@@ -126,6 +130,18 @@ Otherwise, you can also specify the port yourself:
 python manage.py runserver 8002
 ```
 On server startup, the scheduler starts automatically.
+
+### Additional Hints
+If you already set the FPF-Backend up before and want to start from scratch, please remove the existing config in the local db.sqlite
+as it contains an API Key for authorized communication with the Dashboard-Backend.
+
+Option 1: Remove the entries from the database manually (e.g. with SQL queries)
+
+Option 2: Delete the db.sqlite file and re-initialize it with 
+```
+python manage.py makemigrations
+python manage.py migrate
+```
 
 ## API Endpoints
 Here are some of the key API endpoints :
