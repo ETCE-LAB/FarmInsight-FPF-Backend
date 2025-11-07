@@ -1,6 +1,6 @@
 from typing import Type
 
-from .typed_action_script import ActionScript
+from .typed_action_script import ActionScript, ActionScriptDescription
 
 
 def all_subclasses(cls):
@@ -16,15 +16,15 @@ class TypedActionScriptFactory:
             self.registry = {}
             for action_script_class in all_subclasses(ActionScript):
                 description = action_script_class.get_description()
-                if description.action_script_class_id in self.registry:
+                if description.script_class_id in self.registry:
                     raise Exception("Multiple typed action scripts with the same id detected!!")
 
-                self.registry[description.action_script_class_id] = action_script_class
+                self.registry[description.script_class_id] = action_script_class
 
-    def get_available_action_scripts(self) -> list[str]:
+    def get_available_action_scripts(self) -> list[ActionScriptDescription]:
         return [
             action_script_class.get_description() for action_script_class in self.registry.values()
         ]
 
-    def get_typed_action_script_class(self, action_script_class_id: str) -> Type[ActionScript]:
-        return self.registry[action_script_class_id]
+    def get_typed_action_script_class(self, script_class_id: str) -> Type[ActionScript]:
+        return self.registry[script_class_id]

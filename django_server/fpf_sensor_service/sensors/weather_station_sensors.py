@@ -1,11 +1,15 @@
 import json
-
 import requests
+
 from typing import Optional
+
+from Crypto.SelfTest.Hash.test_cSHAKE import descr
+from dateutil.parser import parse as parse_datetime  # to parse ISO 8601 strings
+
 from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
-from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
-from dateutil.parser import parse as parse_datetime  # to parse ISO 8601 strings
+from .sensor_description import SensorDescription, ConnectionType
+from fpf_sensor_service.scripts_base import FieldDescription, FieldType, ValidHttpEndpointRule
 
 
 class HttpWeatherStationAirTemperatureSensor(TypedSensor):
@@ -13,7 +17,7 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -24,7 +28,7 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='a2f4cf30-2615-4b97-be38-1adb19f55d87',
+            script_class_id='a2f4cf30-2615-4b97-be38-1adb19f55d87',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Air Temperature;Luft Temperatur',
@@ -34,22 +38,25 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -68,12 +75,13 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationAirHumiditySensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -84,7 +92,7 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='ed94acb5-847b-4872-9fa4-dce1c9e29cd7',
+            script_class_id='ed94acb5-847b-4872-9fa4-dce1c9e29cd7',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Air Humidity;Luft Luftfeuchtigkeit',
@@ -94,14 +102,18 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -109,7 +121,7 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
         )
 
 
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -128,12 +140,13 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationLightIntensitySensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -144,7 +157,7 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='388a4c21-c845-480c-945c-f54eb60e17d0',
+            script_class_id='388a4c21-c845-480c-945c-f54eb60e17d0',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Light Intensity;Licht Stärke',
@@ -154,21 +167,26 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self) -> MeasurementResult:
+
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -188,12 +206,13 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationUVIndexSensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -204,7 +223,7 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='61e563fc-3acd-4cc6-981b-5ad26b663209',
+            script_class_id='61e563fc-3acd-4cc6-981b-5ad26b663209',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='UV Index;UV Index',
@@ -214,21 +233,25 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -248,12 +271,13 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationWindSpeedSensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -264,7 +288,7 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='f9cd248d-6332-419f-9563-187ee785df33',
+            script_class_id='f9cd248d-6332-419f-9563-187ee785df33',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Wind Speed;Wind Gschwindigkeit',
@@ -274,21 +298,25 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -308,12 +336,13 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationWindDirectionSensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -324,7 +353,7 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='62c4fe04-150a-41c4-a49d-c6585416aa9d',
+            script_class_id='62c4fe04-150a-41c4-a49d-c6585416aa9d',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Wind Direction;Wind Richtung',
@@ -334,21 +363,25 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -368,12 +401,13 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationRainGaugeSensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -384,7 +418,7 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='d17901dd-9179-4a5c-b506-927b90986b73',
+            script_class_id='d17901dd-9179-4a5c-b506-927b90986b73',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Rain Gauge;Regen Pegel',
@@ -394,21 +428,25 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()
@@ -428,12 +466,13 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
             timestamp = parse_datetime(ttn_timestamp)
         return MeasurementResult(value=value, timestamp=timestamp)
 
+
 class HttpWeatherStationBarometricPressureSensor(TypedSensor):
     http_endpoint = None
     auth_header: Optional[dict] = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
         api_key = additional_information.get('authorization')
         if api_key:
@@ -444,7 +483,7 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='c1d19d8c-8ba3-4607-8ebb-ee0faec46042',
+            script_class_id='c1d19d8c-8ba3-4607-8ebb-ee0faec46042',
             model='SenseCAP S2120 8-in-1',
             connection=ConnectionType.HTTP,
             parameter='Barometric Pressure;Barometischer Druck',
@@ -454,21 +493,25 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='authorization',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         url = self.http_endpoint + "?limit=1&order=-received_at"
         response = requests.get(url, headers=self.auth_header)
         response.raise_for_status()

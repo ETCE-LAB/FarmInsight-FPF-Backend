@@ -12,8 +12,9 @@ from django.core.files import File
 from django_server import settings
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.models import Image
-from .auth_services import get_fpf_id, get_or_request_api_key, request_api_key
-from ..sensors import Camera
+from fpf_sensor_service.camera_scripts import TypedCamera
+from .auth_services import get_or_request_api_key, request_api_key
+
 
 logger = get_logger()
 
@@ -50,13 +51,13 @@ def send_images(camera_id):
                 break
 
 
-def camera_task(camera: Camera):
+def camera_task(camera: TypedCamera):
     """
     Function to trigger the measurement of the sensor and to send existing images.
     Gets called at the configured interval for the sensor.
     :param camera: Camera of which images are to be processed.
     """
-    logger.debug("Camera task triggered", extra={'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+    logger.debug("Camera task triggered", extra={'extra': {'camera_id': camera.model.id, 'api_key': get_or_request_api_key()}})
     try:
         result = None
         if settings.USE_DEFAULT_IMAGE:
@@ -69,7 +70,7 @@ def camera_task(camera: Camera):
             while i < settings.MEASUREMENT_RETRY_COUNT:
                 i += 1
                 try:
-                    img_data = camera.get_image()
+                    img_data = camera.run()
                     result = File(img_data, f"{str(uuid.uuid4())}.jpg")
                     break
                 except Exception as e:
@@ -82,12 +83,12 @@ def camera_task(camera: Camera):
         if result is not None:
             Image.objects.create(
                 image=result,
-                camera_id=camera.sensor_config.id,
+                camera_id=camera.model.id,
             )
-            send_images(camera.sensor_config.id)
-            logger.debug("Camera Task completed", extra={'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+            send_images(camera.model.id)
+            logger.debug("Camera Task completed", extra={'extra': {'camera_id': camera.model.id, 'api_key': get_or_request_api_key()}})
         else:
             logger.warning("Camera Task skipped as value is None", extra={
-                'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+                'extra': {'camera_id': camera.model.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
-        logger.error(f"Error processing camera: {e}", extra={'extra': {'camera_id': camera.sensor_config.id, 'api_key': get_or_request_api_key()}})
+        logger.error(f"Error processing camera: {e}", extra={'extra': {'camera_id': camera.model.id, 'api_key': get_or_request_api_key()}})

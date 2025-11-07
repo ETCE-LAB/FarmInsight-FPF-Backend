@@ -1,10 +1,10 @@
 import json
-
 import requests
 
 from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
-from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
+from .sensor_description import SensorDescription, ConnectionType
+from fpf_sensor_service.scripts_base import FieldDescription, FieldType, ValidHttpEndpointRule
 
 
 class HttpMqttSensor(TypedSensor):
@@ -12,14 +12,14 @@ class HttpMqttSensor(TypedSensor):
     http_endpoint = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.mqtt_topic = additional_information['mqtt_topic']
         self.http_endpoint = additional_information['http']
 
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='f631c5fa-e9a0-4b0c-a9f6-75c6b6181f99',
+            script_class_id='f631c5fa-e9a0-4b0c-a9f6-75c6b6181f99',
             model='',
             connection=ConnectionType.HTTP_MQTT,
             parameter='',
@@ -29,21 +29,25 @@ class HttpMqttSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
+                    id='',
                     name='mqtt_topic',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self, payload=None) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         try:
             if payload is not None: # process mqtt
                 value = payload['value']
@@ -52,12 +56,9 @@ class HttpMqttSensor(TypedSensor):
                     return MeasurementResult(value=value, timestamp=timestamp)
                 else:
                     return MeasurementResult(value=value)
-
             else: #process http
                 response = requests.get(self.http_endpoint, timeout=10)
                 response.raise_for_status()
                 return MeasurementResult(value=response.json().get("value"))
-
         except Exception as e:
             raise e
-

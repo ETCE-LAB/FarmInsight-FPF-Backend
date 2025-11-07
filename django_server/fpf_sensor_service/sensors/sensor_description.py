@@ -1,5 +1,9 @@
 from enum import Enum
-from typing import NamedTuple, List
+
+from attr import dataclass
+
+from fpf_sensor_service.scripts_base import ScriptDescription
+
 
 '''
 A list of obvious TODOs left:
@@ -26,33 +30,6 @@ Also need to consider some like parameter/unit (might or might not be) linked to
 
 
 '''
-Every new rule added has to also be added to the sensor_config_serializer.py  validate() method to actually apply.
-'''
-class IntRangeRuleInclusive(NamedTuple):
-    min: int
-    max: int
-
-
-class ValidHttpEndpointRule(NamedTuple):
-    pass
-
-
-'''
-The type of a field needs to be correctly validated the same as any rules applying to the field!  
-'''
-class FieldType(Enum):
-    INTEGER = 'int'
-    STRING = 'str'
-
-
-class FieldDescription(NamedTuple):
-    name: str
-    type: FieldType
-    #hint: str
-    rules: List[object]
-
-
-'''
 The connection type is required and shows up as a column in the frontend.
 '''
 class ConnectionType(Enum):
@@ -67,16 +44,15 @@ class ConnectionType(Enum):
 Every sensor class needs to correctly return a full sensor description object on getDescription()
 These get drawn in frontend as hardware connection.
 '''
-class SensorDescription(NamedTuple):
+@dataclass
+class SensorDescription(ScriptDescription):
     """
     When creating a sensor class generate a corresponding uuid for example like so using the python console:
 
     import uuid
     uuid.uuid4()
 
-    !!! NEVER CHANGE OR DELETE THE sensor_class_id, the DB will store them to identify the class !!!
     """
-    sensor_class_id: str
     model: str
     connection: ConnectionType
     '''
@@ -91,8 +67,3 @@ class SensorDescription(NamedTuple):
     The tags are meant to add additional information for example a minimum interval   
     '''
     tags: dict[str, str]
-    '''
-    Fields are inputs by the user and are stored as a json dict in the additionalInformation DB column
-    '''
-    fields: List[FieldDescription]
-

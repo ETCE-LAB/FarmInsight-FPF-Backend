@@ -1,10 +1,13 @@
 import json
 import asyncio
 
-from fpf_sensor_service.utils import get_logger
-from .action_script_description import ActionScriptDescription, FieldDescription, FieldType
-from .typed_action_script import ActionScript
 from PyP100 import PyP100
+
+from fpf_sensor_service.utils import get_logger
+from fpf_sensor_service.scripts_base import FieldDescription, FieldType
+from .typed_action_script import ActionScript
+from .action_script_description import ActionScriptDescription
+
 
 logger = get_logger()
 
@@ -16,8 +19,8 @@ class TapoP100SmartPlugActionScriptWithDelay(ActionScript):
     maximumDurationInSeconds = 0
 
     def init_additional_information(self):
-        self.maximumDurationInSeconds = self.action.maximumDurationSeconds or 0
-        additional_information = json.loads(self.action.additionalInformation)
+        self.maximumDurationInSeconds = self.model.maximumDurationSeconds or 0
+        additional_information = json.loads(self.model.additionalInformation)
         self.ip_address = additional_information['ip-address']
         self.tapo_account_email = additional_information['tapo-account-email']
         self.tapo_account_password = additional_information['tapo-account-password']
@@ -25,7 +28,7 @@ class TapoP100SmartPlugActionScriptWithDelay(ActionScript):
     @staticmethod
     def get_description() -> ActionScriptDescription:
         return ActionScriptDescription(
-            action_script_class_id='dc83813b-1541-4aac-8caa-ba448a6bbdda',
+            script_class_id='dc83813b-1541-4aac-8caa-ba448a6bbdda',
             name='Tapo Smart Plug (HTTP)',
             description="Turns a Tapo Smart Plug via HTTP calls on and off. MaximumDurationInSeconds adds a delay (optional) to reset the command after the specified time.;Kontrolliert einen Tapo Smart Plug via HTTP-Anfrage. Maximale Dauer in Sekunden kann optional genutzt werden um den Befehl nach angegebener Zeit zurückzusetzen.",
             action_values=['On', 'Off'],
@@ -80,8 +83,8 @@ class TapoP100SmartPlugActionScriptWithDelay(ActionScript):
         except Exception as e:
             raise RuntimeError(f"Failed to control smart plug with value '{action_value}': {e}")
 
-    def run(self, action_value):
+    def run(self, payload=None):
         try:
-            asyncio.run(self.control_smart_plug(action_value=str(action_value).strip().lower()))
+            asyncio.run(self.control_smart_plug(action_value=str(payload).strip().lower()))
         except Exception as e:
             raise RuntimeError(f"Exception during smart plug control: {e}")

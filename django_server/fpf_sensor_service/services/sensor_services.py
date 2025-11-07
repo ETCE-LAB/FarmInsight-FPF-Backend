@@ -60,7 +60,7 @@ def sensor_task(sensor: TypedSensor):
     Gets called at the configured interval for the sensor.
     :param sensor: Sensor of which values are to be processed.
     """
-    logger.debug("Sensor task triggered", extra={'extra': {'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+    logger.debug("Sensor task triggered", extra={'extra': {'sensorId': sensor.model.id, 'api_key': get_or_request_api_key()}})
     try:
         result = None
         if settings.GENERATE_MEASUREMENTS:
@@ -70,7 +70,7 @@ def sensor_task(sensor: TypedSensor):
             while i < settings.MEASUREMENT_RETRY_COUNT:
                 i += 1
                 try:
-                    result = sensor.get_measurement()
+                    result = sensor.run()
                     break
                 except Exception as e:
                     # only raise the error outwards if it's the last attempt
@@ -81,13 +81,13 @@ def sensor_task(sensor: TypedSensor):
 
         if result.value is not None:
             SensorMeasurement.objects.create(
-                sensor_id=sensor.sensor_config.id,
+                sensor_id=sensor.model.id,
                 value=result.value,
                 measuredAt=result.timestamp
             )
-            send_measurements(sensor.sensor_config.id)
-            logger.debug("Sensor Task completed", extra={'extra': {'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+            send_measurements(sensor.model.id)
+            logger.debug("Sensor Task completed", extra={'extra': {'sensorId': sensor.model.id, 'api_key': get_or_request_api_key()}})
         else:
-            logger.warning("Sensor Task skipped as value is None", extra={'extra': { 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+            logger.warning("Sensor Task skipped as value is None", extra={'extra': { 'sensorId': sensor.model.id, 'api_key': get_or_request_api_key()}})
     except Exception as e:
-        logger.error(f"Error processing sensor: {e}", extra={'extra': {'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
+        logger.error(f"Error processing sensor: {e}", extra={'extra': {'sensorId': sensor.model.id, 'api_key': get_or_request_api_key()}})

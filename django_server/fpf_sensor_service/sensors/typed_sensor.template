@@ -1,12 +1,13 @@
 import json
 
 from .typed_sensor import TypedSensor
-from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType
+from .sensor_description import SensorDescription, ConnectionType
+from fpf_sensor_service.scripts_base import FieldDescription, FieldType
 
 '''
 This is a class template to add a new TypedSensor to the project, copy into a .py file and fill out.
 The available types and enums for the sensor description are found in the sensor_description.py file,
-expand as needed but remember to correctly serialize new requirements and also correctly suppport them in the frontent!
+expand as needed but remember to correctly serialize new requirements and also correctly support them in the frontend!
 '''
 class TypedSensorTemplate(TypedSensor):
     def init_additional_information(self):
@@ -16,7 +17,7 @@ class TypedSensorTemplate(TypedSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='<UUID>',
+            script_class_id='<UUID>',
             model='',
             connection=ConnectionType.,
             parameter='',
@@ -26,7 +27,9 @@ class TypedSensorTemplate(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='',
+                    description='',
                     type=FieldType.,
                     rules=[
                       # add relevant rules here 
@@ -35,7 +38,7 @@ class TypedSensorTemplate(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
-        # implement error retrieveal here
+    def run(self, payload=None) -> any:
+        # implement error retrieval here
         pass
 

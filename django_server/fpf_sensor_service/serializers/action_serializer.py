@@ -39,7 +39,6 @@ class ActionSerializer(serializers.ModelSerializer):
         ]
 
     def get_status(self, obj):
-        print(obj)
         latest_entry = ActionQueue.objects.filter(
             action__id=obj.id
         ).order_by('-endedAt', '-createdAt').first()

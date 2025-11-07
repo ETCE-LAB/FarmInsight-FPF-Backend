@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from fpf_sensor_service.models import SensorConfig
-from fpf_sensor_service.sensors import TypedSensorFactory, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule, SensorType
+from fpf_sensor_service.sensors import TypedSensorFactory
+from fpf_sensor_service.scripts_base import FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule, ScriptType
 
 
 typed_sensor_factory = TypedSensorFactory()
@@ -31,8 +32,8 @@ class SensorConfigSerializer(serializers.ModelSerializer):
         fields = ['id', 'intervalSeconds', 'sensorClassId', 'additionalInformation', 'isActive', 'sensorType']
 
     def validate_sensorType(self, value):
-        if value not in SensorType.list():
-            raise serializers.ValidationError(f"SensorType must be one of: {SensorType.list()}")
+        if value not in ScriptType.list():
+            raise serializers.ValidationError(f"ScriptType must be one of: {ScriptType.list()}")
         return value
 
     def validate_intervalSeconds(self, value):

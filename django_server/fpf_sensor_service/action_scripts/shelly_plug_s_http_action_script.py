@@ -4,25 +4,27 @@ import asyncio
 import paho.mqtt.client as mqtt
 
 from fpf_sensor_service.utils import get_logger
-from .action_script_description import ActionScriptDescription, FieldDescription, ValidHttpEndpointRule, FieldType
+from fpf_sensor_service.scripts_base import FieldDescription, ValidHttpEndpointRule, FieldType
 from .typed_action_script import ActionScript
+from .action_script_description import ActionScriptDescription
 
 
 logger = get_logger()
+
 
 class ShellyPlugHttpActionScript(ActionScript):
     http_endpoint = None
     maximumDurationInSeconds = 0
 
     def init_additional_information(self):
-        self.maximumDurationInSeconds = self.action.maximumDurationSeconds or 0
-        additional_information = json.loads(self.action.additionalInformation)
+        self.maximumDurationInSeconds = self.model.maximumDurationSeconds or 0
+        additional_information = json.loads(self.model.additionalInformation)
         self.http_endpoint = additional_information['http']
 
     @staticmethod
     def get_description() -> ActionScriptDescription:
         return ActionScriptDescription(
-            action_script_class_id='baa6ef9a-58dc-4e28-b429-d525dfef0941',
+            script_class_id='baa6ef9a-58dc-4e28-b429-d525dfef0941',
             name='Shelly Plug S (HTTP)',
             description=("Turns a Shelly Plug S via HTTP calls on and off. Maximum duration in seconds adds an optional delay to reset the command after the specified time."
                          ";Steuert einen Shelly Plug S über HTTP. Maximale Dauer in Sekunden fügt eine optionale Wartezeit hinzu die das Kommando nach der angegebenen Dauer umkehrt."),
@@ -49,7 +51,7 @@ class ShellyPlugHttpActionScript(ActionScript):
         """
         try:
             if action_value not in ["on", "off"]:
-                logger.error(f"Invalid action value: {action_value}. Expected 'on' or 'off'.", extra={'action_id': self.action.id})
+                logger.error(f"Invalid action value: {action_value}. Expected 'on' or 'off'.", extra={'action_id': self.model.id})
                 return
 
             # Build URL
@@ -63,18 +65,18 @@ class ShellyPlugHttpActionScript(ActionScript):
             response = requests.get(url, params=params, timeout=5)
 
             if response.status_code == 200:
-                logger.info(f"Successfully sent '{action_value}' command to Shelly plug with delay={self.maximumDurationInSeconds}s.", extra={'action_id': self.action.id})
+                logger.info(f"Successfully sent '{action_value}' command to Shelly plug with delay={self.maximumDurationInSeconds}s.", extra={'action_id': self.model.id})
             else:
-                logger.error(f"Failed to control Shelly plug. Status code: {response.status_code}", extra={'action_id': self.action.id})
+                logger.error(f"Failed to control Shelly plug. Status code: {response.status_code}", extra={'action_id': self.model.id})
 
         except Exception as e:
-            logger.error(f"Exception during Shelly smart plug control: {e}", extra={'action_id': self.action.id})
+            logger.error(f"Exception during Shelly smart plug control: {e}", extra={'action_id': self.model.id})
 
-    def run(self, action_value):
+    def run(self, payload=None):
         try:
-            asyncio.run(self.control_smart_plug(action_value=str(action_value).strip().lower()))
+            asyncio.run(self.control_smart_plug(action_value=str(payload).strip().lower()))
         except Exception as e:
-            logger.error(f"Exception during smart plug control: {e}", extra={'action_id': self.action.id})
+            logger.error(f"Exception during smart plug control: {e}", extra={'action_id': self.model.id})
 
 
 class ShellyPlugMqttActionScript(ActionScript):
@@ -86,8 +88,8 @@ class ShellyPlugMqttActionScript(ActionScript):
     maximumDurationInSeconds = 0
 
     def init_additional_information(self):
-        self.maximumDurationInSeconds = self.action.maximumDurationSeconds or 0
-        info = json.loads(self.action.additionalInformation)
+        self.maximumDurationInSeconds = self.model.maximumDurationSeconds or 0
+        info = json.loads(self.model.additionalInformation)
         self.mqtt_broker = info['mqtt-broker']
         self.mqtt_port = info.get('mqtt-port', 1883)
         self.mqtt_username = info.get('mqtt-username')
@@ -97,7 +99,7 @@ class ShellyPlugMqttActionScript(ActionScript):
     @staticmethod
     def get_description() -> ActionScriptDescription:
         return ActionScriptDescription(
-            action_script_class_id='d821e939-3f67-4ac9-bb3c-274ac0a2056e',
+            script_class_id='d821e939-3f67-4ac9-bb3c-274ac0a2056e',
             name='Shelly Plug S (MQTT)',
             description=("Turns a Shelly Plug S via MQTT communication on and off. MaximumDurationInSeconds adds a delay (optional) to reset the command after the specified time."
                          ";Steuert einen Shelly Plug S über MQTT. Maximale Dauer in Sekunden fügt eine optionale Wartezeit hinzu die das Kommando nach der angegebenen Dauer umkehrt."),
@@ -154,7 +156,7 @@ class ShellyPlugMqttActionScript(ActionScript):
             client.disconnect()
 
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.debug(f"Successfully sent '{payload}' to topic '{topic}'", extra={'action_id': self.action.id})
+                logger.debug(f"Successfully sent '{payload}' to topic '{topic}'", extra={'action_id': self.model.id})
             else:
                 raise RuntimeError(f"Failed to publish message. MQTT return code: {result.rc}")
         except Exception as e:
@@ -169,7 +171,7 @@ class ShellyPlugMqttActionScript(ActionScript):
             self.send_mqtt_command(self.mqtt_topic, action_value)
 
             if self.maximumDurationInSeconds > 0:
-                logger.info(f"Delaying {self.maximumDurationInSeconds} seconds before sending 'off' command.", extra={'action_id': self.action.id})
+                logger.info(f"Delaying {self.maximumDurationInSeconds} seconds before sending 'off' command.", extra={'action_id': self.model.id})
                 asyncio.run(self.delayed_off(self.maximumDurationInSeconds))
 
         except Exception as e:
@@ -179,8 +181,8 @@ class ShellyPlugMqttActionScript(ActionScript):
         await asyncio.sleep(delay_seconds)
         self.send_mqtt_command(self.mqtt_topic, "off")
 
-    def run(self, action_value):
+    def run(self, payload=None):
         try:
-            self.control_smart_plug(action_value=str(action_value).strip().lower())
+            self.control_smart_plug(action_value=str(payload).strip().lower())
         except Exception as e:
             raise RuntimeError(f"Exception during smart plug control: {e}")

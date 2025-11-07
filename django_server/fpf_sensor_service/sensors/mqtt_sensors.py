@@ -2,20 +2,21 @@ import json
 
 from .measurement_result import MeasurementResult
 from .typed_sensor import TypedSensor
-from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, ValidHttpEndpointRule
+from .sensor_description import SensorDescription, ConnectionType
+from fpf_sensor_service.scripts_base import FieldDescription, FieldType
 
 
 class MqttSensor(TypedSensor):
     mqtt_topic = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.mqtt_topic = additional_information['mqtt_topic']
 
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='829e8233-b9c3-4f25-97fb-8852f54c8289',
+            script_class_id='829e8233-b9c3-4f25-97fb-8852f54c8289',
             model='',
             connection=ConnectionType.MQTT,
             parameter='',
@@ -25,14 +26,16 @@ class MqttSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='mqtt_topic',
+                    description='',
                     type=FieldType.STRING,
                     rules=[]
                 ),
             ]
         )
 
-    def get_measurement(self, payload) -> MeasurementResult:
+    def run(self, payload=None) -> any:
         try:
             value = payload['value']
             timestamp = payload.get('timestamp')
@@ -43,4 +46,3 @@ class MqttSensor(TypedSensor):
 
         except (KeyError, json.JSONDecodeError) as e:
             raise ValueError(f"Invalid payload: {e}")
-

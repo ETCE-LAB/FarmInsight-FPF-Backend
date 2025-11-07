@@ -2,7 +2,8 @@ import json
 
 from .typed_sensor import TypedSensor
 from .http_sensor import HttpSensor
-from .sensor_description import SensorDescription, ConnectionType, FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
+from .sensor_description import SensorDescription, ConnectionType
+from fpf_sensor_service.scripts_base import FieldDescription, FieldType, IntRangeRuleInclusive, ValidHttpEndpointRule
 
 #from adafruit_blinka.microcontroller.bcm283x.pin import Pin
 #from adafruit_dht import DHT22
@@ -12,13 +13,13 @@ class PinDHT22HumiditySensor(TypedSensor):
     pin = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.pin = additional_information['pin']
 
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='7711013a-d9f6-4990-9d9b-7222ff98ca9f',
+            script_class_id='7711013a-d9f6-4990-9d9b-7222ff98ca9f',
             model='DHT22',
             connection=ConnectionType.PIN,
             parameter='humidity;feuchtigkeit',
@@ -28,7 +29,9 @@ class PinDHT22HumiditySensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='pin',
+                    description='',
                     type=FieldType.INTEGER,
                     rules=[
                         IntRangeRuleInclusive(
@@ -40,7 +43,7 @@ class PinDHT22HumiditySensor(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
+    def run(self, payload=None) -> any:
         pass
         '''
         dht_device = None
@@ -60,13 +63,13 @@ class PinDHT22TemperatureSensor(TypedSensor):
     pin = None
 
     def init_additional_information(self):
-        additional_information = json.loads(self.sensor_config.additionalInformation)
+        additional_information = json.loads(self.model.additionalInformation)
         self.pin = additional_information['pin']
 
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='5464114a-443f-4c56-a864-abc415b3d3a2',
+            script_class_id='5464114a-443f-4c56-a864-abc415b3d3a2',
             model='DHT22',
             connection=ConnectionType.PIN,
             parameter='temperature;temperatur',
@@ -76,7 +79,9 @@ class PinDHT22TemperatureSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='pin',
+                    description='',
                     type=FieldType.INTEGER,
                     rules=[
                         IntRangeRuleInclusive(
@@ -88,7 +93,7 @@ class PinDHT22TemperatureSensor(TypedSensor):
             ]
         )
 
-    def get_measurement(self):
+    def run(self, payload=None) -> any:
         pass
         '''
         dht_device = None
@@ -108,7 +113,7 @@ class HttpDHT22HumiditySensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='c7fa5c6e-cb40-4f63-9d76-8a556d755b85',
+            script_class_id='c7fa5c6e-cb40-4f63-9d76-8a556d755b85',
             model='DHT22',
             connection=ConnectionType.HTTP,
             parameter='humidity;feuchtigkeit',
@@ -118,7 +123,9 @@ class HttpDHT22HumiditySensor(HttpSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
@@ -132,7 +139,7 @@ class HttpDHT22TemperatureSensor(HttpSensor):
     @staticmethod
     def get_description() -> SensorDescription:
         return SensorDescription(
-            sensor_class_id='fd45e455-57b5-4495-b326-a0cafdc3aa39',
+            script_class_id='fd45e455-57b5-4495-b326-a0cafdc3aa39',
             model='DHT22',
             connection=ConnectionType.HTTP,
             parameter='temperature;temperatur',
@@ -142,7 +149,9 @@ class HttpDHT22TemperatureSensor(HttpSensor):
             },
             fields=[
                 FieldDescription(
+                    id='',
                     name='http',
+                    description='',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
