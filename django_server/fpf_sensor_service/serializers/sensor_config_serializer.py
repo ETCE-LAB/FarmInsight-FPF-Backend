@@ -43,7 +43,7 @@ class SensorConfigSerializer(serializers.ModelSerializer):
         return value
 
     def validate_sensorClassId(self, value):
-        if not str(value) in typed_sensor_factory.registry:
+        if not str(value) in typed_sensor_factory.get_registry():
             raise serializers.ValidationError("Selected sensor is not registered in FPF backend.")
         return value
 

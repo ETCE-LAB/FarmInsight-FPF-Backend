@@ -1,5 +1,7 @@
 from django.db import models
 
+from .hardware import Hardware
+
 
 class SensorConfig(models.Model):
     """
@@ -11,6 +13,7 @@ class SensorConfig(models.Model):
     isActive = models.BooleanField(default=True)
     additionalInformation = models.TextField(blank=True)
     sensorType = models.CharField(max_length=24, blank=False, default='sensor')
+    hardware = models.ForeignKey(Hardware, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return f'ID: {self.id} class: {self.sensorClassId} interval seconds: {self.intervalSeconds} additional: {self.additionalInformation}'

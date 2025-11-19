@@ -15,6 +15,7 @@ class Hardware(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
     orderIndex = models.IntegerField(default=get_order_index_default)
+    pingEndpoint = models.CharField(max_length=256, blank=True, null=True)
 
     class Meta:
         ordering = ['orderIndex']

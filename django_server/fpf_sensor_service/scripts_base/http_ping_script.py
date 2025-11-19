@@ -1,0 +1,28 @@
+import json
+import requests
+
+from .script_description import ScriptDescription
+from .typed_script import TypedScript, ScriptType
+
+
+class HttpPing(TypedScript):
+    http_endpoint = None
+
+    @staticmethod
+    def get_script_type() -> ScriptType:
+        return ScriptType.PING
+
+    def init_additional_information(self):
+        additional_information = json.loads(self.model.additionalInformation)
+        self.http_endpoint = additional_information['http']
+
+    @staticmethod
+    def get_description() -> ScriptDescription:
+        return ScriptDescription(
+            script_class_id='',
+            fields=[],
+        )
+
+    def run(self, payload=None) -> any:
+        response = requests.get(self.http_endpoint, timeout=10)
+        return response.status_code == 200
