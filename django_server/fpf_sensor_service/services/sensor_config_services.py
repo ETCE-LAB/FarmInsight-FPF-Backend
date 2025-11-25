@@ -9,6 +9,11 @@ from fpf_sensor_service.serializers.sensor_config_serializer import SensorConfig
 logger = get_logger()
 
 
+def get_sensor(sensor_id: str) -> SensorConfig:
+    sensor_config = SensorConfig.objects.get(id=sensor_id)
+    return sensor_config
+
+
 def get_sensor_config(sensor_id: str) -> SensorConfigSerializer:
     sensor_config = SensorConfig.objects.get(id=sensor_id)
     return SensorConfigSerializer(sensor_config)

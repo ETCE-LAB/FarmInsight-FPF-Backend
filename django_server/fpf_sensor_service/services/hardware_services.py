@@ -11,6 +11,11 @@ def get_hardware() -> HardwareSerializer:
     return HardwareSerializer(Hardware.objects, many=True)
 
 
+def get_hardware_by_id(hardware_id):
+    hardware = Hardware.objects.get(id=hardware_id)
+    return hardware
+
+
 def get_hardware_by_name(hardware_name):
     try:
         existing_hardware = Hardware.objects.filter(name=hardware_name).first()

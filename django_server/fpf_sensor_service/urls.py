@@ -1,8 +1,7 @@
 from django.urls import path
 from fpf_sensor_service.views import post_sensor, get_available_sensor_types, SensorView, post_fpf_id, \
     post_api_key, ActionView, execute_action, get_available_action_script_types, post_action_order, ActionTriggerView, \
-    get_action_queue, HardwareView, post_hardware_order
-
+    get_action_queue, HardwareView, post_hardware_order, get_ping, get_value_ping
 
 urlpatterns = [
     path('fpf-ids', post_fpf_id, name='post_fpf_id'),
@@ -26,4 +25,7 @@ urlpatterns = [
     path('hardwares', HardwareView.as_view(), name='get_post_hardware'),
     path('hardwares/sort-order', post_hardware_order, name='post_hardware_order'),
     path('hardwares/<str:hardware_id>', HardwareView.as_view(), name='hardware_edits'),
+
+    path('pings/available/<str:resource_id>', get_ping, name='get_ping'),
+    path('pings/value/<str:sensor_id>', get_value_ping, name='get_value_ping'),
 ]
