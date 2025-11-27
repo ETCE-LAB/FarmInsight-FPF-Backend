@@ -22,7 +22,7 @@ def ping_resource(resource_id):
         if sensor.hardware_id:
             hardware = get_hardware_by_id(sensor.hardware_id)
 
-    if hardware is not None:
+    if hardware is not None and hardware.pingEndpoint is not None:
         return HardwarePing(hardware).run()
     elif sensor is not None:
         if not 'http' in sensor.additionalInformation:
