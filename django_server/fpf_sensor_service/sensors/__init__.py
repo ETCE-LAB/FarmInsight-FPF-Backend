@@ -16,3 +16,4 @@ from .mqtt_sensors import MqttSensor
 from .shelly_s_sensors import MQTTShellySSensor, ShellySSensor
 from .http_mqtt_sensors import HttpMqttSensor
 from .anker_solarbank_sensor import AnkerSolarbankPowerSensor
+from .sensecap_seeed_sensor import  SenseCapSeeedSensor
