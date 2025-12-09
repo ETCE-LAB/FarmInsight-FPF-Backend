@@ -1,4 +1,5 @@
 import uuid
+
 from django.db import models
 from django.db.models import Max
 
@@ -23,6 +24,7 @@ class Action(models.Model):
     additionalInformation = models.TextField(blank=True)
     hardware = models.ForeignKey(Hardware, related_name='actions', on_delete=models.SET_NULL, blank=True, null=True)
     orderIndex = models.IntegerField(default=get_order_index_default)
+    nextAction = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         ordering = ['orderIndex']

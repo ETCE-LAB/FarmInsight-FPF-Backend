@@ -7,7 +7,7 @@ from fpf_sensor_service.serializers import ActionScriptDescriptionSerializer
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.services import create_action, delete_action, get_action_by_id, set_is_automated, update_action, \
     get_hardware_by_name, get_active_state_of_action, process_action_queue, create_manual_triggered_action_in_queue, \
-    create_auto_triggered_actions_in_queue, get_action_queue_for_fpf, set_action_order
+    create_auto_triggered_actions_in_queue, get_action_queue_for_fpf, set_action_order, get_actions
 from fpf_sensor_service.action_scripts import TypedActionScriptFactory
 
 
@@ -17,6 +17,10 @@ logger = get_logger()
 
 class ActionView(views.APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = get_actions()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         if request.data.get('hardware').get('name'):

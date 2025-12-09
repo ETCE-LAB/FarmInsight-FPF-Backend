@@ -4,6 +4,11 @@ from fpf_sensor_service.models import Action
 from fpf_sensor_service.serializers import ActionSerializer
 
 
+def get_actions() -> ActionSerializer:
+    actions = Action.objects.all()
+    return ActionSerializer(actions, many=True)
+
+
 def get_action_by_id(action_id: str) -> Action:
     try:
         return Action.objects.get(id=action_id)
@@ -48,4 +53,3 @@ def set_action_order(ids: list[str]):
     for item in items:
         item.orderIndex = ids.index(str(item.id))
     Action.objects.bulk_update(items, ['orderIndex'])
-

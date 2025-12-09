@@ -36,6 +36,7 @@ class ActionSerializer(serializers.ModelSerializer):
             'trigger',
             'status',
             'orderIndex',
+            'nextAction'
         ]
 
     def get_status(self, obj):
