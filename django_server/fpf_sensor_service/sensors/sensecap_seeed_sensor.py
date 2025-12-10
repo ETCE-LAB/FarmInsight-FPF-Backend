@@ -58,7 +58,6 @@ class SenseCapSeeedSensor(TypedSensor):
 
     def get_measurement(self) -> MeasurementResult:
 
-
         response = requests.get(
             self.http_endpoint,
             auth=(self.username, self.password),
@@ -72,11 +71,13 @@ class SenseCapSeeedSensor(TypedSensor):
 
         points = data.get("data", [{}])[0].get("points", [])
 
+        # Try to get the matching measurement
         matched_points = [p for p in points if p.get("measurement_id") == sensor_id]
 
         if not matched_points:
             raise ValueError(f"No measurement with id {sensor_id} found")
 
+        # Get the latest measurement in case there are multiple measurements returned
         newest_point = max(
             matched_points,
             key=lambda p: datetime.fromisoformat(p["time"].replace("Z", "+00:00"))
