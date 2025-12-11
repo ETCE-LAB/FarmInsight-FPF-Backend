@@ -12,3 +12,4 @@ class ActionQueue(models.Model):
     value = models.TextField(null=True)
     action = models.ForeignKey(Action, related_name='queueEntries', on_delete=models.CASCADE)
     trigger = models.ForeignKey(ActionTrigger, on_delete=models.CASCADE)
+    dependsOn = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)

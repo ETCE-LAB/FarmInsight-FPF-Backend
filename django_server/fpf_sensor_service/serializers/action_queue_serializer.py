@@ -18,7 +18,7 @@ class ActionQueueSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActionQueue
         read_only_fields = ['id', 'createdAt', 'actionId', 'actionTriggerId']
-        fields = ['id', 'createdAt', 'startedAt', 'endedAt', 'value', 'actionId', 'actionTriggerId']
+        fields = ['id', 'createdAt', 'startedAt', 'endedAt', 'value', 'actionId', 'actionTriggerId', 'dependsOn']
 
 
 # This serializer contains more of the data from trigger and action to show in the frontend
