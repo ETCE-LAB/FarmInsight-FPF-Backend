@@ -73,11 +73,19 @@ measurements to the FarmInsights Dashboard-Backend based on user-configured inte
 - SQLite
 - `pip` (Python package manager)
 - `virtualenv` (recommended for isolated environments)
+  You need to activate the virtual environment with
+```
+source .venv/bin/activate
+```
 
 ### Step-by-Step Guide
 
-Install the required dependencies for the project using `pip`:
+1. After cloning the repository, move into the following folder
+```
+cd .\django_server\
+```
 
+2. Install the required dependencies for the project using `pip`:
 ```
 pip install -r requirements.txt
 ```
@@ -99,7 +107,13 @@ MQTT_PORT=<Port of MQTT broker HERE (default is:1883)>
 
 ```
 
-Run the server via the IDE or via:
+3. Pull the git submodule:
+```
+git submodule init
+git submodule update
+```
+
+4. Run the server via the IDE or via:
 ```
 python manage.py runserver
 ```
@@ -116,6 +130,18 @@ Otherwise, you can also specify the port yourself:
 python manage.py runserver 8002
 ```
 On server startup, the scheduler starts automatically.
+
+### Additional Hints
+If you already set the FPF-Backend up before and want to start from scratch, please remove the existing config in the local db.sqlite
+as it contains an API Key for authorized communication with the Dashboard-Backend.
+
+Option 1: Remove the entries from the database manually (e.g. with SQL queries)
+
+Option 2: Delete the db.sqlite file and re-initialize it with 
+```
+python manage.py makemigrations
+python manage.py migrate
+```
 
 ## API Endpoints
 Here are some of the key API endpoints :

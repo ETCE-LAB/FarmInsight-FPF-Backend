@@ -1,18 +1,29 @@
+/*
+	The sensor we use is the Adafruit SHT 30 Mesh-protected Weather-proof sensor https://www.adafruit.com/product/4099
+	It's cables are: Brown/Red = VCC (3-5VDC), Black = Ground, Yellow = Clock, Green/Blue = Data (sometimes we hear of sensors where data and clock are swapped so please try both ways)
+	
+	This means for the ardino nano the following pins will be connected (https://content.arduino.cc/assets/Pinout-NANO33IoT_latest.pdf):
+	Brown/red 	-> 3V3 or 5V
+	Black 		-> Ground pin
+	Yellow 		-> A5 (SCL)
+	Green/Blue 	-> A4 (SDA)
+*/
+
 #include <Wire.h>
 #include <WiFiNINA.h>
 #include <Adafruit_SHT31.h>
 
 // WiFi Credentials
-const char ssid[] = "ssid";
-const char pass[] = "pw";
+const char ssid[] = "";
+const char pw[] = "";
 
 // Static IP Configuration (Optional)
-IPAddress local_IP(1, 1, 1, 1);     // IP-Adresse des Arduino 214
+IPAddress local_IP(139, 174, 57, xx);    
 IPAddress gateway(1, 1, 1, 1);        // Gateway (Router-IP)
 IPAddress subnet(255, 255, 255, 192);       // Subnetzmaske
-IPAddress dns(8, 8, 8, 8);                // DNS-Server (Google DNS als Beispiel)
 
 int status = WL_IDLE_STATUS; // WiFi Status
+
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
 WiFiServer server(80);
 
@@ -31,26 +42,42 @@ void sendResponse(WiFiClient &client, String data) {
   client.println(data);
 }
 
-// WiFi Reconnection
 void checkWiFiConnection() {
   status = WiFi.status();
   if (status == WL_CONNECTED) return;
-  
-  Serial.println("Reconnecting to WiFi...");
+
+  Serial.println("WiFI not connected");
+
+  Serial.print("Connecting to WiFi..");
   while (status != WL_CONNECTED) {
-    status = WiFi.begin(ssid, pass);
+    status = WiFi.begin(ssid, pw);
+    Serial.print(".");
     delay(10000);
   }
-  if (!server) {
+
+  Serial.println();
+  Serial.println("Connected to WiFi");
+}
+
+void checkServerStatus() {
+  if (server.status() != 1 && status == WL_CONNECTED) {
+    Serial.println("Server not listening");
+    Serial.println("Starting server");
+    
     server.begin();
+
+    if (server.status() == 1) {
+      Serial.println("Server start successful");
+    } else {
+      Serial.println("Server start failed");
+    }
   }
-  
-  Serial.println("WiFi Reconnected!");
 }
 
 // Setup Function
 void setup() {
   Serial.begin(9600);
+  delay(100);
   Wire.begin();
 
   WiFi.config(local_IP, gateway, subnet);
@@ -61,6 +88,8 @@ void setup() {
     Serial.println("SHT could not be initialized, please check cabels and connection!");
     delay(2000);
   }
+
+  server.begin();
 }
 
 // Main Loop
@@ -69,11 +98,12 @@ void loop() {
 
   WiFiClient client = server.available();
   if (client) {
-	Serial.println("New client connected");
-  
+	  Serial.println("New client connected");
+    
     while (client.connected() && !client.available()) delay(1);
+    
     String request = client.readStringUntil('\r');
-	Serial.println("Request: " + request);
+	  Serial.println("Request: " + request);
   
     if (request.startsWith("GET /measurements/humidity")) sendResponse(client, getSensorData(0));
     else if (request.startsWith("GET /measurements/temperature")) sendResponse(client, getSensorData(1));
@@ -86,6 +116,8 @@ void loop() {
     }
 
     client.stop();
-	Serial.println("Client disconnected");
+	  Serial.println("Client disconnected");
   }
+
+  checkServerStatus();
 }

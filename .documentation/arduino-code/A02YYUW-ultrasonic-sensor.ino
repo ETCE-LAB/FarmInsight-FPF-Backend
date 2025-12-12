@@ -1,21 +1,25 @@
+/*
+	The sensor we use is the A02YYUW Waterproof Ultrasonic Sensor https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311
+	
+	The sensor comes with a UART cable and 4 pin cables.
+	https://content.arduino.cc/assets/Pinout-NANO33IoT_latest.pdf
+	Red		-> 3V3 or 5V
+	Black 	-> Ground pin
+	Blue 	-> TX
+	Green 	-> RX
+*/
+
 #include <WiFiNINA.h>
 #include <Adafruit_ADS1X15.h>
 
-float latestDistance = 0.0;
-unsigned long lastReadTime = 0;
-
 // Enter WLAN Access Credentials
-const char ssid[] = "ssid";
-const char pass[] = "pw";
-
-const float BASE_CM = 30.0;
-const float HEIGHT_CM = 60.0;
+const char ssid[] = "SSID";
+const char pw[] = "pass";
 
 // Enter the static network information
-IPAddress local_IP(1, 1, 1, 1);
+IPAddress local_IP(139, 174, 57, xx);
 IPAddress gateway(1, 1, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(8, 8, 8, 8);
 
 // Status of connection
 int status = WL_IDLE_STATUS;
@@ -23,9 +27,6 @@ int status = WL_IDLE_STATUS;
 // Declare an array named 'data' with 4 elements, all initialized to 0
 // This array will store the bytes received from the distance sensor
 unsigned char data[4] = {};
-
-// Declare a floating-point variable to store the measured distance
-float distance;
 
 // Wi-Fi server object
 WiFiServer server(80);
@@ -72,15 +73,26 @@ float readDistance(unsigned long timeout = 1000) {
   return 0.0;
 }
 
+const float MAX_DIST_CM = 78.0;
+const float MIN_DIST_CM = 3.0;
+const float WATER_FULL_L = 210;
+
 float calculateVolume(float distance_cm) {
-  if (distance_cm < BASE_CM || distance_cm > HEIGHT_CM) {
-    Serial.println("Out of range (too close or overflow)");
+  // -1.574 * 10^-5 * x^3 + 0.01306 * x^2 - 3.617 * x + 210
+
+  if (distance_cm > MAX_DIST_CM) { // shouldn't happen if sensor is installed correctly inside the container
     return 0.0;
+  } else if (distance_cm < MIN_DIST_CM) { // Overflow should prevent this from ever happening but better to catch it
+    return WATER_FULL_L;
   }
 
-  float water_height = HEIGHT_CM - distance_cm;
-  float volume_cm3 = 65.0 * 45.0 * water_height;
-  float volume_liters = volume_cm3 / 1000.0;
+  // -1.574 * 10^-5 * d^3 + 0.01306 * d^2 - 3.617 * d + 210
+  float d = distance_cm;
+  float volume_liters = -1.574 * 0.00001 * d * d * d + 0.01306 * d * d - 3.617 * d + 210;
+
+  if (volume_liters < 0) {
+    volume_liters = 0.0;
+  }
 
   Serial.print("Distance: ");
   Serial.print(distance_cm);
@@ -91,11 +103,42 @@ float calculateVolume(float distance_cm) {
   return volume_liters;
 }
 
+void checkWiFiConnection() {
+  status = WiFi.status();
+  if (status == WL_CONNECTED) return;
 
+  Serial.println("WiFI not connected");
+
+  Serial.print("Connecting to WiFi..");
+  while (status != WL_CONNECTED) {
+    status = WiFi.begin(ssid, pw);
+    Serial.print(".");
+    delay(10000);
+  }
+
+  Serial.println();
+  Serial.println("Connected to WiFi");
+}
+
+void checkServerStatus() {
+  if (server.status() != 1) {
+    Serial.println("Server not listening");
+    Serial.println("Starting server");
+    
+    server.begin();
+
+    if (server.status() == 1) {
+      Serial.println("Server start successful");
+    } else {
+      Serial.println("Server start failed");
+    }
+  }
+}
 
 void setup() {
   Serial1.begin(9600);
   Serial.begin(9600);
+
   // check WLAN-module exists
   if (WiFi.status() == WL_NO_MODULE) {
     Serial.println("WIFI-module not found!");
@@ -104,29 +147,18 @@ void setup() {
 
   // apply WLAN config
   WiFi.config(local_IP, gateway, subnet);
-
-  // WLAN connect with retries if not possible
-  while (status != WL_CONNECTED) {
-    Serial.print("Connected with: ");
-    Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
-
-    delay(10000);
-  }
+  checkWiFiConnection();
 
   // Print connection details
-  Serial.println("Wifi Connected!");
   Serial.print("IP-Adresse: ");
   Serial.println(WiFi.localIP());
 
-  // Start the server
   server.begin();
-
 }
 
 void loop() {
-  // Continuously update distance
-
+  checkWiFiConnection();
+  checkServerStatus();
 
   WiFiClient client = server.available();
   if (client) {
@@ -140,7 +172,7 @@ void loop() {
     Serial.println(request);
 
     if (request.startsWith("GET /measurements/distance")) {
-       float distance = readDistance();
+      float distance = readDistance();
       float volume = calculateVolume(distance);
 
       String jsonResponse = "{";

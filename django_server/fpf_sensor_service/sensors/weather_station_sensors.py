@@ -30,7 +30,7 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
             parameter='Air Temperature;Luft Temperatur',
             unit='°C',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -90,7 +90,7 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
             parameter='Air Humidity;Luft Luftfeuchtigkeit',
             unit='%',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -150,7 +150,7 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
             parameter='Light Intensity;Licht Stärke',
             unit='lux',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -210,7 +210,7 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
             parameter='UV Index;UV Index',
             unit='UV',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -270,7 +270,7 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
             parameter='Wind Speed;Wind Gschwindigkeit',
             unit='km/h',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -330,7 +330,7 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
             parameter='Wind Direction;Wind Richtung',
             unit='°',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -366,7 +366,6 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
         ttn_timestamp = json_data.get("result", {}).get("uplink_message", {}).get("received_at")
         if ttn_timestamp:
             timestamp = parse_datetime(ttn_timestamp)
-
         return MeasurementResult(value=value, timestamp=timestamp)
 
 class HttpWeatherStationRainGaugeSensor(TypedSensor):
@@ -391,7 +390,7 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
             parameter='Rain Gauge;Regen Pegel',
             unit='mm',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
@@ -451,7 +450,7 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
             parameter='Barometric Pressure;Barometischer Druck',
             unit='Pa',
             tags={
-                'info': 'see local SenseCap config to set matching interval. Most common is hourly.'
+                'info': 'see local SenseCap config to set matching interval. Most common is hourly.;Aus lokaler SenseCap Konfiguration passendes Intervall entnehmen. Üblich ist stündlich.'
             },
             fields=[
                 FieldDescription(
