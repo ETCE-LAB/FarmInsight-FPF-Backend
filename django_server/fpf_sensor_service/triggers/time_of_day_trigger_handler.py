@@ -31,13 +31,16 @@ class TimeOfDayTriggerHandler(BaseTriggerHandler):
 
     def enqueue_if_needed(self):
         from fpf_sensor_service.services import is_new_action
-        if self.should_trigger() and self.trigger.action.isAutomated:
+        if self.should_trigger() and self.trigger.action.isAutomated and self.trigger.action.isActive:
             if is_new_action(self.trigger.action.id, self.trigger.id):
-                serializer = ActionQueueSerializer(data={
-                    "actionId": str(self.trigger.action.id),
-                    "actionTriggerId": str(self.trigger.id),
-                    "value": self.trigger.actionValue,
-                }, partial=True)
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    logger.info(f"Queued by timeOfDay trigger {self.trigger.description} with value {self.trigger.actionValue}", extra={'action_id': self.trigger.action.id})
+                if self.trigger.action.nextAction is None:
+                    serializer = ActionQueueSerializer(data={
+                        "actionId": str(self.trigger.action.id),
+                        "actionTriggerId": str(self.trigger.id),
+                        "value": self.trigger.actionValue,
+                    }, partial=True)
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
+                        logger.info(f"Queued by timeOfDay trigger {self.trigger.description} with value {self.trigger.actionValue}", extra={'action_id': self.trigger.action.id})
+                else:
+                    BaseTriggerHandler.enqueue_chained_actions(self.trigger, self.trigger.action, None, self.trigger.actionValue.split(";"), 0, 'timeOfDay')

@@ -7,9 +7,9 @@ from fpf_sensor_service.triggers import TriggerHandlerFactory
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.action_scripts import TypedActionScriptFactory
 from fpf_sensor_service.serializers import ActionQueueSerializerDescriptive
+from fpf_sensor_service.scripts_base import ScriptType
 from .action_services import get_action_by_id
 from .action_trigger_services import get_all_active_auto_triggers
-
 
 typed_action_script_factory = TypedActionScriptFactory()
 logger = get_logger()
@@ -81,7 +81,7 @@ def process_action_queue():
     :return:
     """
     # Filter out finished and cancelled actions
-    pending_actions = ActionQueue.objects.filter(endedAt__isnull=True, startedAt__isnull=True).order_by('createdAt')
+    pending_actions = ActionQueue.objects.filter(endedAt__isnull=True).order_by('createdAt')
 
     for queue_entry in pending_actions:
         action = queue_entry.action
@@ -91,6 +91,11 @@ def process_action_queue():
         # Don't execute actions for inactive controllable action
         if not action.isActive:
             logger.info(f"Skipping action because it is not active.", extra={'action_id':action.id})
+            continue
+
+        # Don't execute if the action is still waiting on another actions execution
+        if queue_entry.dependsOn is not None and queue_entry.dependsOn.endedAt is None:
+            logger.debug(f"Skipping entry because it is still waiting on it's predecessor.", extra={'action_id': action.id})
             continue
 
         # Don't execute auto actions if manual action is active, cancel the auto action in the queue
@@ -128,22 +133,44 @@ def process_action_queue():
                 logger.info(f"Skipping execution, hardware {hardware} has another action in MANUAL mode, which is blocking this auto trigger.", extra={'action_id':action.id})
                 continue
 
-        # Execute the action
-        queue_entry.startedAt = now()
-
         script = typed_action_script_factory.get_typed_action_script_class(str(action.actionClassId))
         script_class = script(action)
-        script_class.run(trigger.actionValue)
 
-        # Set endedAt with the given maximum duration of the action
-        queue_entry.endedAt = now() + timedelta(seconds=action.maximumDurationSeconds or 0)
-        queue_entry.save()
-        logger.info(f"Executed successfully", extra={'action_id': action.id})
+        if script_class.get_script_type() == ScriptType.PING:
+            if queue_entry.startedAt is None:
+                queue_entry.startedAt = now()
+
+            result: bool = script_class.run(queue_entry.value)
+            if result:
+                queue_entry.endedAt = now()
+                logger.info(f"Executed successfully", extra={'action_id': action.id})
+            else:
+                if queue_entry.startedAt < now() - timedelta(minutes=5):
+                    queue_entry.endedAt = now()
+                    logger.info(f"Ping timed out, execution cancelled.", extra={'action_id': action.id})
+
+                    # remove all following actions too!
+                    next_entry = pending_actions.filter(lambda x: x.dependsOn == queue_entry)
+                    while next_entry is not None:
+                        next_entry.endedAt = now()
+                        next_entry.save()
+                        logger.info(f"Ping timed out, execution cancelled.", extra={'action_id': next_entry.action.id})
+                        next_entry = pending_actions.filter(lambda x: x.dependsOn == next_entry)
+
+            queue_entry.save()
+        else:
+            # Execute the action
+            queue_entry.startedAt = now()
+            script_class.run(queue_entry.value)
+
+            # Set endedAt with the given maximum duration of the action
+            queue_entry.endedAt = now() + timedelta(seconds=action.maximumDurationSeconds or 0)
+            queue_entry.save()
+            logger.info(f"Executed successfully", extra={'action_id': action.id})
 
 
 def create_auto_triggered_actions_in_queue(action_id=None):
     auto_triggers = get_all_active_auto_triggers(action_id)
-
     for auto_trigger in auto_triggers:
         handler = TriggerHandlerFactory.get_handler(auto_trigger)
         handler.enqueue_if_needed()

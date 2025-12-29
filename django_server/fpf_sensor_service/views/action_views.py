@@ -76,7 +76,6 @@ def execute_action(request, action_id, trigger_id):
         #if active_state is not None and get_action_by_id(action_id).isAutomated == False and (active_state.trigger.id is None or active_state.trigger.id == trigger_id):
         elif active_state is not None and (get_action_by_id(action_id).isAutomated == False and str(active_state.trigger.id) == trigger_id):
             set_is_automated(action_id, True)
-            process_action_queue()
 
         # The user selected a new manual trigger, different from the current active state
         else:

@@ -36,7 +36,7 @@ class IntervalTriggerHandler(BaseTriggerHandler):
             id=job_id,
             trigger="interval",
             seconds=interval,
-            next_run_time=now() + timedelta(seconds=delay)
+            next_run_time=now() + timedelta(seconds=1)
         )
 
 
@@ -50,17 +50,20 @@ def enqueue_interval_action(trigger_id):
 
     trigger = get_action_trigger(trigger_id)
 
-    if trigger and trigger.action.isAutomated:
+    if trigger and trigger.action.isAutomated and trigger.action.isActive:
         # Only enqueue if the action is new (there must not be a created action by the same trigger in the queue, which has not ended yet.)
         if not is_already_enqueued(trigger_id):
-            serializer = ActionQueueSerializer(data={
-                "actionId": str(trigger.action.id),
-                "actionTriggerId": str(trigger.id),
-                "value": trigger.actionValue
-            }, partial=True)
+            if trigger.action.nextAction is None:
+                serializer = ActionQueueSerializer(data={
+                    "actionId": str(trigger.action.id),
+                    "actionTriggerId": str(trigger.id),
+                    "value": trigger.actionValue
+                }, partial=True)
 
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                logger.info(f"Queued by interval trigger {trigger.description} with value {trigger.actionValue}", extra={'action_id': trigger.action.id})
-
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    logger.info(f"Queued by interval trigger {trigger.description} with value {trigger.actionValue}", extra={'action_id': trigger.action.id})
+            else:
+                BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None, trigger.actionValue.split(";"), 0,
+                                             'interval')
             process_action_queue()

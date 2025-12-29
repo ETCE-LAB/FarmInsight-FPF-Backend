@@ -46,6 +46,7 @@ class SensorAppConfig(AppConfig):
                         self.log.info("MQTT Service started successfully.")
                     except Exception as e:
                         self.log.error(f"Error starting MQTTService: {e}")
+
                     break
             except OperationalError as e:
                 self.log.error(f"Database not ready yet: {e}")

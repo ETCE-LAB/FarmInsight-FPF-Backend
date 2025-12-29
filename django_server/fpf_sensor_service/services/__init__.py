@@ -5,3 +5,4 @@ from .hardware_services import create_hardware, update_hardware, remove_hardware
 from .action_queue_services import get_active_state_of_action, get_active_state_of_hardware, is_already_enqueued, process_action_queue, create_auto_triggered_actions_in_queue, get_active_state, is_new_action, get_action_queue_for_fpf
 from .action_trigger_services import create_action_trigger, get_action_trigger, get_all_auto_timeOfDay_action_triggers, get_all_auto_interval_triggers, get_all_active_auto_triggers, update_action_trigger, create_manual_triggered_action_in_queue
 from .ping_services import ping_resource
+from .auto_trigger_scheduler_services import AutoTriggerScheduler

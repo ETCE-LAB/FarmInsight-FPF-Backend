@@ -59,15 +59,19 @@ def create_measurement_auto_triggered_actions_in_queue(sensor_id, measurement_va
             trigger = get_action_trigger(str(trigger_id))
             # Trigger type logic to check for triggering && currently active trigger for the action must not be this trigger.
             handler = TriggerHandlerFactory.get_handler(trigger)
-            if trigger.action.isAutomated and handler.should_trigger(measurement=measurement_value):
+            if trigger.action.isAutomated and trigger.action.isActive and handler.should_trigger(measurement=measurement_value):
                 if is_new_action(trigger.action.id, trigger.id) and not is_already_enqueued(trigger_id):
-                    serializer = ActionQueueSerializer(data={
-                        "actionId": str(trigger.action.id),
-                        "actionTriggerId": str(trigger.id),
-                        "value": trigger.actionValue
-                    }, partial=True)
-                    if serializer.is_valid(raise_exception=True):
-                        serializer.save()
-                        logger.info(f"Queued by measurement trigger {trigger.description} from value {measurement_value:.2f}", extra={'action_id': trigger.action.id})
+                    if trigger.action.nextAction is None:
+                        serializer = ActionQueueSerializer(data={
+                            "actionId": str(trigger.action.id),
+                            "actionTriggerId": str(trigger.id),
+                            "value": trigger.actionValue
+                        }, partial=True)
+                        if serializer.is_valid(raise_exception=True):
+                            serializer.save()
+                            logger.info(f"Queued by measurement trigger {trigger.description} from value {measurement_value:.2f}", extra={'action_id': trigger.action.id})
+                    else:
+                        BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None,
+                                                                   trigger.actionValue.split(";"), 0, 'measurement')
 
         process_action_queue()

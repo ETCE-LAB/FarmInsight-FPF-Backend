@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 
+from fpf_sensor_service.triggers import BaseTriggerHandler
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.models import ActionTrigger
 from fpf_sensor_service.serializers import ActionTriggerSerializer, ActionQueueSerializer
@@ -76,20 +77,20 @@ def create_manual_triggered_action_in_queue(action_id, trigger_id):
     :param trigger_id:
     :return:
     """
-    from fpf_sensor_service.services import process_action_queue, get_action_trigger
 
     trigger = get_action_trigger(trigger_id)
     if trigger.isActive: #and is_new_action(action_id, trigger.id): Disabled for now.
         # We would need to check all controllable actions with the same hardware in the active state and maybe the
         # user want to trigger a manual action more than once in case of network failure.
-
-        serializer = ActionQueueSerializer(data={
-            "actionId": action_id,
-            "actionTriggerId": trigger_id,
-            "value": trigger.actionValue,
-        }, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            logger.info(f"Queued by manual trigger {trigger.description} with value {trigger.actionValue}", extra={'action_id': action_id})
-
-    process_action_queue()
+        if trigger.action.nextAction is None:
+            serializer = ActionQueueSerializer(data={
+                "actionId": action_id,
+                "actionTriggerId": trigger_id,
+                "value": trigger.actionValue,
+            }, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                logger.info(f"Queued by manual trigger {trigger.description} with value {trigger.actionValue}", extra={'action_id': action_id})
+        else:
+            BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None, trigger.actionValue.split(";"), 0,
+                                                       'manual')
