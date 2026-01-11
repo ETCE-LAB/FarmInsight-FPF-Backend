@@ -6,5 +6,4 @@ ONLY ActionScript classes imported here will be visible to the program and count
 To disable any action scripts just comment out the line by putting a # in front of it
 """
 
-from .tapo_p100_action_script import TapoP100SmartPlugActionScriptWithDelay
-from .shelly_plug_s_http_action_script import ShellyPlugHttpActionScript, ShellyPlugMqttActionScript
+from .shelly_plug_s_http_action_script import ShellyPlugHttpActionScript

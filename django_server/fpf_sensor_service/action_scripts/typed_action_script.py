@@ -14,7 +14,7 @@ class ActionScript(TypedScript):
     def get_description() -> ActionScriptDescription:
         pass
 
-    def run(self, payload=None) -> any:
+    async def run(self, payload=None) -> any:
         """
         :param payload: The action value
         """

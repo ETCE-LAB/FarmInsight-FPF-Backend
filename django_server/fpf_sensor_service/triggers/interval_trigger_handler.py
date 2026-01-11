@@ -46,7 +46,7 @@ def enqueue_interval_action(trigger_id):
     :param trigger_id:
     :return:
     """
-    from fpf_sensor_service.services import get_action_trigger, process_action_queue, is_already_enqueued
+    from fpf_sensor_service.services import get_action_trigger, is_already_enqueued
 
     trigger = get_action_trigger(trigger_id)
 
@@ -66,4 +66,3 @@ def enqueue_interval_action(trigger_id):
             else:
                 BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None, trigger.actionValue.split(";"), 0,
                                              'interval')
-            process_action_queue()

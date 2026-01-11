@@ -1,9 +1,10 @@
-import json
-import requests
 import asyncio
+import json
+import aiohttp
 import paho.mqtt.client as mqtt
+from asgiref.sync import sync_to_async
 
-from fpf_sensor_service.utils import get_logger
+from fpf_sensor_service.utils import get_logger, async_safe_log
 from fpf_sensor_service.scripts_base import FieldDescription, ValidHttpEndpointRule, FieldType
 from .typed_action_script import ActionScript
 from .action_script_description import ActionScriptDescription
@@ -42,41 +43,33 @@ class ShellyPlugHttpActionScript(ActionScript):
             ]
         )
 
-    async def control_smart_plug(self, action_value):
+    async def run(self, payload=None):
         """
         Controls the Shelly plug via HTTP.
         Supports:
         - Plain string: "on" / "off"
         - JSON string: {"value": "on", "delay": 1800}
         """
-        try:
-            if action_value not in ["on", "off"]:
-                logger.error(f"Invalid action value: {action_value}. Expected 'on' or 'off'.", extra={'action_id': self.model.id})
-                return
+        action_value = str(payload).strip().lower()
+        if action_value not in ["on", "off"]:
+            raise Exception(f"Invalid action value: {action_value}. Expected 'on' or 'off'.")
 
-            # Build URL
-            url = f"http://{self.http_endpoint}/relay/0"
-            params = {"turn": action_value}
+        # Build URL
+        url = f"http://{self.http_endpoint}/relay/0"
+        params = {"turn": action_value}
 
-            if self.maximumDurationInSeconds > 0:
-                params["timer"] = self.maximumDurationInSeconds
+        if self.maximumDurationInSeconds > 0:
+            params["timer"] = self.maximumDurationInSeconds
 
-            # Send HTTP request
-            response = requests.get(url, params=params, timeout=5)
-
-            if response.status_code == 200:
-                logger.info(f"Successfully sent '{action_value}' command to Shelly plug with delay={self.maximumDurationInSeconds}s.", extra={'action_id': self.model.id})
-            else:
-                logger.error(f"Failed to control Shelly plug. Status code: {response.status_code}", extra={'action_id': self.model.id})
-
-        except Exception as e:
-            logger.error(f"Exception during Shelly smart plug control: {e}", extra={'action_id': self.model.id})
-
-    def run(self, payload=None):
-        try:
-            asyncio.run(self.control_smart_plug(action_value=str(payload).strip().lower()))
-        except Exception as e:
-            logger.error(f"Exception during smart plug control: {e}", extra={'action_id': self.model.id})
+        # Send HTTP request
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, timeout=5) as response:
+                if response.status == 200:
+                    await async_safe_log('info',
+                                         f"Successfully sent '{action_value}' command to Shelly plug with delay={self.maximumDurationInSeconds}s.",
+                                         extra={'action_id': self.model.id})
+                else:
+                    raise Exception(f"Failed to control Shelly plug. Status code: {response.status}")
 
 
 class ShellyPlugMqttActionScript(ActionScript):
@@ -141,48 +134,32 @@ class ShellyPlugMqttActionScript(ActionScript):
             ]
         )
 
+    @sync_to_async
     def send_mqtt_command(self, topic: str, payload: str):
-        try:
-            client = mqtt.Client()
-            if self.mqtt_username and self.mqtt_password:
-                client.username_pw_set(self.mqtt_username, self.mqtt_password)
+        client = mqtt.Client()
+        if self.mqtt_username and self.mqtt_password:
+            client.username_pw_set(self.mqtt_username, self.mqtt_password)
 
-            client.connect(self.mqtt_broker, self.mqtt_port, 60)
-            client.loop_start()
-            logger.debug(f"Publishing to {topic}: {payload}")
-            result = client.publish(topic, payload)
-            result.wait_for_publish()
-            client.loop_stop()
-            client.disconnect()
+        client.connect(self.mqtt_broker, self.mqtt_port, 60)
+        client.loop_start()
+        result = client.publish(topic, payload)
+        result.wait_for_publish()
+        client.loop_stop()
+        client.disconnect()
 
-            if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.debug(f"Successfully sent '{payload}' to topic '{topic}'", extra={'action_id': self.model.id})
-            else:
-                raise RuntimeError(f"Failed to publish message. MQTT return code: {result.rc}")
-        except Exception as e:
-            raise RuntimeError(f"Exception during MQTT communication: {e}")
+        if result.rc == mqtt.MQTT_ERR_SUCCESS:
+            logger.debug(f"Successfully sent '{payload}' to topic '{topic}'", extra={'action_id': self.model.id})
+        else:
+            raise RuntimeError(f"Failed to publish message. MQTT return code: {result.rc}")
 
-    def control_smart_plug(self, action_value):
-        try:
+    async def run(self, payload=None):
+        action_value = str(payload).strip().lower()
+        if action_value not in ["on", "off"]:
+            raise Exception(f"Invalid action value: {action_value}. Expected 'on' or 'off'.")
 
-            if action_value not in ["on", "off"]:
-                raise ValueError(f"Invalid action value: {action_value}. Expected 'on' or 'off'.")
+        await self.send_mqtt_command(self.mqtt_topic, action_value)
 
-            self.send_mqtt_command(self.mqtt_topic, action_value)
-
-            if self.maximumDurationInSeconds > 0:
-                logger.info(f"Delaying {self.maximumDurationInSeconds} seconds before sending 'off' command.", extra={'action_id': self.model.id})
-                asyncio.run(self.delayed_off(self.maximumDurationInSeconds))
-
-        except Exception as e:
-            raise RuntimeError(f"Exception during Shelly smart plug control: {e}") from e
-
-    async def delayed_off(self, delay_seconds: int):
-        await asyncio.sleep(delay_seconds)
-        self.send_mqtt_command(self.mqtt_topic, "off")
-
-    def run(self, payload=None):
-        try:
-            self.control_smart_plug(action_value=str(payload).strip().lower())
-        except Exception as e:
-            raise RuntimeError(f"Exception during smart plug control: {e}")
+        # if maximumDurationSet, it means to reverse the command after that time
+        if self.maximumDurationInSeconds > 0:
+            await asyncio.sleep(self.maximumDurationInSeconds)
+            await self.send_mqtt_command(self.mqtt_topic, "on" if action_value == "on" else "off")

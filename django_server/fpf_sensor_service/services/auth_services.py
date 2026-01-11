@@ -1,4 +1,5 @@
 import requests
+from asgiref.sync import sync_to_async
 
 from django_server import settings
 
@@ -38,3 +39,17 @@ def get_or_request_api_key() -> str or None:
     if not api_key:
         return request_api_key()
     return api_key.value
+
+
+@sync_to_async
+def async_get_or_request_api_key() -> str or None:
+    return get_or_request_api_key
+
+
+@sync_to_async
+def async_get_fpf_id() -> str or None:
+    fpf_config = Configuration.objects.filter(key=ConfigurationKeys.FPF_ID.value).first()
+    if not fpf_config:
+        logger.debug('!!! FPF ID CONFIGURATION LOST, UNABLE TO PROCEED !!!')
+        return None
+    return fpf_config.value

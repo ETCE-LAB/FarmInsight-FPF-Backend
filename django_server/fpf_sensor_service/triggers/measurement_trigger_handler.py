@@ -48,7 +48,7 @@ def create_measurement_auto_triggered_actions_in_queue(sensor_id, measurement_va
     :param sensor_id:
     :return:
     """
-    from fpf_sensor_service.services import is_new_action, process_action_queue, is_already_enqueued, get_action_trigger
+    from fpf_sensor_service.services import is_new_action, is_already_enqueued, get_action_trigger
     from .trigger_handler_factory import TriggerHandlerFactory
     from .measurement_trigger_manager import MeasurementTriggerManager
 
@@ -73,5 +73,3 @@ def create_measurement_auto_triggered_actions_in_queue(sensor_id, measurement_va
                     else:
                         BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None,
                                                                    trigger.actionValue.split(";"), 0, 'measurement')
-
-        process_action_queue()

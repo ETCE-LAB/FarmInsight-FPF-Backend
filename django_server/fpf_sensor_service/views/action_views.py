@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from fpf_sensor_service.serializers import ActionScriptDescriptionSerializer
 from fpf_sensor_service.utils import get_logger
 from fpf_sensor_service.services import create_action, delete_action, get_action_by_id, set_is_automated, update_action, \
-    get_hardware_by_name, get_active_state_of_action, process_action_queue, create_manual_triggered_action_in_queue, \
-    create_auto_triggered_actions_in_queue, get_action_queue_for_fpf, set_action_order, get_actions
+    get_hardware_by_name, get_active_state_of_action, create_manual_triggered_action_in_queue, \
+    create_auto_triggered_actions_in_queue, get_action_queue_for_fpf, set_action_order, get_actions, clear_action_queue
 from fpf_sensor_service.action_scripts import TypedActionScriptFactory
 
 
@@ -104,4 +104,11 @@ def get_action_queue(request):
 @permission_classes([IsAuthenticated])
 def post_action_order(request):
     set_action_order(request.data)
+    return Response(data={'success': ''}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_clear_action_queue(request):
+    clear_action_queue()
     return Response(data={'success': ''}, status=status.HTTP_200_OK)

@@ -1,3 +1,5 @@
+import threading
+
 from datetime import timedelta
 
 from django.utils import timezone
@@ -7,6 +9,7 @@ from fpf_sensor_service.models import SensorConfig
 from fpf_sensor_service.sensors import TypedSensorFactory
 from fpf_sensor_service.sensors.sensor_description import ConnectionType
 from fpf_sensor_service.utils import get_logger
+from .action_queue_services import run_process_queue_in_thread
 from .auth_services import get_or_request_api_key, get_fpf_id
 from .sensor_services import sensor_task
 from .camera_services import camera_task
@@ -84,6 +87,8 @@ def start_scheduler():
     AutoTriggerScheduler.get_instance().start()
     MeasurementTriggerManager.build_trigger_mapping()
 
+    t = threading.Thread(target=run_process_queue_in_thread, daemon=True)
+    t.start()
 
 def stop_scheduler():
     """

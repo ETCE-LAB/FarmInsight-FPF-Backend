@@ -1,5 +1,4 @@
-import json
-import requests
+import aiohttp
 
 from .script_description import ScriptDescription
 from .typed_script import TypedScript, ScriptType
@@ -20,6 +19,7 @@ class SimplePing(TypedScript):
             fields=[],
         )
 
-    def run(self, payload=None) -> any:
-        response = requests.get(payload, timeout=10)
-        return response.status_code == 200
+    async def run(self, payload=None) -> any:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(payload, timeout=10) as response:
+                return response.status == 200

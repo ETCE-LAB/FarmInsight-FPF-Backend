@@ -119,6 +119,8 @@ MQTT_CONFIG = {
     "PASSWORD": env("MQTT_PASSWORD", default=None),
 }
 
+
+LOGGING_API_URL = f'{MEASUREMENTS_BASE_URL}/api/log_messages'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -156,7 +158,7 @@ LOGGING = {
         'api': {
             'level': env('API_LOG_LEVEL', default='ERROR'),
             'class': 'django_server.custom_loggers.APILogHandler',
-            'api_url': f'{MEASUREMENTS_BASE_URL}/api/log_messages',
+            'api_url': LOGGING_API_URL,
             'fpf_id': '',
             'formatter': 'message_only',
         },
@@ -172,5 +174,10 @@ LOGGING = {
             'level': env('SENSOR_SERVICE_LOG_LEVEL', default='DEBUG'),
             'propagate': False,
         },
+        'async_safe': {
+            'handlers': ['console'],
+            'level': env('SENSOR_SERVICE_LOG_LEVEL', default='DEBUG'),
+            'propagate': False,
+        }
     },
 }

@@ -52,5 +52,5 @@ class TypedScript(ABC):
     Pings a boolean.
     '''
     @abstractmethod
-    def run(self, payload=None) -> any:
+    async def run(self, payload=None) -> any:
         pass

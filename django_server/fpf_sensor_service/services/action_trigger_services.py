@@ -23,25 +23,6 @@ def get_action_trigger(action_trigger_id):
     return get_object_or_404(ActionTrigger, pk=action_trigger_id)
 
 
-def get_all_auto_timeOfDay_action_triggers(action_id=None):
-    if not action_id:
-        return ActionTrigger.objects.filter(isActive=True).exclude(type='timeOfDay')
-    else:
-        return ActionTrigger.objects.filter(
-            isActive=True,
-            action_id=action_id
-        ).exclude(type='timeOfDay')
-
-
-def get_all_auto_interval_triggers(action_id=None):
-    if not action_id:
-        return ActionTrigger.objects.filter(isActive=True).exclude(type='interval')
-    else:
-        return ActionTrigger.objects.filter(
-            isActive=True,
-            action_id=action_id
-        ).exclude(type='interval')
-
 
 def get_all_active_auto_triggers(action_id=None):
     if not action_id:
