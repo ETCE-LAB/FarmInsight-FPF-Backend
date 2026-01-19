@@ -31,3 +31,7 @@ class ActionTriggerView(APIView):
     def get(self, request, action_trigger_id):
         serializer = get_action_trigger(action_trigger_id)
         return Response(serializer.data)
+
+    def delete(self, request, action_trigger_id):
+
+        return Response(data={}, status=status.HTTP_200_OK)

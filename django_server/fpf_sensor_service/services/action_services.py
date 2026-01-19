@@ -2,6 +2,8 @@ from rest_framework.exceptions import NotFound
 
 from fpf_sensor_service.models import Action
 from fpf_sensor_service.serializers import ActionSerializer
+from fpf_sensor_service.triggers import MeasurementTriggerManager
+from .action_trigger_services import get_all_triggers_by_action_id, delete_action_trigger
 
 
 def get_actions() -> ActionSerializer:
@@ -37,7 +39,16 @@ def update_action(action_id: str, action_data: any) -> ActionSerializer:
     return serializer
 
 
-def delete_action(action: Action):
+def delete_action(action_id: str):
+    action = get_action_by_id(action_id)
+
+    triggers = get_all_triggers_by_action_id(action_id)
+
+    for trigger in triggers:
+        delete_action_trigger(trigger)
+
+    MeasurementTriggerManager.build_trigger_mapping()
+
     action.delete()
 
 

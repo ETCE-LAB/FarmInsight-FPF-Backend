@@ -43,7 +43,12 @@ def get_or_request_api_key() -> str or None:
 
 @sync_to_async
 def async_get_or_request_api_key() -> str or None:
-    return get_or_request_api_key
+    return get_or_request_api_key()
+
+
+@sync_to_async
+def async_request_api_key() -> str or None:
+    return request_api_key()
 
 
 @sync_to_async

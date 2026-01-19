@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.utils.timezone import now
 from asgiref.sync import sync_to_async
+from django.shortcuts import get_object_or_404
 
 from fpf_sensor_service.models import ActionQueue, Hardware
 from fpf_sensor_service.triggers import TriggerHandlerFactory
@@ -64,9 +65,9 @@ def get_active_state_of_hardware(hardware_id):
     return last_action
 
 
-def is_already_enqueued(trigger_id):
+def is_already_enqueued(trigger_id) -> bool:
     """
-    Return if the trigger is already enqueued in the queue but not started or finished yet.
+    Return if the trigger is already enqueued in the queue but not finished yet.
     This prevents overloading the queue with the same action multiple times.
     :param trigger_id:
     :return:
@@ -74,7 +75,7 @@ def is_already_enqueued(trigger_id):
     return ActionQueue.objects.filter(
         trigger_id=trigger_id,
         endedAt__isnull=True,
-    ).order_by('createdAt').last()
+    ).count() > 0
 
 
 #TODO: move to settings or into the ping script? could be a trigger value?
@@ -105,17 +106,22 @@ async def cancel_whole_action_chain(queue_entry: ActionQueue):
 
 async def run_ping_action(queue_entry: ActionQueue, script_class: TypedScript):
     while True:
-        result: bool = await script_class.run(queue_entry.value)
-        if result:
-            queue_entry.endedAt = now()
-            await async_safe_log('info', f"Executed successfully", extra={'action_id': queue_entry.action.id})
-            await queue_entry.asave()
+        try:
+            result: bool = await script_class.run(queue_entry.value)
+            if result:
+                queue_entry.endedAt = now()
+                await async_safe_log('info', f"Executed successfully", extra={'action_id': queue_entry.action.id})
+                await queue_entry.asave()
+                break
+            else:
+                if queue_entry.startedAt + timedelta(minutes=MAX_PING_TIME_MINUTES) < now():
+                    await async_safe_log('error', f"Ping timed out, execution cancelled.",
+                                         extra={'action_id': queue_entry.action.id})
+                    await cancel_whole_action_chain(queue_entry)
+        except Exception as e:
+            await async_safe_log('error', str(e), extra={'action_id': queue_entry.action.id})
+            await cancel_whole_action_chain(queue_entry)
             break
-        else:
-            if queue_entry.startedAt + timedelta(minutes=MAX_PING_TIME_MINUTES) < now():
-                await async_safe_log('error', f"Ping timed out, execution cancelled.",
-                                     extra={'action_id': queue_entry.action.id})
-                await cancel_whole_action_chain(queue_entry)
 
         await asyncio.sleep(PING_RETRY_DELAY_SECONDS)
 
@@ -138,16 +144,16 @@ process_tasks = set()
 
 @sync_to_async
 def get_pending_actions() -> [ActionQueue]:
-    # all these select related are required, because they have to get fetches right here and not later inside the async code
-    return list(ActionQueue.objects.filter(endedAt__isnull=True).order_by('createdAt').select_related('action', 'trigger', 'action__hardware', 'dependsOn').all())
+    # all these select related are required, because they have to get db fetches right here and not later inside the async code
+    return list(ActionQueue.objects.filter(startedAt__isnull=True, endedAt__isnull=True).order_by('createdAt').select_related('action', 'trigger', 'action__hardware', 'dependsOn').all())
 
 
 @sync_to_async
 def get_last_entry_by_hardware(hardware: Hardware) -> ActionQueue:
     return ActionQueue.objects.filter(
         action__hardware=hardware,
-        endedAt__isnull=False,
-    ).order_by('-endedAt').first()
+        startedAt__isnull=False,
+    ).order_by('-startedAt').first()
 
 
 @sync_to_async
@@ -198,7 +204,7 @@ async def process_action_queue():
                 if hardware is not None:
                     # Don't execute if another action for the same hardware is still running
                     last_entry = await get_last_entry_by_hardware(hardware)
-                    if last_entry and last_entry.endedAt > now():
+                    if last_entry and (last_entry.endedAt is None or last_entry.endedAt > now()):
                         await async_safe_log('debug', f"Skipping execution, hardware {hardware} is busy until {last_entry.endedAt}", extra={'action_id':action.id})
                         continue
 
@@ -213,19 +219,11 @@ async def process_action_queue():
                 script = typed_action_script_factory.get_typed_action_script_class(str(action.actionClassId))
                 script_class = script(action)
 
-                # Setting startedAt and endedAt right here.
-                # OVERESTIMATING the endedAt time here leniently so none of the next process_queue calls will react to it before it being truly finished
-                # only after the task has finished later, setting the actual real end time.
-                # But we do have to set it here so we don't run into any cases where we check for ended_at is null
-                # and double process the entry, that could be bad.
                 queue_entry.startedAt = now()
+                await queue_entry.asave()
                 if script_class.get_script_type() == ScriptType.PING:
-                    queue_entry.endedAt = now() + timedelta(minutes=MAX_PING_TIME_MINUTES + 1)
-                    await queue_entry.asave()
                     task = asyncio.create_task(run_ping_action(queue_entry, script_class))
                 else:
-                    queue_entry.endedAt = now() + timedelta(seconds=action.maximumDurationSeconds + 1 or 1)
-                    await queue_entry.asave()
                     task = asyncio.create_task(run_action(queue_entry, script_class))
 
                 process_tasks.add(task)
@@ -266,9 +264,13 @@ def is_new_action(action_id, trigger_id):
     return False
 
 
-def get_action_queue_for_fpf() -> ActionQueueSerializerDescriptive:
+def action_queue() -> ActionQueueSerializerDescriptive:
     queue = ActionQueue.objects.all()
     return ActionQueueSerializerDescriptive(queue, many=True)
+
+
+def action_queue_entry(entry_id: str) -> ActionQueueSerializerDescriptive:
+    return ActionQueueSerializerDescriptive(get_object_or_404(ActionQueue, pk=entry_id))
 
 
 def clear_action_queue():

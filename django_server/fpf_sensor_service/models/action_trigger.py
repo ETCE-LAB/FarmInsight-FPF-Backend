@@ -28,3 +28,4 @@ class ActionTriggerType(Enum):
     MANUAL = 'manual'
     SINGLE_SENSOR_VALUE = 'sensorValue'
     TIME_OF_DAY = 'timeOfDay'
+    INTERVAL = 'interval'

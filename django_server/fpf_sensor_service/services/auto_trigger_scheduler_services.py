@@ -25,17 +25,18 @@ class AutoTriggerScheduler:
 
     def __init__(self):
         if not getattr(self, "_initialized", False):
-            self._scheduler = BackgroundScheduler()
+            self.scheduler = BackgroundScheduler()
             self.log = get_logger()
             self._initialized = True
 
     def start(self, interval_seconds: int = 1):
-        self._scheduler.add_job(
+        self.scheduler.add_job(
             create_auto_triggered_actions_in_queue,
             trigger=IntervalTrigger(seconds=interval_seconds),
             id="auto_trigger_processing",
             replace_existing=True,
             next_run_time=timezone.now() + timedelta(seconds=1)
         )
-        self._scheduler.start()
+        self.scheduler.start()
         self.log.info(f"AutoTriggerScheduler started with interval: {interval_seconds} seconds.")
+

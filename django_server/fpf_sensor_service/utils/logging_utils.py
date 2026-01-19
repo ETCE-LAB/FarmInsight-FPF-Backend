@@ -1,7 +1,8 @@
 import logging
 import aiohttp
-from django.conf import settings
 
+from rest_framework import status
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -10,7 +11,7 @@ def get_logger():
 
 
 async def async_safe_log(level: str, message: str, extra: dict = None):
-    from fpf_sensor_service.services import async_get_or_request_api_key
+    from fpf_sensor_service.services import async_get_or_request_api_key, async_request_api_key
 
     # we can still log to std out in async, just not over the api the same way
     logger = logging.getLogger('async_safe')
@@ -36,7 +37,12 @@ async def async_safe_log(level: str, message: str, extra: dict = None):
 
     try:
         async with aiohttp.ClientSession() as session:
-            await session.get(settings.LOGGING_API_URL, json=payload, headers=headers, timeout=5)
+            async with session.post(settings.LOGGING_API_URL, json=payload, headers=headers, timeout=5) as response:
+                if response.status == status.HTTP_403_FORBIDDEN:
+                    headers = {
+                        'Authorization': f"ApiKey {await async_request_api_key()}"
+                    }
+                    await session.post(settings.LOGGING_API_URL, json=payload, headers=headers, timeout=5)
     except Exception as e:
         logger.error(e)
 

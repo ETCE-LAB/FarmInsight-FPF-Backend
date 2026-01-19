@@ -1,6 +1,5 @@
 import json
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import timedelta
 from django.utils.timezone import now
 
@@ -11,24 +10,25 @@ from .base_trigger_handlers import BaseTriggerHandler
 
 logger = get_logger()
 
-scheduler = BackgroundScheduler()
-scheduler.start()
-
 
 class IntervalTriggerHandler(BaseTriggerHandler):
     def should_trigger(self, interval, **kwargs):
         pass
 
     def enqueue_if_needed(self):
+        # doing this to reduce the amount of schedulers flying around
+        from fpf_sensor_service.services.auto_trigger_scheduler_services import AutoTriggerScheduler
+
+        job_id = f"interval_trigger_{self.trigger.id}"
+
+        scheduler = AutoTriggerScheduler.get_instance().scheduler
+        if scheduler.get_job(job_id):
+            return
+
         logic = json.loads(self.trigger.triggerLogic)
         delay = logic.get("delayInSeconds", 0)
 
         interval = delay + int(json.loads(self.trigger.action.additionalInformation).get("delay", 0))
-
-        job_id = f"interval_trigger_{self.trigger.id}"
-
-        if scheduler.get_job(job_id):
-            return
 
         scheduler.add_job(
             func=enqueue_interval_action,
@@ -48,7 +48,14 @@ def enqueue_interval_action(trigger_id):
     """
     from fpf_sensor_service.services import get_action_trigger, is_already_enqueued
 
-    trigger = get_action_trigger(trigger_id)
+    trigger = None
+    try:
+        trigger = get_action_trigger(trigger_id)
+    except:
+        # reason we do nothing here, is that when the trigger gets deleted the service cleans up this job
+        # but just in case if it were that in the time between the trigger getting removed from the DB
+        # and this job getting deleted this runs this would throw
+        pass
 
     if trigger and trigger.action.isAutomated and trigger.action.isActive:
         # Only enqueue if the action is new (there must not be a created action by the same trigger in the queue, which has not ended yet.)

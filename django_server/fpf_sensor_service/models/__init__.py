@@ -4,5 +4,5 @@ from .configuration import Configuration, ConfigurationKeys
 from .image import Image
 from .action import Action
 from .hardware import Hardware
-from .action_trigger import ActionTrigger
+from .action_trigger import ActionTrigger, ActionTriggerType
 from .action_queue import ActionQueue

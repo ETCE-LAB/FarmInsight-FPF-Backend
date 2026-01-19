@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
 
+from fpf_sensor_service.services.auto_trigger_scheduler_services import AutoTriggerScheduler
 from fpf_sensor_service.triggers import BaseTriggerHandler
 from fpf_sensor_service.utils import get_logger
-from fpf_sensor_service.models import ActionTrigger
+from fpf_sensor_service.models import ActionTrigger, ActionTriggerType
 from fpf_sensor_service.serializers import ActionTriggerSerializer, ActionQueueSerializer
 
 
@@ -23,6 +24,9 @@ def get_action_trigger(action_trigger_id):
     return get_object_or_404(ActionTrigger, pk=action_trigger_id)
 
 
+def get_all_triggers_by_action_id(action_id):
+    return ActionTrigger.objects.filter(id=action_id)
+
 
 def get_all_active_auto_triggers(action_id=None):
     if not action_id:
@@ -40,6 +44,9 @@ def update_action_trigger(action_trigger_id, data) -> ActionTriggerSerializer:
     except ActionTrigger.DoesNotExist:
         raise NotFound()
 
+    if action_trigger.type == ActionTriggerType.INTERVAL:
+        AutoTriggerScheduler.get_instance().scheduler.remove_job(f"interval_trigger_{action_trigger.id}")
+
     data["actionId"] = action_trigger.action_id
     data["id"] = action_trigger_id
     serializer = ActionTriggerSerializer(action_trigger, data=data)
@@ -49,7 +56,20 @@ def update_action_trigger(action_trigger_id, data) -> ActionTriggerSerializer:
     return serializer
 
 
-def create_manual_triggered_action_in_queue(action_id, trigger_id):
+def delete_action_trigger(trigger: ActionTrigger):
+    trigger_id = trigger.id
+    remove_interval_job = trigger.type == ActionTriggerType.INTERVAL
+
+    trigger.delete()
+
+    # the reason we delete first from the db is that the AutoTriggerScheduler runs in parallel, and it could
+    # pick up the trigger again before we delete it, but after we removed the job and that way create a new job
+    # for a trigger that got removed just a moment later
+    if remove_interval_job:
+        AutoTriggerScheduler.get_instance().scheduler.remove_job(f"interval_trigger_{trigger_id}")
+
+
+def create_manual_triggered_action_in_queue(action_id, trigger_id) -> [dict]:
     """
     When the user manually selects a manual button in the frontend, the trigger will be activated and
     an entry in the action queue will be created. If no other actions for the same controllable actions are currently
@@ -72,6 +92,7 @@ def create_manual_triggered_action_in_queue(action_id, trigger_id):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 logger.info(f"Queued by manual trigger {trigger.description} with value {trigger.actionValue}", extra={'action_id': action_id})
+                return [serializer.data]
         else:
-            BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None, trigger.actionValue.split(";"), 0,
+            return BaseTriggerHandler.enqueue_chained_actions(trigger, trigger.action, None, trigger.actionValue.split(";"), 0,
                                                        'manual')
