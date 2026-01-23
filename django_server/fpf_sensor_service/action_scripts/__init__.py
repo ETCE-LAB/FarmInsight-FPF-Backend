@@ -7,3 +7,5 @@ To disable any action scripts just comment out the line by putting a # in front 
 """
 
 from .shelly_plug_s_http_action_script import ShellyPlugHttpActionScript
+from .camera_action_script import CameraWrapperActionScript
+from. sensor_action_script import SensorWrapperActionScript

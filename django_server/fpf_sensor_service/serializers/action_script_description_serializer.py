@@ -8,6 +8,7 @@ class ActionScriptDescriptionSerializer(serializers.Serializer):
     action_script_class_id = serializers.CharField(source='script_class_id')
     name = serializers.CharField()
     description = serializers.CharField()
+    has_action_value = serializers.BooleanField()
     action_values = serializers.ListField(
         child=serializers.CharField()
     )

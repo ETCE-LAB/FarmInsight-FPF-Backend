@@ -5,3 +5,4 @@ from .action_views import ActionView, execute_action, get_action_queue, get_avai
 from .action_trigger_views import ActionTriggerView
 from .hardware_views import HardwareView, post_hardware_order
 from .ping_views import get_ping, get_value_ping
+from .mock_views import get_mock_image, get_mock_sensor_value

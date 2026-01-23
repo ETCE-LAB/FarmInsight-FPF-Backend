@@ -22,7 +22,6 @@ def get_ping(request, resource_id):
     except NotFound:
         return Response(status=HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(e)
         return Response(data={'error': f'{e}'}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response(data={'result': response}, status=HTTP_200_OK)

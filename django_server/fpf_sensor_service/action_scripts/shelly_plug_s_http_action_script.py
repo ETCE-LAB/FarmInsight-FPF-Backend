@@ -29,6 +29,7 @@ class ShellyPlugHttpActionScript(ActionScript):
             name='Shelly Plug S (HTTP)',
             description=("Turns a Shelly Plug S via HTTP calls on and off. Maximum duration in seconds adds an optional delay to reset the command after the specified time."
                          ";Steuert einen Shelly Plug S über HTTP. Maximale Dauer in Sekunden fügt eine optionale Wartezeit hinzu die das Kommando nach der angegebenen Dauer umkehrt."),
+            has_action_value=True,
             action_values=['On', 'Off'],
             fields=[
                 FieldDescription(
@@ -96,6 +97,7 @@ class ShellyPlugMqttActionScript(ActionScript):
             name='Shelly Plug S (MQTT)',
             description=("Turns a Shelly Plug S via MQTT communication on and off. MaximumDurationInSeconds adds a delay (optional) to reset the command after the specified time."
                          ";Steuert einen Shelly Plug S über MQTT. Maximale Dauer in Sekunden fügt eine optionale Wartezeit hinzu die das Kommando nach der angegebenen Dauer umkehrt."),
+            has_action_value=True,
             action_values=['On', 'Off'],
             fields=[
                 FieldDescription(

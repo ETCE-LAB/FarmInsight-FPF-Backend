@@ -10,6 +10,8 @@ The type of a field needs to be correctly validated the same as any rules applyi
 class FieldType(ListableEnum):
     INTEGER = 'int'
     STRING = 'str'
+    CAMERA_ID = 'cameraId'
+    SENSOR_ID = 'sensorId'
 
 
 class FieldDescription(NamedTuple):

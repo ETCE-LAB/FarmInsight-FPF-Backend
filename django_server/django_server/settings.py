@@ -121,6 +121,7 @@ MQTT_CONFIG = {
 
 
 LOGGING_API_URL = f'{MEASUREMENTS_BASE_URL}/api/log_messages'
+SENSOR_SERVICE_LOG_LEVEL = env('SENSOR_SERVICE_LOG_LEVEL', default='DEBUG')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -171,7 +172,7 @@ LOGGING = {
         },
         'fpf_sensor_service': {
             'handlers': ['console', 'api'],
-            'level': env('SENSOR_SERVICE_LOG_LEVEL', default='DEBUG'),
+            'level': SENSOR_SERVICE_LOG_LEVEL,
             'propagate': False,
         },
         'async_safe': {

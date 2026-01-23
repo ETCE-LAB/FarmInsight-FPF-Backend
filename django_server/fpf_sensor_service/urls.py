@@ -2,7 +2,7 @@ from django.urls import path
 from fpf_sensor_service.views import post_sensor, get_available_sensor_types, SensorView, post_fpf_id, \
     post_api_key, ActionView, execute_action, get_available_action_script_types, post_action_order, ActionTriggerView, \
     get_action_queue, HardwareView, post_hardware_order, get_ping, get_value_ping, get_clear_action_queue, \
-    get_action_queue_entry
+    get_action_queue_entry, get_mock_image, get_mock_sensor_value
 
 urlpatterns = [
     path('fpf-ids', post_fpf_id, name='post_fpf_id'),
@@ -31,4 +31,7 @@ urlpatterns = [
 
     path('pings/available/<str:resource_id>', get_ping, name='get_ping'),
     path('pings/value/<str:sensor_id>', get_value_ping, name='get_value_ping'),
+
+    path('mocks/sensor/<str:sensor_id>', get_mock_sensor_value, name='get_mock_sensor_value'),
+    path('mocks/camera/<str:camera_id>', get_mock_image, name='get_mock_image'),
 ]

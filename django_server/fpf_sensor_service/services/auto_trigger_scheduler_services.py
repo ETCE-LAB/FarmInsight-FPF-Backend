@@ -5,7 +5,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from django.utils import timezone
 
-from .action_queue_services import create_auto_triggered_actions_in_queue
 from fpf_sensor_service.utils import get_logger
 
 
@@ -30,6 +29,8 @@ class AutoTriggerScheduler:
             self._initialized = True
 
     def start(self, interval_seconds: int = 1):
+        from .action_queue_services import create_auto_triggered_actions_in_queue
+
         self.scheduler.add_job(
             create_auto_triggered_actions_in_queue,
             trigger=IntervalTrigger(seconds=interval_seconds),

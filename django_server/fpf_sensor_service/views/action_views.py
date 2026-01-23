@@ -30,7 +30,7 @@ class ActionView(views.APIView):
 
         action = create_action(request.data)
 
-        logger.info("Controllable action created successfully", extra={'fpf_id': fpf_id})
+        #logger.info("Controllable action created successfully", extra={'fpf_id': fpf_id})
 
         return Response(action.data, status=status.HTTP_201_CREATED)
 
@@ -71,8 +71,7 @@ def execute_action(request, action_id, trigger_id):
             set_is_automated(action_id, False)
             data = create_manual_triggered_action_in_queue(action_id, trigger_id)
 
-        #if active_state is not None and get_action_by_id(action_id).isAutomated == False and (active_state.trigger.id is None or active_state.trigger.id == trigger_id):
-        elif active_state is not None and (get_action_by_id(action_id).isAutomated == False and str(active_state.trigger.id) == trigger_id):
+        elif get_action_by_id(action_id).isAutomated == False and str(active_state.trigger.id) == trigger_id:
             set_is_automated(action_id, True)
 
         # The user selected a new manual trigger, different from the current active state

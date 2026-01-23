@@ -11,10 +11,27 @@ def get_logger():
 
 
 async def async_safe_log(level: str, message: str, extra: dict = None):
-    from fpf_sensor_service.services import async_get_or_request_api_key, async_request_api_key
-
     # we can still log to std out in async, just not over the api the same way
     logger = logging.getLogger('async_safe')
+
+    if level == 'debug':
+        logger.debug(message, extra=extra)
+    elif level == 'info':
+        logger.info(message, extra=extra)
+    elif level == 'error':
+        logger.error(message, extra=extra)
+
+    if settings.SENSOR_SERVICE_LOG_LEVEL.lower() == 'info':
+        if level == 'debug': return
+    elif settings.SENSOR_SERVICE_LOG_LEVEL.lower() == 'warning':
+        if level == 'debug': return
+        if level == 'info': return
+    elif settings.SENSOR_SERVICE_LOG_LEVEL.lower() == 'error':
+        if level == 'debug': return
+        if level == 'info': return
+        if level == 'warning': return
+
+    from fpf_sensor_service.services import async_get_or_request_api_key, async_request_api_key
 
     payload = {
         'message': message,
@@ -45,10 +62,3 @@ async def async_safe_log(level: str, message: str, extra: dict = None):
                     await session.post(settings.LOGGING_API_URL, json=payload, headers=headers, timeout=5)
     except Exception as e:
         logger.error(e)
-
-    if level == 'debug':
-        logger.debug(message, extra=extra)
-    elif level == 'info':
-        logger.info(payload, extra=extra)
-    elif level == 'error':
-        logger.error(message, extra=extra)
