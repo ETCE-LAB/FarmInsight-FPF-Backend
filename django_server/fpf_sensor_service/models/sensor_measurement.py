@@ -10,4 +10,4 @@ class SensorMeasurement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     sensor = models.ForeignKey(SensorConfig, on_delete=models.DO_NOTHING)
     measuredAt = models.DateTimeField(null=True, blank=True, auto_now_add=True)
-    value = models.FloatField()
+    value = models.FloatField(null =True)
