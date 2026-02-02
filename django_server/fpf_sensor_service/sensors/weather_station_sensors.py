@@ -14,8 +14,8 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -34,14 +34,14 @@ class HttpWeatherStationAirTemperatureSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -74,8 +74,8 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -94,14 +94,14 @@ class HttpWeatherStationAirHumiditySensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -134,8 +134,8 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -154,14 +154,14 @@ class HttpWeatherStationLightIntensitySensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -194,8 +194,8 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -214,14 +214,14 @@ class HttpWeatherStationUVIndexSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -254,8 +254,8 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -274,14 +274,14 @@ class HttpWeatherStationWindSpeedSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -314,8 +314,8 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -334,14 +334,14 @@ class HttpWeatherStationWindDirectionSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -374,8 +374,8 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -394,14 +394,14 @@ class HttpWeatherStationRainGaugeSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
@@ -434,8 +434,8 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
 
     def init_additional_information(self):
         additional_information = json.loads(self.sensor_config.additionalInformation)
-        self.http_endpoint = additional_information['http']
-        api_key = additional_information.get('authorization')
+        self.http_endpoint = additional_information['api id']
+        api_key = additional_information.get('api key')
         if api_key:
             self.auth_header = {"Authorization": f"Bearer {api_key}"}
         else:
@@ -454,14 +454,14 @@ class HttpWeatherStationBarometricPressureSensor(TypedSensor):
             },
             fields=[
                 FieldDescription(
-                    name='http',
+                    name='api id',
                     type=FieldType.STRING,
                     rules=[
                         ValidHttpEndpointRule(),
                     ]
                 ),
                 FieldDescription(
-                    name='authorization',
+                    name='api key',
                     type=FieldType.STRING,
                     rules=[]
                 ),
