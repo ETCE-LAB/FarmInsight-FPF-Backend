@@ -56,6 +56,8 @@ accessible through the web application.
 The FPF (Food Production Facility) Backend application collects data from all configured sensors and sends
 measurements to the FarmInsights Dashboard-Backend based on user-configured intervals.
 
+In case a FPF is unable to retrieve Measurements, a Null Value will be stored in the Influx DB.
+
 ### Built with
 
 [![Python][Python-img]][Python-url] <br>
