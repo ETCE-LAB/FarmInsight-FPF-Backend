@@ -106,7 +106,7 @@ def task(sensor: TypedSensor):
     logger.debug("Sensor task triggered", extra={'extra': {'fpfId': get_fpf_id(), 'sensorId': sensor.sensor_config.id, 'api_key': get_or_request_api_key()}})
     try:
         if settings.GENERATE_MEASUREMENTS:
-            result = MeasurementResult(value=random.uniform(20.0, 20.5))
+            result =  MeasurementResult(value=random.uniform(20.0, 20.5)) #MeasurementResult(value=None) #
         else:
             i = 0
             while i < settings.MEASUREMENT_RETRY_COUNT:
@@ -122,7 +122,7 @@ def task(sensor: TypedSensor):
                     else:
                         time.sleep(settings.MEASUREMENT_RETRY_SLEEP_BETWEEN_S)
 
-        if result.value is not None:
+        if result is not None:
             SensorMeasurement.objects.create(
                 sensor_id=sensor.sensor_config.id,
                 value=result.value,
